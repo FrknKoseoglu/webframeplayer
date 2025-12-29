@@ -1,7 +1,13 @@
+'use client';
+
 import Link from 'next/link';
 import { Tv, Github, Mail } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n';
 
 export function Footer() {
+  const { t } = useTranslation();
+  const f = t.landing.footer;
+
   return (
     <footer className="py-12 bg-[var(--iptv-background)] border-t border-white/10">
       <div className="max-w-6xl mx-auto px-6">
@@ -17,13 +23,13 @@ export function Footer() {
           {/* Links */}
           <div className="flex items-center gap-6 text-sm text-white/60">
             <Link href="/login" className="hover:text-white transition-colors">
-              Login
+              {f.login}
             </Link>
             <Link href="#features" className="hover:text-white transition-colors">
-              Features
+              {f.features}
             </Link>
             <Link href="#" className="hover:text-white transition-colors">
-              Privacy
+              {f.privacy}
             </Link>
           </div>
 
@@ -49,7 +55,7 @@ export function Footer() {
         {/* Copyright */}
         <div className="mt-8 pt-8 border-t border-white/5 text-center">
           <p className="text-sm text-white/40">
-            © {new Date().getFullYear()} Web IPTV Player. All rights reserved.
+            © {new Date().getFullYear()} {f.copyright}
           </p>
         </div>
       </div>

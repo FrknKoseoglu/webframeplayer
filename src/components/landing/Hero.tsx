@@ -1,6 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import { Play, Tv, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { useTranslation } from '@/lib/i18n';
 
 interface HeroProps {
   hasProfiles?: boolean;
@@ -8,8 +12,16 @@ interface HeroProps {
 }
 
 export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
+  const { t } = useTranslation();
+  const h = t.landing.hero;
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[var(--iptv-background)]">
+      {/* Language Switcher - Top Right */}
+      <div className="absolute top-6 right-6 z-20">
+        <LanguageSwitcher />
+      </div>
+
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--iptv-primary)]/20 via-transparent to-purple-900/20" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/20 via-transparent to-transparent" />
@@ -22,20 +34,20 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-sm text-white/70">No Download Required</span>
+          <span className="text-sm text-white/70">{h.badge}</span>
         </div>
 
         {/* Headline */}
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-          Your TV, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--iptv-primary)] to-orange-500">Anywhere.</span>
+          {h.title1.split(',')[0]}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--iptv-primary)] to-orange-500">{h.title1.split(',')[1] || 'Anywhere.'}</span>
           <br />
-          <span className="text-3xl md:text-5xl lg:text-6xl text-white/90">The Ultimate Web IPTV Player</span>
+          <span className="text-3xl md:text-5xl lg:text-6xl text-white/90">{h.title2}</span>
         </h1>
 
         {/* Subheadline */}
         <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10">
-          Stream Live TV, Movies, and Series directly in your browser. 
-          Compatible with <strong className="text-white/80">Xtream Codes</strong> and <strong className="text-white/80">M3U Playlists</strong>.
+          {h.subtitle}{' '}
+          <strong className="text-white/80">{h.compatible}</strong>
         </p>
 
         {/* CTA Buttons - Conditional based on profile state */}
@@ -46,12 +58,12 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
               <Link href="/dashboard">
                 <Button size="lg" className="bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-red-500/25 min-h-[56px]">
                   <ArrowRight className="w-5 h-5 mr-2" />
-                  Go to Dashboard
+                  {h.ctaDashboard}
                 </Button>
               </Link>
               <Link href="/login">
                 <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/5 px-8 py-6 text-lg rounded-xl min-h-[56px]">
-                  Add New Service
+                  {h.ctaNewService}
                 </Button>
               </Link>
             </>
@@ -61,12 +73,12 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
               <Link href="/login">
                 <Button size="lg" className="bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-red-500/25 min-h-[56px]">
                   <Play className="w-5 h-5 mr-2" />
-                  Start Watching Now
+                  {h.ctaStart}
                 </Button>
               </Link>
               <Link href="#features">
                 <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/5 px-8 py-6 text-lg rounded-xl min-h-[56px]">
-                  Learn More
+                  {h.ctaLearnMore}
                 </Button>
               </Link>
             </>
@@ -77,15 +89,15 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
         <div className="mt-16 flex flex-wrap justify-center gap-8 md:gap-16">
           <div className="text-center">
             <p className="text-3xl md:text-4xl font-bold text-white">M3U8</p>
-            <p className="text-sm text-white/50 mt-1">HLS Streaming</p>
+            <p className="text-sm text-white/50 mt-1">{h.statHls}</p>
           </div>
           <div className="text-center">
             <p className="text-3xl md:text-4xl font-bold text-white">Xtream</p>
-            <p className="text-sm text-white/50 mt-1">Codes Support</p>
+            <p className="text-sm text-white/50 mt-1">{h.statXtream}</p>
           </div>
           <div className="text-center">
             <p className="text-3xl md:text-4xl font-bold text-white">100%</p>
-            <p className="text-sm text-white/50 mt-1">Browser Based</p>
+            <p className="text-sm text-white/50 mt-1">{h.statBrowser}</p>
           </div>
         </div>
       </div>

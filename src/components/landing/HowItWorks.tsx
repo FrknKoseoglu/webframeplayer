@@ -1,44 +1,49 @@
-import { Link2, KeyRound, Play } from 'lucide-react';
+'use client';
 
-const steps = [
-  {
-    number: '01',
-    icon: Link2,
-    title: 'Get Your Playlist',
-    description: 'Obtain your IPTV playlist URL or Xtream Codes credentials from your provider.',
-  },
-  {
-    number: '02',
-    icon: KeyRound,
-    title: 'Enter Credentials',
-    description: 'Enter your Xtream Codes login details or paste your M3U playlist URL.',
-  },
-  {
-    number: '03',
-    icon: Play,
-    title: 'Start Streaming',
-    description: 'Enjoy instant access to Live TV, Movies, and Series. No installation needed!',
-  },
-];
+import { Link2, KeyRound, Play } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n';
 
 export function HowItWorks() {
+  const { t } = useTranslation();
+  const h = t.landing.howItWorks;
+
+  const steps = [
+    {
+      number: '01',
+      icon: Link2,
+      title: h.step1Title,
+      description: h.step1Desc,
+    },
+    {
+      number: '02',
+      icon: KeyRound,
+      title: h.step2Title,
+      description: h.step2Desc,
+    },
+    {
+      number: '03',
+      icon: Play,
+      title: h.step3Title,
+      description: h.step3Desc,
+    },
+  ];
+
   return (
     <section className="py-20 md:py-32 bg-[var(--iptv-background)]">
       <div className="max-w-5xl mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            How It Works
+            {h.title}
           </h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Get started in just 3 simple steps. No downloads, no plugins.
+            {h.subtitle}
           </p>
         </div>
 
         {/* Steps */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {steps.map((step, index) => {
-            const Icon = step.icon;
             return (
               <div key={index} className="relative text-center">
                 {/* Connector Line (hidden on mobile) */}

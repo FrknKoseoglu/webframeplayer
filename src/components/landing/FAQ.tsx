@@ -3,45 +3,29 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const faqs = [
-  {
-    question: 'Is this player free to use?',
-    answer: 'Yes! The Web IPTV Player is completely free to use. You just need your own IPTV subscription or playlist URL from your provider.',
-  },
-  {
-    question: 'Does it support MKV and MP4 files?',
-    answer: 'Yes, the player supports a wide range of formats including MKV, MP4, and HLS (M3U8) streams. Our dual player engine ensures maximum compatibility.',
-  },
-  {
-    question: 'Can I use it on iPhone or Android?',
-    answer: 'Absolutely! The Web IPTV Player is fully responsive and works on any device with a modern web browser - including iOS Safari and Android Chrome.',
-  },
-  {
-    question: 'What is Xtream Codes?',
-    answer: 'Xtream Codes is a popular IPTV panel system used by many providers. If your provider uses Xtream Codes, you can connect using your server URL, username, and password.',
-  },
-  {
-    question: 'Do I need to install anything?',
-    answer: 'No installation required! The player runs entirely in your web browser. Just enter your credentials and start watching.',
-  },
-  {
-    question: 'Is my data secure?',
-    answer: 'Your credentials are stored locally in your browser and never sent to our servers. The player connects directly to your IPTV provider.',
-  },
-];
+import { useTranslation } from '@/lib/i18n';
 
 // FAQ Schema for SEO
 export function FAQSchema() {
+  // Static English schema for SEO bots (they don't execute JS)
+  const faqs = [
+    { q: 'Is this player free to use?', a: 'Yes! The Web IPTV Player is completely free to use.' },
+    { q: 'Does it support MKV and MP4 files?', a: 'Yes, the player supports MKV, MP4, and HLS streams.' },
+    { q: 'Can I use it on iPhone or Android?', a: 'Absolutely! Works on any device with a modern browser.' },
+    { q: 'What is Xtream Codes?', a: 'Xtream Codes is a popular IPTV panel system.' },
+    { q: 'Do I need to install anything?', a: 'No installation required! Runs in your browser.' },
+    { q: 'Is my data secure?', a: 'Credentials are stored locally, never sent to our servers.' },
+  ];
+
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: faqs.map((faq) => ({
       '@type': 'Question',
-      name: faq.question,
+      name: faq.q,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: faq.answer,
+        text: faq.a,
       },
     })),
   };
@@ -56,6 +40,17 @@ export function FAQSchema() {
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const { t } = useTranslation();
+  const f = t.landing.faq;
+
+  const faqs = [
+    { question: f.q1, answer: f.a1 },
+    { question: f.q2, answer: f.a2 },
+    { question: f.q3, answer: f.a3 },
+    { question: f.q4, answer: f.a4 },
+    { question: f.q5, answer: f.a5 },
+    { question: f.q6, answer: f.a6 },
+  ];
 
   return (
     <section className="py-20 md:py-32 bg-[var(--iptv-surface-dark)]">
@@ -63,10 +58,10 @@ export function FAQ() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Frequently Asked Questions
+            {f.title}
           </h2>
           <p className="text-lg text-white/60">
-            Got questions? We've got answers.
+            {f.subtitle}
           </p>
         </div>
 

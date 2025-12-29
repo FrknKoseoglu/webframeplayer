@@ -4,6 +4,7 @@ import { get, set, del } from 'idb-keyval';
 import { useMemo } from 'react';
 import { fetchFullEpg } from '@/lib/xtream-adapter';
 import type { Profile, ContentItem, Category, ContentType, LoadingStep, EpgProgram, SearchIndexItem, Episode } from '@/types/iptv';
+import type { Language } from '@/lib/i18n';
 
 // IndexedDB Storage Adapter
 const storage: StateStorage = {
@@ -50,6 +51,9 @@ interface PlayerState {
   epgData: Record<string, EpgProgram[]>;
   lastEpgSync: number;
   selectedProgram: EpgProgram | null;
+  
+  // Language
+  language: Language;
 }
 
 // Store actions interface
@@ -88,6 +92,9 @@ interface PlayerActions {
   fetchGlobalEpg: () => Promise<void>;
   setSelectedProgram: (program: EpgProgram | null) => void;
   
+  // Language
+  setLanguage: (lang: Language) => void;
+  
   // Reset
   reset: () => void;
 }
@@ -114,6 +121,7 @@ const initialState: PlayerState = {
   epgData: {},
   lastEpgSync: 0,
   selectedProgram: null,
+  language: 'tr',
 };
 
 export const usePlayerStore = create<PlayerStore>()(
@@ -297,7 +305,14 @@ export const usePlayerStore = create<PlayerStore>()(
 
       setSelectedProgram: (program) => {
         set({ selectedProgram: program });
-      },  // Reset
+      },
+      
+      // Language
+      setLanguage: (lang) => {
+        set({ language: lang });
+      },
+      
+      // Reset
       reset: () => set(initialState),
     }),
     {
@@ -311,6 +326,7 @@ export const usePlayerStore = create<PlayerStore>()(
         content: state.content,
         categories: state.categories,
         searchIndex: state.searchIndex,
+        language: state.language,
       }),
     }
   )
