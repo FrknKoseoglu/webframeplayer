@@ -130,7 +130,7 @@ export function VodPlayer({ src, poster, title }: VodPlayerProps) {
                     value: index,
                     default: index === hls.audioTrack,
                   })),
-                  onSelect: function (item: { html: string; value: number }) {
+                  onSelect: function (item: any) {
                     hls.audioTrack = item.value;
                     return item.html;
                   },
@@ -154,7 +154,7 @@ export function VodPlayer({ src, poster, title }: VodPlayerProps) {
                   tooltip: hls.subtitleTrack === -1 ? 'Kapalı' : (hls.subtitleTracks[hls.subtitleTrack]?.name || 'Açık'),
                   icon: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>',
                   selector: subtitleOptions,
-                  onSelect: function (item: { html: string; value: number }) {
+                  onSelect: function (item: any) {
                     hls.subtitleTrack = item.value;
                     return item.html;
                   },

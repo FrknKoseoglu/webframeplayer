@@ -1,6 +1,7 @@
 'use client';
 
-import { usePlayerStore, Channel } from '@/store/usePlayerStore';
+import { usePlayerStore } from '@/store/usePlayerStore';
+import type { ContentItem } from '@/types/iptv';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,10 +16,10 @@ import { Search, Menu, Radio, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 function ChannelList() {
-  const { playlist, activeChannel, searchQuery, playChannel, setSearchQuery } = usePlayerStore();
+  const { content, activeContent, searchQuery, playContent, setSearchQuery } = usePlayerStore();
 
-  const filteredChannels = playlist.filter((channel) =>
-    channel.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredChannels = content.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()) && item.type === 'live'
   );
 
   return (
@@ -66,8 +67,8 @@ function ChannelList() {
               <ChannelItem
                 key={channel.id}
                 channel={channel}
-                isActive={activeChannel?.id === channel.id}
-                onClick={() => playChannel(channel)}
+                isActive={activeContent?.id === channel.id}
+                onClick={() => playContent(channel, true)}
               />
             ))
           )}
@@ -85,7 +86,7 @@ function ChannelList() {
 }
 
 interface ChannelItemProps {
-  channel: Channel;
+  channel: ContentItem;
   isActive: boolean;
   onClick: () => void;
 }

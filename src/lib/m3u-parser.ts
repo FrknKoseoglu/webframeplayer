@@ -118,26 +118,28 @@ export async function fetchM3UPlaylist(url: string): Promise<M3UPlaylist> {
 
 // Convert M3U playlist to unified ContentItem array
 export function convertM3UToContent(playlist: M3UPlaylist): ContentItem[] {
-  return playlist.items
-    .map((item, index) => {
-      const streamUrl = sanitizeUrl(item.url);
-      
-      // Skip items with invalid URLs
-      if (!streamUrl) {
-        return null;
-      }
+  const result: ContentItem[] = [];
+  
+  playlist.items.forEach((item, index) => {
+    const streamUrl = sanitizeUrl(item.url);
+    
+    // Skip items with invalid URLs
+    if (!streamUrl) {
+      return;
+    }
 
-      return {
-        id: `m3u_${index}_${(item.tvg?.id || item.name || 'unknown').replace(/[^a-zA-Z0-9_-]/g, '_')}`,
-        name: sanitizeString(item.name || item.tvg?.name) || 'Unknown',
-        group: sanitizeString(item.group?.title) || 'Uncategorized',
-        groupId: (item.group?.title || 'uncategorized').toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '_'),
-        logo: sanitizeLogoUrl(item.tvg?.logo),
-        url: streamUrl,
-        type: 'live' as const,
-      };
-    })
-    .filter((item): item is ContentItem => item !== null);
+    result.push({
+      id: `m3u_${index}_${(item.tvg?.id || item.name || 'unknown').replace(/[^a-zA-Z0-9_-]/g, '_')}`,
+      name: sanitizeString(item.name || item.tvg?.name) || 'Unknown',
+      group: sanitizeString(item.group?.title) || 'Uncategorized',
+      groupId: (item.group?.title || 'uncategorized').toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '_'),
+      logo: sanitizeLogoUrl(item.tvg?.logo),
+      url: streamUrl,
+      type: 'live' as const,
+    });
+  });
+
+  return result;
 }
 
 // Extract unique categories from M3U playlist
