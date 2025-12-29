@@ -1,0 +1,375 @@
+import { create } from 'zustand';
+import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
+import { get, set, del } from 'idb-keyval';
+import { useMemo } from 'react';
+import { fetchFullEpg } from '@/lib/xtream-adapter';
+import type { Profile, ContentItem, Category, ContentType, LoadingStep, EpgProgram, SearchIndexItem, Episode } from '@/types/iptv';
+
+// IndexedDB Storage Adapter
+const storage: StateStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    return (await get(name)) || null;
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    await set(name, value);
+  },
+  removeItem: async (name: string): Promise<void> => {
+    await del(name);
+  },
+};
+
+// Store state interface
+interface PlayerState {
+  // Profile management
+  profiles: Profile[];
+  activeProfile: Profile | null;
+  
+  // Content data
+  categories: Category[];
+  content: ContentItem[];
+  searchIndex: SearchIndexItem[];
+  
+  // UI state
+  favorites: string[];
+  activeCategory: string | null;
+  contentType: ContentType;
+  searchQuery: string;
+  sidebarOpen: boolean;
+  
+  // Loading state
+  isLoading: boolean;
+  loadingStep: LoadingStep;
+  loadingProgress: number;
+  
+  // Player state
+  activeContent: ContentItem | null;
+  isPlaying: boolean;
+  
+  // EPG state
+  epgData: Record<string, EpgProgram[]>;
+  lastEpgSync: number;
+  selectedProgram: EpgProgram | null;
+}
+
+// Store actions interface
+interface PlayerActions {
+  // Profile actions
+  addProfile: (profile: Profile) => void;
+  removeProfile: (id: string) => void;
+  switchProfile: (id: string) => void;
+  updateProfile: (id: string, updates: Partial<Profile>) => void;
+  
+  // Content actions
+  setCategories: (categories: Category[]) => void;
+  setContent: (content: ContentItem[]) => void;
+  appendContent: (content: ContentItem[]) => void;
+  clearContent: () => void;
+  
+  // UI actions
+  toggleFavorite: (id: string) => void;
+  setActiveCategory: (id: string | null) => void;
+  setContentType: (type: ContentType) => void;
+  setSearchQuery: (query: string) => void;
+  toggleSidebar: () => void;
+  
+  // Loading actions
+  setLoading: (isLoading: boolean, step?: LoadingStep, progress?: number) => void;
+  
+  // Player actions
+  playContent: (content: ContentItem, autoPlay?: boolean) => void;
+  playEpisode: (series: ContentItem, episode: Episode) => void;
+  startPlayback: () => void;
+  stopContent: () => void;
+  
+  // EPG actions
+  setEpgData: (channelId: string, programs: EpgProgram[]) => void;
+  fetchGlobalEpg: () => Promise<void>;
+  setSelectedProgram: (program: EpgProgram | null) => void;
+  
+  // Reset
+  reset: () => void;
+}
+
+type PlayerStore = PlayerState & PlayerActions;
+
+const initialState: PlayerState = {
+  profiles: [],
+  activeProfile: null,
+  categories: [],
+  content: [],
+  searchIndex: [],
+  favorites: [],
+  activeCategory: null,
+  contentType: 'live',
+  searchQuery: '',
+  sidebarOpen: true,
+  isLoading: false,
+  loadingStep: 'idle',
+  loadingProgress: 0,
+  activeContent: null,
+  isPlaying: false,
+  epgData: {},
+  lastEpgSync: 0,
+  selectedProgram: null,
+};
+
+export const usePlayerStore = create<PlayerStore>()(
+  persist(
+    (set, get) => ({
+      ...initialState,
+
+      // Profile actions
+      addProfile: (profile) => {
+        set((state) => ({
+          profiles: [...state.profiles, profile],
+        }));
+      },
+
+      removeProfile: (id) => {
+        set((state) => ({
+          profiles: state.profiles.filter((p) => p.id !== id),
+          activeProfile: state.activeProfile?.id === id ? null : state.activeProfile,
+        }));
+      },
+
+      switchProfile: (id) => {
+        const profile = get().profiles.find((p) => p.id === id);
+        if (profile) {
+          set((state) => ({
+            profiles: state.profiles.map((p) => ({
+              ...p,
+              active: p.id === id,
+            })),
+            activeProfile: profile,
+            // Clear content when switching profiles
+            categories: [],
+            content: [],
+            activeCategory: null,
+          }));
+        }
+      },
+
+      updateProfile: (id, updates) => {
+        set((state) => ({
+          profiles: state.profiles.map((p) =>
+            p.id === id ? { ...p, ...updates } : p
+          ),
+          activeProfile:
+            state.activeProfile?.id === id
+              ? { ...state.activeProfile, ...updates }
+              : state.activeProfile,
+        }));
+      },
+
+      // Content actions
+      setCategories: (categories) => set({ categories }),
+      
+      setContent: (content) => {
+        // Generate search index linearly
+        const searchIndex = content.map(item => ({
+          id: item.id,
+          n: item.name,
+          g: item.group,
+          t: item.type,
+          s: (item.name + ' ' + item.group).toLowerCase()
+        }));
+        
+        set({ content, searchIndex });
+      },
+      
+      appendContent: (newContent) => {
+        set((state) => {
+          const newIndex = newContent.map(item => ({
+            id: item.id,
+            n: item.name,
+            g: item.group,
+            t: item.type,
+            s: (item.name + ' ' + item.group).toLowerCase()
+          }));
+          
+          return {
+            content: [...state.content, ...newContent],
+            searchIndex: [...state.searchIndex, ...newIndex]
+          };
+        });
+      },
+      
+      clearContent: () => set({ content: [], categories: [], searchIndex: [], epgData: {} }),
+
+      // UI actions
+      toggleFavorite: (id) => {
+        set((state) => ({
+          favorites: state.favorites.includes(id)
+            ? state.favorites.filter((f) => f !== id)
+            : [...state.favorites, id],
+        }));
+      },
+
+      setActiveCategory: (id) => set({ activeCategory: id }),
+      
+      setContentType: (type) => set({ contentType: type, activeCategory: null }),
+      
+      setSearchQuery: (query) => set({ searchQuery: query }),
+      
+      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+
+      // Loading actions
+      setLoading: (isLoading, step, progress) => {
+        set((state) => ({
+          isLoading,
+          loadingStep: step || state.loadingStep,
+          loadingProgress: progress || state.loadingProgress,
+        }));
+      },
+      
+      // Player actions
+      playContent: (content, autoPlay = true) => {
+        set({ 
+          activeContent: content,
+          isPlaying: autoPlay,
+        });
+      },
+
+      playEpisode: (series, episode) => {
+        set({
+          activeContent: {
+            ...series,
+            id: `${series.id}_ep_${episode.id}`,
+            name: `${series.name} - S${episode.seasonNum}E${episode.episodeNum} - ${episode.title}`,
+            url: episode.url,
+            seasonNumber: episode.seasonNum,
+            episodeNumber: episode.episodeNum,
+          },
+          isPlaying: true,
+        });
+      },
+
+      startPlayback: () => set({ isPlaying: true }),
+      
+      stopContent: () => {
+        set({ 
+          activeContent: null, 
+          isPlaying: false,
+          activeCategory: null 
+        });
+      },
+      
+      // EPG actions
+      setEpgData: (channelId, programs) => {
+        set((state) => ({
+          epgData: { ...state.epgData, [channelId]: programs },
+        }));
+      },
+
+      fetchGlobalEpg: async () => {
+        const { activeProfile, lastEpgSync } = get();
+        if (!activeProfile?.credentials) return;
+
+        // Cache for 1 hour
+        const now = Date.now();
+        if (now - lastEpgSync < 3600000) return; 
+
+        get().setLoading(true, 'processing');
+        try {
+          const programs = await fetchFullEpg(activeProfile.credentials);
+          set((state) => ({
+            epgData: programs, // Replace or merge? Replace is safer for memory if we want to clear old stuff
+            lastEpgSync: now,
+            loadingStep: 'complete', // ensure we don't get stuck
+          }));
+        } catch (e) {
+          console.error('Global EPG fetch failed', e);
+        } finally {
+          get().setLoading(false);
+        }
+      },
+
+      setSelectedProgram: (program) => {
+        set({ selectedProgram: program });
+      },  // Reset
+      reset: () => set(initialState),
+    }),
+    {
+      name: 'iptv-player-storage',
+      storage: createJSONStorage(() => storage),
+      partialize: (state) => ({
+        profiles: state.profiles,
+        favorites: state.favorites,
+        activeProfile: state.activeProfile,
+        // Now we persist content and categories too
+        content: state.content,
+        categories: state.categories,
+        searchIndex: state.searchIndex,
+      }),
+    }
+  )
+);
+
+// Selector hooks for performance
+export const useProfiles = () => usePlayerStore((state) => state.profiles);
+export const useActiveProfile = () => usePlayerStore((state) => state.activeProfile);
+export const useContent = () => usePlayerStore((state) => state.content);
+export const useCategories = () => usePlayerStore((state) => state.categories);
+export const useFavorites = () => usePlayerStore((state) => state.favorites);
+export const useActiveContent = () => usePlayerStore((state) => state.activeContent);
+export const useIsLoading = () => usePlayerStore((state) => state.isLoading);
+
+// Filtered content selector with performance optimization
+const CONTENT_LIMIT = 100; // Max items to render at once
+
+export const useFilteredContent = () => {
+  const content = usePlayerStore((state) => state.content);
+  const searchIndex = usePlayerStore((state) => state.searchIndex);
+  const searchQuery = usePlayerStore((state) => state.searchQuery);
+  const activeCategory = usePlayerStore((state) => state.activeCategory);
+  const contentType = usePlayerStore((state) => state.contentType);
+  const favorites = usePlayerStore((state) => state.favorites);
+
+  return useMemo(() => {
+    // 1. If searching, use the lightweight search index
+    if (searchQuery && searchQuery.length > 2) {
+      const query = searchQuery.toLowerCase();
+      // Find matching IDs from index
+      const matches = searchIndex
+        .filter(item => 
+          item.t === contentType && 
+          item.s.includes(query)
+        )
+        .slice(0, CONTENT_LIMIT)
+        .map(item => item.id);
+      
+      // Map back to content objects
+      // Note: This is O(N*M) worst case but matches are usually small. 
+      // For better perf we could make content a Map, but array is needed for virtualization
+      return content.filter(item => matches.includes(item.id));
+    }
+
+    // 2. Normal filtering (category based)
+    
+    // For movies/series, require category selection
+    if ((contentType === 'movie' || contentType === 'series') && 
+        !activeCategory && activeCategory !== 'favorites') {
+      return [];
+    }
+
+    const filtered = content.filter((item) => {
+      // Filter by content type
+      if (item.type !== contentType) return false;
+
+      // Filter by category
+      if (activeCategory && activeCategory !== 'favorites' && item.groupId !== activeCategory) {
+        return false;
+      }
+
+      // Filter favorites
+      if (activeCategory === 'favorites' && !favorites.includes(item.id)) {
+        return false;
+      }
+
+      return true;
+    });
+
+    // Limit rendered items for performance
+    return filtered.slice(0, CONTENT_LIMIT);
+  }, [content, searchIndex, searchQuery, activeCategory, contentType, favorites]);
+};
