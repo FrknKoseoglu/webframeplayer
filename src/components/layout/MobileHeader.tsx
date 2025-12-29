@@ -14,13 +14,15 @@ import { usePlayerStore } from '@/store/usePlayerStore';
 import { cn } from '@/lib/utils';
 
 interface MobileHeaderProps {
-  sidebarContent: React.ReactNode;
+  sidebarContent: (closeSidebar: () => void) => React.ReactNode;
 }
 
 export function MobileHeader({ sidebarContent }: MobileHeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { searchQuery, setSearchQuery } = usePlayerStore();
+
+  const closeSidebar = () => setSidebarOpen(false);
 
   return (
     <>
@@ -94,7 +96,7 @@ export function MobileHeader({ sidebarContent }: MobileHeaderProps) {
           <SheetHeader className="sr-only">
             <SheetTitle>Navigation Menu</SheetTitle>
           </SheetHeader>
-          {sidebarContent}
+          {sidebarContent(closeSidebar)}
         </SheetContent>
       </Sheet>
     </>

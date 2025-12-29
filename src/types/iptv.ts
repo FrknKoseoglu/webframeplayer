@@ -13,6 +13,7 @@ export interface Profile {
   credentials?: XtreamCredentials;
   active: boolean;
   createdAt: number;
+  lastRefresh?: number; // Timestamp of last content refresh
 }
 
 // Content Types

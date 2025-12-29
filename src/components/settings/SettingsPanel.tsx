@@ -2,9 +2,23 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe, Gauge, Server, Plus, Trash2, Edit, AlertTriangle } from 'lucide-react';
+import { Globe, Gauge, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePlayerStore } from '@/store/usePlayerStore';
+import { 
+  authenticateXtream, 
+  getLiveCategories, 
+  getVodCategories,
+  getSeriesCategories,
+  getLiveStreams, 
+  getVodStreams,
+  getSeries,
+  convertCategories, 
+  convertLiveStreams,
+  convertVodStreams,
+  convertSeries,
+} from '@/lib/xtream-adapter';
+import { processM3UPlaylist } from '@/lib/m3u-parser';
 import { cn } from '@/lib/utils';
 
 const BUFFER_OPTIONS = [
@@ -14,10 +28,23 @@ const BUFFER_OPTIONS = [
   { id: 'high', label: { tr: 'Yüksek Gecikme', en: 'High Latency' }, desc: { tr: '~10s gecikme, stabil', en: '~10s delay, stable' } },
 ] as const;
 
+const CACHE_OPTIONS = [
+  { id: 4 as const, label: { tr: '4 Saat', en: '4 Hours' } },
+  { id: 24 as const, label: { tr: '1 Gün', en: '1 Day' } },
+  { id: 72 as const, label: { tr: '3 Gün', en: '3 Days' } },
+  { id: 168 as const, label: { tr: '7 Gün', en: '7 Days' } },
+];
+
 export function SettingsPanel() {
   const router = useRouter();
-  const { language, bufferMode, profiles, activeProfile, setLanguage, setBufferMode, removeProfile, switchProfile } = usePlayerStore();
+  const { 
+    language, bufferMode, cacheExpiry, profiles, activeProfile, 
+    setLanguage, setBufferMode, setCacheExpiry, removeProfile, switchProfile, updateProfile,
+    setCategories, setContent, setLoading
+  } = usePlayerStore();
+  
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [refreshingId, setRefreshingId] = useState<string | null>(null);
 
   const handleDeleteClick = (id: string) => {
     setDeleteConfirmId(id);
@@ -28,7 +55,6 @@ export function SettingsPanel() {
       const wasActive = activeProfile?.id === deleteConfirmId;
       removeProfile(deleteConfirmId);
       setDeleteConfirmId(null);
-      // If deleted the active profile, redirect to login
       if (wasActive) {
         router.push('/login');
       }
@@ -46,8 +72,68 @@ export function SettingsPanel() {
   };
 
   const handleEditProfile = (id: string) => {
-    // Navigate to login with edit mode (can be extended later)
     router.push(`/login?edit=${id}`);
+  };
+
+  const handleRefreshProfile = async (profile: typeof profiles[0]) => {
+    if (refreshingId) return;
+    setRefreshingId(profile.id);
+    setLoading(true, 'processing');
+
+    try {
+      if (profile.type === 'xtream' && profile.credentials) {
+        const credentials = profile.credentials;
+        
+        const [liveCategories, vodCategories, seriesCategories] = await Promise.all([
+          getLiveCategories(credentials),
+          getVodCategories(credentials),
+          getSeriesCategories(credentials),
+        ]);
+
+        const [liveStreams, vodStreams, seriesList] = await Promise.all([
+          getLiveStreams(credentials),
+          getVodStreams(credentials),
+          getSeries(credentials),
+        ]);
+
+        const categories = [
+          ...convertCategories(liveCategories, 'live'),
+          ...convertCategories(vodCategories, 'movie'),
+          ...convertCategories(seriesCategories, 'series'),
+        ];
+        const content = [
+          ...convertLiveStreams(liveStreams, credentials, liveCategories),
+          ...convertVodStreams(vodStreams, credentials, vodCategories),
+          ...convertSeries(seriesList, credentials, seriesCategories),
+        ];
+
+        setCategories(categories);
+        setContent(content);
+        updateProfile(profile.id, { lastRefresh: Date.now() });
+
+      } else if (profile.type === 'm3u' && profile.m3uUrl) {
+        const { content, categories } = await processM3UPlaylist(profile.m3uUrl);
+        setCategories(categories);
+        setContent(content);
+        updateProfile(profile.id, { lastRefresh: Date.now() });
+      }
+    } catch (err) {
+      console.error('Refresh failed:', err);
+    } finally {
+      setRefreshingId(null);
+      setLoading(false);
+    }
+  };
+
+  const formatLastRefresh = (timestamp?: number) => {
+    if (!timestamp) return language === 'tr' ? 'Hiç' : 'Never';
+    const diff = Date.now() - timestamp;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(hours / 24);
+    
+    if (days > 0) return language === 'tr' ? `${days} gün önce` : `${days} days ago`;
+    if (hours > 0) return language === 'tr' ? `${hours} saat önce` : `${hours} hours ago`;
+    return language === 'tr' ? 'Az önce' : 'Just now';
   };
 
   return (
@@ -171,6 +257,36 @@ export function SettingsPanel() {
           </div>
         </div>
 
+        {/* Cache Expiry Section */}
+        <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-orange-400" />
+            </div>
+            <div>
+              <h2 className="text-white font-semibold">{language === 'tr' ? 'Önbellek Süresi' : 'Cache Duration'}</h2>
+              <p className="text-white/50 text-sm">{language === 'tr' ? 'İçerik ne sıklıkla yenilensin' : 'How often content should refresh'}</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-4 gap-2">
+            {CACHE_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => setCacheExpiry(option.id)}
+                className={cn(
+                  'p-3 rounded-lg border text-center transition-all',
+                  cacheExpiry === option.id
+                    ? 'bg-[var(--iptv-primary)]/20 border-[var(--iptv-primary)]/50 text-white'
+                    : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
+                )}
+              >
+                <p className="font-medium text-sm">{option.label[language]}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Services Section */}
         <div className="bg-white/5 rounded-xl border border-white/10 p-5">
           <div className="flex items-center justify-between mb-4">
@@ -219,10 +335,21 @@ export function SettingsPanel() {
                       {activeProfile?.id === profile.id && (
                         <span className="ml-2 text-green-400">● {language === 'tr' ? 'Aktif' : 'Active'}</span>
                       )}
+                      <span className="ml-2 text-white/30">• {formatLastRefresh(profile.lastRefresh)}</span>
                     </p>
                   </div>
                   
                   <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => { e.stopPropagation(); handleRefreshProfile(profile); }}
+                      disabled={refreshingId === profile.id}
+                      className="h-8 w-8 text-white/40 hover:text-green-400"
+                      title={language === 'tr' ? 'Şimdi Güncelle' : 'Refresh Now'}
+                    >
+                      <RefreshCw className={cn("w-4 h-4", refreshingId === profile.id && "animate-spin")} />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -251,3 +378,4 @@ export function SettingsPanel() {
     </div>
   );
 }
+

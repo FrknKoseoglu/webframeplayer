@@ -57,6 +57,12 @@ interface PlayerState {
   
   // Buffer settings
   bufferMode: 'instant' | 'low' | 'medium' | 'high';
+  
+  // Cache settings (in hours)
+  cacheExpiry: 4 | 24 | 72 | 168; // 4h, 1d, 3d, 7d
+  
+  // Volume (0-1)
+  volume: number;
 }
 
 // Store actions interface
@@ -101,6 +107,12 @@ interface PlayerActions {
   // Buffer
   setBufferMode: (mode: 'instant' | 'low' | 'medium' | 'high') => void;
   
+  // Cache
+  setCacheExpiry: (hours: 4 | 24 | 72 | 168) => void;
+  
+  // Volume
+  setVolume: (volume: number) => void;
+  
   // Reset
   reset: () => void;
 }
@@ -129,6 +141,8 @@ const initialState: PlayerState = {
   selectedProgram: null,
   language: 'tr',
   bufferMode: 'low',
+  cacheExpiry: 24, // 1 day default
+  volume: 1, // Full volume default
 };
 
 export const usePlayerStore = create<PlayerStore>()(
@@ -324,6 +338,16 @@ export const usePlayerStore = create<PlayerStore>()(
         set({ bufferMode: mode });
       },
       
+      // Cache
+      setCacheExpiry: (hours) => {
+        set({ cacheExpiry: hours });
+      },
+      
+      // Volume
+      setVolume: (volume) => {
+        set({ volume: Math.max(0, Math.min(1, volume)) });
+      },
+      
       // Reset
       reset: () => set(initialState),
     }),
@@ -340,6 +364,8 @@ export const usePlayerStore = create<PlayerStore>()(
         searchIndex: state.searchIndex,
         language: state.language,
         bufferMode: state.bufferMode,
+        cacheExpiry: state.cacheExpiry,
+        volume: state.volume,
       }),
     }
   )

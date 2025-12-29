@@ -163,7 +163,7 @@ export default function DashboardPage() {
   }
 
   // Sidebar content for reuse in both desktop sidebar and mobile drawer
-  const SidebarContent = (
+  const SidebarContent = (closeSidebar?: () => void) => (
     <div className="flex flex-col h-full bg-[var(--iptv-surface-dark)]">
       {/* Logo - Only in mobile drawer, desktop has it inline */}
       <div className="p-4 border-b border-white/5 md:block">
@@ -248,7 +248,7 @@ export default function DashboardPage() {
       {/* Settings */}
       <div className="p-3 border-t border-white/5">
         <button 
-          onClick={() => setActiveNav('settings')}
+          onClick={() => { setActiveNav('settings'); closeSidebar?.(); }}
           className={`flex items-center gap-3 px-3 py-3 rounded-lg w-full min-h-[44px] transition-all ${
             activeNav === 'settings'
               ? 'bg-[var(--iptv-primary)] text-white'
@@ -271,7 +271,7 @@ export default function DashboardPage() {
       <MobileHeader sidebarContent={SidebarContent} />
       
       {/* Desktop Sidebar - Hidden on mobile */}
-      <aside className={`hidden md:flex ${sidebarOpen ? 'w-56' : 'w-16'} flex-shrink-0 flex-col bg-[var(--iptv-surface-dark)] border-r border-white/5 h-full transition-all duration-300`}>
+      <aside className={`hidden md:flex ${sidebarOpen ? 'w-64' : 'w-16'} flex-shrink-0 flex-col bg-[var(--iptv-surface-dark)] border-r border-white/5 h-full transition-all duration-300`}>
         {/* Logo */}
         <div className="p-4 border-b border-white/5">
           <div className="flex items-center gap-3 mb-3">
@@ -400,8 +400,8 @@ export default function DashboardPage() {
             </div>
           </div>
           
-          {/* Channel List - Full width on mobile, fixed 320px on desktop */}
-          <div className="w-full md:w-80 flex-1 md:flex-initial flex flex-col min-h-0 border-r border-white/5 bg-[var(--iptv-background)] overflow-hidden">
+          {/* Channel List - Full width on mobile, fixed 400px on desktop */}
+          <div className="w-full md:w-[400px] flex-1 md:flex-initial flex flex-col min-h-0 border-r border-white/5 bg-[var(--iptv-background)] overflow-hidden">
             {/* Search - Hidden on mobile (already in MobileHeader) */}
             <div className="hidden md:flex p-3 border-b border-white/5 items-center gap-2 shrink-0">
               <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-white/60 hover:text-white shrink-0 min-h-[44px] min-w-[44px]">
@@ -470,10 +470,10 @@ export default function DashboardPage() {
 
           {/* Col 3: Player + EPG - Hidden on mobile (shown via sticky player above) */}
           <div className="hidden md:flex flex-1 flex-col">
-            {/* Video Row: Player + Ad */}
-            <div className="shrink-0 flex bg-black">
-              {/* Video Player or Preview - 16:9 */}
-              <div className="flex-1">
+            {/* Video Row: Player */}
+            <div className="shrink-0 flex justify-start bg-black">
+              {/* Video Player or Preview - 16:9, 85% width, left aligned */}
+              <div className="w-[85%]">
                 <div className="aspect-video bg-black relative">
                   {activeContent ? (
                     activeContent.type === 'live' || isPlaying ? (
@@ -484,25 +484,10 @@ export default function DashboardPage() {
                   ) : null}
                 </div>
               </div>
-              {/* Ad Area - Hidden on smaller desktop */}
-              <div className="hidden lg:flex w-[200px] bg-[var(--iptv-surface-dark)] border-l border-white/5 flex-col items-center justify-center p-4">
-                <div className="w-full h-full border-2 border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center text-center">
-                  <span className="text-white/20 text-xs font-medium uppercase tracking-wider">Reklam Alanı</span>
-                  <span className="text-white/10 text-[10px] mt-1">300x250</span>
-                </div>
-              </div>
             </div>
 
-            {/* EPG - 2 Column Layout (Ad + EPG) */}
+            {/* EPG Section */}
             <div className="flex-1 flex min-h-0 bg-[var(--iptv-surface-dark)] overflow-hidden">
-              {/* Ad Area - Hidden on smaller screens */}
-              <div className="hidden xl:flex w-[200px] border-r border-white/5 flex-col items-center justify-center p-4 shrink-0">
-                <div className="w-full h-full border-2 border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center text-center">
-                  <span className="text-white/20 text-xs font-medium uppercase tracking-wider">Reklam</span>
-                  <span className="text-white/10 text-[10px] mt-1">160x600</span>
-                </div>
-              </div>
-
               {/* Channel Info + EPG List */}
               <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 {activeContent ? (
@@ -577,12 +562,8 @@ export default function DashboardPage() {
                             <ContentDetails content={activeContent} variant="compact" />
                           </div>
                         ) : (
-                          <div className="h-full w-full flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-xl bg-[var(--iptv-surface-dark)] text-center p-6">
-                            <span className="text-white/20 text-sm font-medium uppercase tracking-wider mb-2">Sponsor Alanı</span>
-                            <span className="text-white/10 text-xs">Bu alana reklam veya banner gelebilir</span>
-                            <div className="mt-4 px-4 py-2 bg-white/5 rounded text-white/40 text-xs">
-                              728x90 / Responsive Ads
-                            </div>
+                          <div className="h-full overflow-y-auto">
+                            <ContentDetails content={activeContent} variant="compact" />
                           </div>
                         )}
                       </div>
