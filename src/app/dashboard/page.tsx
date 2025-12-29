@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Home, Tv, Film, Video, Heart, Settings, Search, Menu, X, 
-  Play, Radio 
+  Play, Radio, ChevronDown 
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { LoadingBar } from '@/components/ui/LoadingBar';
 import { EpgPopup } from '@/components/epg/EpgPopup';
 import { ContentDetails } from '@/components/details/ContentDetails';
 import { SeriesInfoPanel } from '@/components/details/SeriesInfoPanel';
+import { HomeView } from '@/components/home/HomeView';
 import { getShortEPG, convertEpgListings } from '@/lib/xtream-adapter';
 import type { ContentType, ContentItem, Category, EpgProgram } from '@/types/iptv';
 
@@ -64,7 +65,8 @@ export default function DashboardPage() {
   } = usePlayerStore();
 
   const filteredContent = useFilteredContent();
-  const [activeNav, setActiveNav] = useState<string>('live');
+  const [activeNav, setActiveNav] = useState<string>('home');
+  const profiles = usePlayerStore((s) => s.profiles);
 
   useEffect(() => {
     if (!activeProfile) {
@@ -78,11 +80,22 @@ export default function DashboardPage() {
 
   const handleNavClick = (item: NavItem) => {
     setActiveNav(item.id);
-    if (item.special === 'favorites') {
+    if (item.special === 'home') {
+      // Stay on home, don't change content type
+    } else if (item.special === 'favorites') {
       setActiveCategory('favorites');
     } else if (item.contentType) {
       setContentType(item.contentType);
       setActiveCategory(null);
+    }
+  };
+
+  const handleHomeNavigate = (nav: string) => {
+    const navItem = NAV_ITEMS.find(n => n.id === nav);
+    if (navItem) {
+      handleNavClick(navItem);
+    } else if (nav === 'settings') {
+      // Handle settings
     }
   };
 
@@ -149,11 +162,24 @@ export default function DashboardPage() {
       {/* Col 1: Sidebar */}
       <aside className={`${sidebarOpen ? 'w-56' : 'w-16'} flex-shrink-0 flex flex-col bg-[var(--iptv-surface-dark)] border-r border-white/5 h-full transition-all duration-300`}>
         {/* Logo */}
-        <div className="p-4 flex items-center gap-3 border-b border-white/5">
-          <div className="w-10 h-10 rounded-full bg-[var(--iptv-primary)] flex items-center justify-center shrink-0">
-            <Tv className="w-5 h-5 text-white" />
+        <div className="p-4 border-b border-white/5">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-[var(--iptv-primary)] flex items-center justify-center shrink-0">
+              <Tv className="w-5 h-5 text-white" />
+            </div>
+            {sidebarOpen && <span className="text-white font-bold">IPTV Player</span>}
           </div>
-          {sidebarOpen && <span className="text-white font-bold">IPTV Player</span>}
+          
+          {/* Service Selector */}
+          {sidebarOpen && profiles.length > 1 && (
+            <button 
+              onClick={() => router.push('/login')}
+              className="w-full flex items-center justify-between px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors"
+            >
+              <span className="text-sm text-white/80 truncate">{activeProfile?.name}</span>
+              <ChevronDown className="w-4 h-4 text-white/40 shrink-0" />
+            </button>
+          )}
         </div>
 
         {/* Navigation */}
@@ -213,8 +239,16 @@ export default function DashboardPage() {
         </div>
       </aside>
 
-      {/* Col 2: Channel List */}
-      <div className="w-80 flex flex-col border-r border-white/5 bg-[var(--iptv-background)]">
+      {/* Main Content Area - Conditional based on activeNav */}
+      {activeNav === 'home' ? (
+        /* Home View - Full width, no ads */
+        <div className="flex-1">
+          <HomeView onNavigate={handleHomeNavigate} />
+        </div>
+      ) : (
+        <>
+        {/* Col 2: Channel List */}
+        <div className="w-80 flex flex-col border-r border-white/5 bg-[var(--iptv-background)]">
         {/* Search */}
         <div className="p-3 border-b border-white/5 flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-white/60 hover:text-white shrink-0">
@@ -412,6 +446,8 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }
