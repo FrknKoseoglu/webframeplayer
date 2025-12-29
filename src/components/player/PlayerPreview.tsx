@@ -82,73 +82,87 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
-        {/* Left Side: Info */}
-        <div className="flex-1 flex flex-col justify-end p-8 md:p-12 min-w-0">
-          <div className="max-w-2xl animate-fade-in-up">
-            {/* Metadata */}
-            <div className="flex items-center gap-3 mb-4 text-sm font-medium">
-              {content.rating && (
-                <div className="flex items-center gap-1.5 text-yellow-500">
-                  <Star className="w-4 h-4 fill-current" />
-                  <span>{content.rating}</span>
-                </div>
-              )}
-              {content.year && (
-                <span className="text-white/80 border-l border-white/20 pl-3">{content.year}</span>
-              )}
-              {content.duration && (
-                <span className="text-white/80 border-l border-white/20 pl-3">{formatDuration(content.duration)}</span>
-              )}
-              <span className="text-[var(--iptv-primary)] font-bold border-l border-white/20 pl-3 uppercase tracking-wider">
-                {content.type === 'series' ? 'Di̇zi̇' : 'Fi̇lm'}
-              </span>
+        {/* Left Side: Poster + Info */}
+        <div className="flex-1 flex gap-6 p-8 md:p-12 min-w-0 overflow-hidden">
+          {/* Poster Image */}
+          {content.logo && (
+            <div className="hidden md:block shrink-0 w-48">
+              <img 
+                src={content.logo} 
+                alt={content.name}
+                className="w-full h-auto rounded-xl shadow-2xl object-cover"
+              />
             </div>
+          )}
+          
+          {/* Info */}
+          <div className="flex-1 flex flex-col justify-end min-w-0">
+            <div className="max-w-2xl animate-fade-in-up">
+              {/* Metadata */}
+              <div className="flex items-center gap-3 mb-4 text-sm font-medium">
+                {content.rating && (
+                  <div className="flex items-center gap-1.5 text-yellow-500">
+                    <Star className="w-4 h-4 fill-current" />
+                    <span>{content.rating}</span>
+                  </div>
+                )}
+                {content.year && (
+                  <span className="text-white/80 border-l border-white/20 pl-3">{content.year}</span>
+                )}
+                {content.duration && (
+                  <span className="text-white/80 border-l border-white/20 pl-3">{formatDuration(content.duration)}</span>
+                )}
+                <span className="text-[var(--iptv-primary)] font-bold border-l border-white/20 pl-3 uppercase tracking-wider">
+                  {content.type === 'series' ? 'Di̇zi̇' : 'Fi̇lm'}
+                </span>
+              </div>
 
-            {/* Title */}
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-xl truncate">
-              {content.name}
-            </h1>
+              {/* Title - Full display, no truncate */}
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight drop-shadow-xl">
+                {content.name}
+              </h1>
 
-            {/* Plot */}
-            <p className="text-white/80 text-lg mb-8 line-clamp-3 leading-relaxed max-w-2xl">
-              {content.plot || "Açıklama bulunmuyor."}
-            </p>
+              {/* Plot */}
+              <p className="text-white/80 text-base mb-6 line-clamp-3 leading-relaxed max-w-2xl">
+                {content.plot || "Açıklama bulunmuyor."}
+              </p>
 
-            {/* Actions (Movies only, or quick play for series) */}
-            <div className="flex items-center gap-4">
-              {content.type === 'movie' && (
-                <Button 
-                  size="lg"
-                  onClick={startPlayback}
-                  className="h-14 px-8 bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary)]/90 text-white rounded-xl gap-3 text-lg font-semibold shadow-lg shadow-[var(--iptv-primary)]/20 transition-all hover:scale-105"
-                >
-                  <Play className="w-6 h-6 fill-current" />
-                  HEMEN İZLE
-                </Button>
-              )}
+              {/* Actions (Movies only, or quick play for series) */}
+              <div className="flex items-center gap-4">
+                {content.type === 'movie' && (
+                  <Button 
+                    size="lg"
+                    onClick={startPlayback}
+                    className="h-14 px-8 bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary)]/90 text-white rounded-xl gap-3 text-lg font-semibold shadow-lg shadow-[var(--iptv-primary)]/20 transition-all hover:scale-105"
+                  >
+                    <Play className="w-6 h-6 fill-current" />
+                    HEMEN İZLE
+                  </Button>
+                )}
 
-              {content.type === 'movie' && content.downloadUrl && (
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  onClick={handleDownload}
-                  className="h-14 px-8 border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl gap-3 text-lg font-semibold backdrop-blur-sm transition-all hover:scale-105"
-                >
-                  <Download className="w-6 h-6" />
-                  İNDİR
-                </Button>
-              )}
-              
-              {content.type === 'series' && seasons.length === 0 && !loading && (
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  className="h-14 px-8 border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl gap-2 backdrop-blur-sm"
-                >
-                  <Lock className="w-5 h-5 text-white/60" />
-                  <span className="text-white/80">FRAGMAN (YAKINDA)</span>
-                </Button>
-              )}
+                {content.type === 'movie' && content.downloadUrl && (
+                  <Button 
+                    size="lg"
+                    variant="outline"
+                    onClick={handleDownload}
+                    className="h-14 px-8 border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl gap-3 text-lg font-semibold backdrop-blur-sm transition-all hover:scale-105"
+                  >
+                    <Download className="w-6 h-6" />
+                    İNDİR
+                  </Button>
+                )}
+                
+                {content.type === 'series' && seasons.length === 0 && !loading && (
+                  <Button 
+                    size="lg"
+                    variant="outline"
+                    className="h-14 px-8 border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl gap-2 backdrop-blur-sm"
+                  >
+                    <Lock className="w-5 h-5 text-white/60" />
+                    <span className="text-white/80">FRAGMAN (YAKINDA)</span>
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>

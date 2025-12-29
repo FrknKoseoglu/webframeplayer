@@ -31,6 +31,7 @@ interface PlayerState {
   
   // UI state
   favorites: string[];
+  hiddenGroups: string[];
   activeCategory: string | null;
   contentType: ContentType;
   searchQuery: string;
@@ -67,6 +68,7 @@ interface PlayerActions {
   
   // UI actions
   toggleFavorite: (id: string) => void;
+  toggleHiddenGroup: (groupId: string) => void;
   setActiveCategory: (id: string | null) => void;
   setContentType: (type: ContentType) => void;
   setSearchQuery: (query: string) => void;
@@ -99,6 +101,7 @@ const initialState: PlayerState = {
   content: [],
   searchIndex: [],
   favorites: [],
+  hiddenGroups: [],
   activeCategory: null,
   contentType: 'live',
   searchQuery: '',
@@ -202,6 +205,14 @@ export const usePlayerStore = create<PlayerStore>()(
           favorites: state.favorites.includes(id)
             ? state.favorites.filter((f) => f !== id)
             : [...state.favorites, id],
+        }));
+      },
+
+      toggleHiddenGroup: (groupId) => {
+        set((state) => ({
+          hiddenGroups: state.hiddenGroups.includes(groupId)
+            ? state.hiddenGroups.filter((g) => g !== groupId)
+            : [...state.hiddenGroups, groupId],
         }));
       },
 
@@ -324,6 +335,7 @@ export const useFilteredContent = () => {
   const activeCategory = usePlayerStore((state) => state.activeCategory);
   const contentType = usePlayerStore((state) => state.contentType);
   const favorites = usePlayerStore((state) => state.favorites);
+  const hiddenGroups = usePlayerStore((state) => state.hiddenGroups);
 
   return useMemo(() => {
     // 1. If searching, use the lightweight search index
@@ -333,7 +345,8 @@ export const useFilteredContent = () => {
       const matches = searchIndex
         .filter(item => 
           item.t === contentType && 
-          item.s.includes(query)
+          item.s.includes(query) &&
+          !hiddenGroups.includes(content.find(c => c.id === item.id)?.groupId || '')
         )
         .slice(0, CONTENT_LIMIT)
         .map(item => item.id);
@@ -356,6 +369,9 @@ export const useFilteredContent = () => {
       // Filter by content type
       if (item.type !== contentType) return false;
 
+      // Filter hidden groups
+      if (item.groupId && hiddenGroups.includes(item.groupId)) return false;
+
       // Filter by category
       if (activeCategory && activeCategory !== 'favorites' && item.groupId !== activeCategory) {
         return false;
@@ -371,5 +387,5 @@ export const useFilteredContent = () => {
 
     // Limit rendered items for performance
     return filtered.slice(0, CONTENT_LIMIT);
-  }, [content, searchIndex, searchQuery, activeCategory, contentType, favorites]);
+  }, [content, searchIndex, searchQuery, activeCategory, contentType, favorites, hiddenGroups]);
 };

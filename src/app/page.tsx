@@ -1,33 +1,33 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { usePlayerStore } from '@/store/usePlayerStore';
-import { Loader2 } from 'lucide-react';
+import { Hero, Features, HowItWorks, FAQ, FAQSchema, Footer } from '@/components/landing';
 
 export default function Home() {
-  const router = useRouter();
-  const { activeProfile, profiles } = usePlayerStore();
+  const [hasProfiles, setHasProfiles] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // If there's an active profile, go to dashboard
-    if (activeProfile) {
-      router.replace('/dashboard');
-      return;
-    }
+    // Check for existing profiles on client side (after hydration)
+    const state = usePlayerStore.getState();
+    setHasProfiles(state.profiles && state.profiles.length > 0);
+    setIsHydrated(true);
+  }, []);
 
-    // If there are saved profiles but none active, go to login to select
-    // If no profiles at all, go to login to create one
-    router.replace('/login');
-  }, [activeProfile, profiles, router]);
-
-  // Loading state while redirecting
   return (
-    <div className="min-h-screen bg-[var(--iptv-background)] flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 className="w-8 h-8 text-[var(--iptv-primary)] animate-spin" />
-        <p className="text-white/60 text-sm">Yükleniyor...</p>
-      </div>
-    </div>
+    <>
+      {/* FAQ Schema for SEO */}
+      <FAQSchema />
+
+      {/* Landing Page Content - visible to everyone */}
+      <main>
+        <Hero hasProfiles={hasProfiles} isHydrated={isHydrated} />
+        <Features />
+        <HowItWorks />
+        <FAQ />
+        <Footer />
+      </main>
+    </>
   );
 }

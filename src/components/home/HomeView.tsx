@@ -74,40 +74,47 @@ export function HomeView({ onNavigate, backgroundImage }: HomeViewProps) {
       )}
 
       {/* Content */}
-      <div className="relative z-10 h-full flex flex-col justify-center p-12">
+      <div className="relative z-10 h-full flex flex-col justify-center p-6 md:p-12 overflow-auto">
         {/* Welcome Text */}
-        <div className="mb-12">
-          <h1 className="text-5xl font-bold text-white mb-4">
+        <div className="mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 md:mb-4">
             Hoş Geldiniz, <span className="text-[var(--iptv-primary)]">{activeProfile?.name}</span>
           </h1>
-          <p className="text-xl text-white/60">
+          <p className="text-lg md:text-xl text-white/60">
             İzlemek istediğiniz kategoriyi seçin
           </p>
         </div>
 
         {/* Category Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-5xl">
           {categories.map((cat) => {
             const Icon = cat.icon;
+            const isEmpty = cat.count === 0;
             return (
               <button
                 key={cat.id}
-                onClick={() => onNavigate(cat.id)}
-                className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 text-left"
+                onClick={() => {
+                  if (isEmpty && (cat.id === 'movies' || cat.id === 'series')) {
+                    alert(`Bu hizmette ${cat.label.toLowerCase()} mevcut değildir.`);
+                    return;
+                  }
+                  onNavigate(cat.id);
+                }}
+                className={`group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 md:p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 text-left min-h-[120px] md:min-h-[160px] ${isEmpty ? 'opacity-60' : ''}`}
               >
                 {/* Icon */}
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <Icon className="w-7 h-7 text-white" />
+                <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center mb-3 md:mb-4 group-hover:scale-110 transition-transform`}>
+                  <Icon className="w-5 h-5 md:w-7 md:h-7 text-white" />
                 </div>
 
                 {/* Label */}
-                <h3 className="text-xl font-bold text-white mb-1">{cat.label}</h3>
-                <p className="text-sm text-white/50">{cat.description}</p>
+                <h3 className="text-base md:text-xl font-bold text-white mb-1">{cat.label}</h3>
+                <p className="text-xs md:text-sm text-white/50 hidden sm:block">{cat.description}</p>
 
                 {/* Count Badge */}
                 {cat.count !== null && (
-                  <div className="absolute top-4 right-4 px-2 py-1 bg-white/10 rounded-lg">
-                    <span className="text-xs font-medium text-white/70">{cat.count.toLocaleString()}</span>
+                  <div className={`absolute top-3 right-3 md:top-4 md:right-4 px-2 py-1 rounded-lg ${isEmpty ? 'bg-red-500/20' : 'bg-white/10'}`}>
+                    <span className={`text-xs font-medium ${isEmpty ? 'text-red-300' : 'text-white/70'}`}>{cat.count.toLocaleString()}</span>
                   </div>
                 )}
               </button>
@@ -116,18 +123,18 @@ export function HomeView({ onNavigate, backgroundImage }: HomeViewProps) {
         </div>
 
         {/* Quick Stats */}
-        <div className="mt-12 flex gap-8 text-white/40">
+        <div className="mt-8 md:mt-12 flex flex-wrap gap-4 md:gap-8 text-white/40">
           <div>
-            <span className="text-3xl font-bold text-white">{content.filter(c => c.type === 'live').length}</span>
-            <span className="ml-2 text-sm">Canlı Kanal</span>
+            <span className="text-2xl md:text-3xl font-bold text-white">{content.filter(c => c.type === 'live').length}</span>
+            <span className="ml-2 text-xs md:text-sm">Canlı Kanal</span>
           </div>
           <div>
-            <span className="text-3xl font-bold text-white">{content.filter(c => c.type === 'movie').length}</span>
-            <span className="ml-2 text-sm">Film</span>
+            <span className="text-2xl md:text-3xl font-bold text-white">{content.filter(c => c.type === 'movie').length}</span>
+            <span className="ml-2 text-xs md:text-sm">Film</span>
           </div>
           <div>
-            <span className="text-3xl font-bold text-white">{content.filter(c => c.type === 'series').length}</span>
-            <span className="ml-2 text-sm">Dizi</span>
+            <span className="text-2xl md:text-3xl font-bold text-white">{content.filter(c => c.type === 'series').length}</span>
+            <span className="ml-2 text-xs md:text-sm">Dizi</span>
           </div>
         </div>
       </div>
