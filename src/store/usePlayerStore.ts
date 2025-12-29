@@ -54,6 +54,9 @@ interface PlayerState {
   
   // Language
   language: Language;
+  
+  // Buffer settings
+  bufferMode: 'instant' | 'low' | 'medium' | 'high';
 }
 
 // Store actions interface
@@ -95,6 +98,9 @@ interface PlayerActions {
   // Language
   setLanguage: (lang: Language) => void;
   
+  // Buffer
+  setBufferMode: (mode: 'instant' | 'low' | 'medium' | 'high') => void;
+  
   // Reset
   reset: () => void;
 }
@@ -122,6 +128,7 @@ const initialState: PlayerState = {
   lastEpgSync: 0,
   selectedProgram: null,
   language: 'tr',
+  bufferMode: 'low',
 };
 
 export const usePlayerStore = create<PlayerStore>()(
@@ -312,6 +319,11 @@ export const usePlayerStore = create<PlayerStore>()(
         set({ language: lang });
       },
       
+      // Buffer
+      setBufferMode: (mode) => {
+        set({ bufferMode: mode });
+      },
+      
       // Reset
       reset: () => set(initialState),
     }),
@@ -327,6 +339,7 @@ export const usePlayerStore = create<PlayerStore>()(
         categories: state.categories,
         searchIndex: state.searchIndex,
         language: state.language,
+        bufferMode: state.bufferMode,
       }),
     }
   )

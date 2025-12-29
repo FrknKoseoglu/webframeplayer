@@ -19,6 +19,7 @@ import { ContentDetails } from '@/components/details/ContentDetails';
 import { SeriesInfoPanel } from '@/components/details/SeriesInfoPanel';
 import { HomeView } from '@/components/home/HomeView';
 import { MobileHeader } from '@/components/layout/MobileHeader';
+import { SettingsPanel } from '@/components/settings/SettingsPanel';
 import { getShortEPG, convertEpgListings } from '@/lib/xtream-adapter';
 import type { ContentType, ContentItem, Category, EpgProgram } from '@/types/iptv';
 
@@ -220,17 +221,17 @@ export default function DashboardPage() {
                   {filteredCategories.map((cat, index) => (
                     <div
                       key={`${cat.id}_${index}`}
-                      className={`flex items-center gap-2 px-3 py-3 rounded-lg text-sm min-h-[44px] ${activeCategory === cat.id ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5'}`}
+                      className={`category-item flex items-center gap-2 px-3 py-3 rounded-lg text-sm min-h-[44px] overflow-hidden ${activeCategory === cat.id ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5'}`}
                     >
                       <button
                         onClick={() => handleCategoryClick(cat)}
-                        className="flex-1 text-left truncate hover:text-white"
+                        className="flex-1 text-left hover:text-white overflow-hidden"
                       >
-                        {cat.name}
+                        <span className="category-text block">{cat.name}</span>
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleHiddenGroup(cat.id); }}
-                        className={`p-2 rounded hover:bg-white/10 min-w-[44px] min-h-[44px] flex items-center justify-center ${hiddenGroups.includes(cat.id) ? 'text-red-400' : 'text-white/30 hover:text-white/60'}`}
+                        className={`p-2 rounded hover:bg-white/10 min-w-[44px] min-h-[44px] flex items-center justify-center shrink-0 ${hiddenGroups.includes(cat.id) ? 'text-red-400' : 'text-white/30 hover:text-white/60'}`}
                         title={hiddenGroups.includes(cat.id) ? 'Grubu göster' : 'Grubu gizle'}
                       >
                         {hiddenGroups.includes(cat.id) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -246,7 +247,14 @@ export default function DashboardPage() {
 
       {/* Settings */}
       <div className="p-3 border-t border-white/5">
-        <button className="flex items-center gap-3 px-3 py-3 rounded-lg text-white/60 hover:text-white hover:bg-white/5 w-full min-h-[44px]">
+        <button 
+          onClick={() => setActiveNav('settings')}
+          className={`flex items-center gap-3 px-3 py-3 rounded-lg w-full min-h-[44px] transition-all ${
+            activeNav === 'settings'
+              ? 'bg-[var(--iptv-primary)] text-white'
+              : 'text-white/60 hover:text-white hover:bg-white/5'
+          }`}
+        >
           <Settings className="w-5 h-5" />
           <span className="text-sm">Ayarlar</span>
         </button>
@@ -320,17 +328,17 @@ export default function DashboardPage() {
                     {filteredCategories.map((cat, index) => (
                       <div
                         key={`${cat.id}_${index}`}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${activeCategory === cat.id ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5'}`}
+                        className={`category-item flex items-center gap-2 px-3 py-2 rounded-lg text-sm overflow-hidden ${activeCategory === cat.id ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5'}`}
                       >
                         <button
                           onClick={() => handleCategoryClick(cat)}
-                          className="flex-1 text-left truncate hover:text-white"
+                          className="flex-1 text-left hover:text-white overflow-hidden"
                         >
-                          {cat.name}
+                          <span className="category-text block">{cat.name}</span>
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); toggleHiddenGroup(cat.id); }}
-                          className={`p-1 rounded hover:bg-white/10 ${hiddenGroups.includes(cat.id) ? 'text-red-400' : 'text-white/30 hover:text-white/60'}`}
+                          className={`p-1 rounded hover:bg-white/10 shrink-0 ${hiddenGroups.includes(cat.id) ? 'text-red-400' : 'text-white/30 hover:text-white/60'}`}
                           title={hiddenGroups.includes(cat.id) ? 'Grubu göster' : 'Grubu gizle'}
                         >
                           {hiddenGroups.includes(cat.id) ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -346,7 +354,14 @@ export default function DashboardPage() {
 
         {/* Settings */}
         <div className="p-3 border-t border-white/5">
-          <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 w-full">
+          <button 
+            onClick={() => setActiveNav('settings')}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg w-full transition-all ${
+              activeNav === 'settings'
+                ? 'bg-[var(--iptv-primary)] text-white'
+                : 'text-white/60 hover:text-white hover:bg-white/5'
+            }`}
+          >
             <Settings className="w-5 h-5" />
             {sidebarOpen && <span className="text-sm">Ayarlar</span>}
           </button>
@@ -358,6 +373,11 @@ export default function DashboardPage() {
         /* Home View - Full width, no ads */
         <div className="flex-1 overflow-auto">
           <HomeView onNavigate={handleHomeNavigate} />
+        </div>
+      ) : activeNav === 'settings' ? (
+        /* Settings Panel - Full width */
+        <div className="flex-1 overflow-auto">
+          <SettingsPanel />
         </div>
       ) : (
         /* Mobile: flex-col (player on top, content below) | Desktop: flex-row */

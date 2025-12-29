@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Tv, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -27,13 +27,15 @@ type LoginTab = 'xtream' | 'm3u';
 
 interface LoginScreenProps {
   onBack?: () => void;
+  editProfile?: Profile;
 }
 
-export function LoginScreen({ onBack }: LoginScreenProps) {
+export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
   const router = useRouter();
-  const { addProfile, switchProfile, setCategories, setContent, setLoading } = usePlayerStore();
+  const { addProfile, updateProfile, switchProfile, setCategories, setContent, setLoading } = usePlayerStore();
   
-  const [activeTab, setActiveTab] = useState<LoginTab>('xtream');
+  const isEditMode = !!editProfile;
+  const [activeTab, setActiveTab] = useState<LoginTab>(editProfile?.type === 'm3u' ? 'm3u' : 'xtream');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState<LoadingStep>('idle');
@@ -48,6 +50,23 @@ export function LoginScreen({ onBack }: LoginScreenProps) {
   // M3U form state
   const [m3uUrl, setM3uUrl] = useState('');
   const [m3uName, setM3uName] = useState('');
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (editProfile) {
+      if (editProfile.type === 'xtream' && editProfile.credentials) {
+        setServiceName(editProfile.name);
+        setXtreamUrl(editProfile.credentials.url);
+        setXtreamUsername(editProfile.credentials.username);
+        setXtreamPassword(editProfile.credentials.password);
+        setActiveTab('xtream');
+      } else if (editProfile.type === 'm3u' && editProfile.m3uUrl) {
+        setM3uName(editProfile.name);
+        setM3uUrl(editProfile.m3uUrl);
+        setActiveTab('m3u');
+      }
+    }
+  }, [editProfile]);
 
   const updateStep = (step: LoadingStep) => {
     setLoadingStep(step);
@@ -107,19 +126,28 @@ export function LoginScreen({ onBack }: LoginScreenProps) {
         ...convertSeries(seriesList, credentials, seriesCategories),
       ];
 
-      // Create profile with custom name
-      const profile: Profile = {
-        id: crypto.randomUUID(),
-        name: serviceName || authResponse.user_info.username || 'Xtream Hizmet',
-        type: 'xtream',
-        credentials,
-        active: true,
-        createdAt: Date.now(),
-      };
-
-      // Save to store
-      addProfile(profile);
-      switchProfile(profile.id);
+      // Create or update profile
+      if (isEditMode && editProfile) {
+        // Update existing profile
+        updateProfile(editProfile.id, {
+          name: serviceName || authResponse.user_info.username || 'Xtream Hizmet',
+          credentials,
+        });
+        switchProfile(editProfile.id);
+      } else {
+        // Create new profile
+        const profile: Profile = {
+          id: crypto.randomUUID(),
+          name: serviceName || authResponse.user_info.username || 'Xtream Hizmet',
+          type: 'xtream',
+          credentials,
+          active: true,
+          createdAt: Date.now(),
+        };
+        addProfile(profile);
+        switchProfile(profile.id);
+      }
+      
       setCategories(categories);
       setContent(content);
 
@@ -149,19 +177,28 @@ export function LoginScreen({ onBack }: LoginScreenProps) {
       
       const { content, categories } = await processM3UPlaylist(m3uUrl);
 
-      // Create profile
-      const profile: Profile = {
-        id: crypto.randomUUID(),
-        name: m3uName || 'M3U Playlist',
-        type: 'm3u',
-        m3uUrl,
-        active: true,
-        createdAt: Date.now(),
-      };
-
-      // Save to store
-      addProfile(profile);
-      switchProfile(profile.id);
+      // Create or update profile
+      if (isEditMode && editProfile) {
+        // Update existing profile
+        updateProfile(editProfile.id, {
+          name: m3uName || 'M3U Playlist',
+          m3uUrl,
+        });
+        switchProfile(editProfile.id);
+      } else {
+        // Create new profile
+        const profile: Profile = {
+          id: crypto.randomUUID(),
+          name: m3uName || 'M3U Playlist',
+          type: 'm3u',
+          m3uUrl,
+          active: true,
+          createdAt: Date.now(),
+        };
+        addProfile(profile);
+        switchProfile(profile.id);
+      }
+      
       setCategories(categories);
       setContent(content);
 
@@ -198,10 +235,10 @@ export function LoginScreen({ onBack }: LoginScreenProps) {
               <Tv className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-white">
-              {onBack ? 'Yeni Hizmet Ekle' : 'IPTV Player'}
+              {isEditMode ? 'Hizmeti Düzenle' : onBack ? 'Yeni Hizmet Ekle' : 'IPTV Player'}
             </h1>
             <p className="text-gray-400 text-sm font-medium">
-              {onBack ? 'Yeni bir IPTV hizmeti ekleyin' : 'Hesabınıza giriş yaparak yayınların keyfini çıkarın'}
+              {isEditMode ? 'Hizmet bilgilerini güncelleyin' : onBack ? 'Yeni bir IPTV hizmeti ekleyin' : 'Hesabınıza giriş yaparak yayınların keyfini çıkarın'}
             </p>
             {onBack && (
               <Button
@@ -352,7 +389,7 @@ export function LoginScreen({ onBack }: LoginScreenProps) {
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      <span>Giriş Yap</span>
+                      <span>{isEditMode ? 'Güncelle' : 'Giriş Yap'}</span>
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </>
                   )}
@@ -401,7 +438,7 @@ export function LoginScreen({ onBack }: LoginScreenProps) {
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      <span>Listeyi Yükle</span>
+                      <span>{isEditMode ? 'Güncelle' : 'Listeyi Yükle'}</span>
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </>
                   )}

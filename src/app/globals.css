@@ -250,3 +250,26 @@ html, body {
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
+
+/* Category text marquee animation on hover */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-100% + 140px));
+  }
+}
+
+.category-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.category-item:hover .category-text {
+  overflow: visible;
+  text-overflow: unset;
+  animation: marquee 3s linear infinite alternate;
+}
