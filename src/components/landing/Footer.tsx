@@ -17,7 +17,7 @@ export function Footer() {
             <div className="w-10 h-10 rounded-full bg-[var(--iptv-primary)] flex items-center justify-center">
               <Tv className="w-5 h-5 text-white" />
             </div>
-            <span className="text-white font-bold">Web IPTV Player</span>
+            <span className="text-white font-bold tracking-[0.2em]">FRAME</span>
           </div>
 
           {/* Links */}

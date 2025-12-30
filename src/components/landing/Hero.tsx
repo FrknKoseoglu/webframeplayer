@@ -39,15 +39,14 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
 
         {/* Headline */}
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-          {h.title1.split(',')[0]}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--iptv-primary)] to-orange-500">{h.title1.split(',')[1] || 'Anywhere.'}</span>
-          <br />
-          <span className="text-3xl md:text-5xl lg:text-6xl text-white/90">{h.title2}</span>
+          {h.headline.split('.')[0]}. <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--iptv-primary)] to-orange-500">{h.headline.split('.')[1]?.trim() || 'Framed Perfectly.'}</span>
         </h1>
 
         {/* Subheadline */}
         <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10">
-          {h.subtitle}{' '}
-          <strong className="text-white/80">{h.compatible}</strong>
+          {h.subheadline.split('**')[0]}
+          <strong className="text-white/90">Frame</strong>
+          {h.subheadline.split('**')[2] || '—the fastest, most elegant way to stream your content on any browser.'}
         </p>
 
         {/* CTA Buttons - Conditional based on profile state */}
@@ -78,7 +77,7 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
               </Link>
               <Link href="#features">
                 <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/5 px-8 py-6 text-lg rounded-xl min-h-[56px]">
-                  {h.ctaLearnMore}
+                  {h.ctaDemo}
                 </Button>
               </Link>
             </>

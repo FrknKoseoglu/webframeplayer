@@ -9,19 +9,27 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Web IPTV Player | Watch Live TV, Movies & Series Online",
-  description: "The best online IPTV Web Player. Support for M3U8, Xtream Codes, and HLS streaming. Watch your favorite Live TV channels and VOD on any browser. No download required.",
-  keywords: "iptv web player, online tv player, m3u player, xtream codes login, hls player, web tv, smart tv interface",
+  title: "Frame | The Ultimate Web Media Player",
+  description: "Experience your content in its purest form. Frame is a high-performance, cloud-synced web player for your m3u playlists and Xtream Codes. No clutter, just focus.",
+  keywords: "frame player, web frame, minimalist iptv player, cloud media player, iptv web player, online tv player, m3u player, xtream codes login, hls player",
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
   openGraph: {
-    title: "Web IPTV Player | Watch Live TV, Movies & Series Online",
-    description: "Stream Live TV, Movies, and Series directly in your browser. Compatible with Xtream Codes and M3U Playlists.",
+    title: "Frame | The Ultimate Web Media Player",
+    description: "Experience your content in its purest form. A high-performance, cloud-synced web player for your media.",
     type: "website",
-    siteName: "Web IPTV Player",
+    siteName: "Frame Player",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Web IPTV Player | Watch Live TV Online",
-    description: "Stream Live TV, Movies, and Series in your browser. No download required.",
+    title: "Frame | The Ultimate Web Media Player",
+    description: "Experience your content in its purest form. No clutter, just focus.",
   },
   robots: {
     index: true,

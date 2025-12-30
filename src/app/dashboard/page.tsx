@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Home, Tv, Film, Video, Heart, Settings, Search, Menu, X, 
-  Play, Radio, ChevronDown, Eye, EyeOff
+  Play, Radio, ChevronDown, Eye, EyeOff, Calendar
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -474,10 +474,10 @@ export default function DashboardPage() {
 
           {/* Col 3: Player + EPG - Hidden on mobile (shown via sticky player above) */}
           <div className="hidden md:flex flex-1 flex-col">
-            {/* Video Row: Player */}
-            <div className="shrink-0 flex justify-start bg-black">
-              {/* Video Player or Preview - 16:9, 85% width, left aligned */}
-              <div className="w-[85%]">
+            {/* Video Row: Player + Ad */}
+            <div className="shrink-0 flex bg-black">
+              {/* Video Player or Preview - 16:9, 75% width */}
+              <div className="w-[75%]">
                 <div className="aspect-video bg-black relative">
                   {activeContent ? (
                     activeContent.type === 'live' || isPlaying ? (
@@ -488,12 +488,29 @@ export default function DashboardPage() {
                   ) : null}
                 </div>
               </div>
+              {/* Ad Area - Right of Player */}
+              <div className="w-[25%] bg-zinc-900 flex items-center justify-center border-l border-white/5">
+                <div className="text-center p-4">
+                  <div className="w-full h-full min-h-[200px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10">
+                    <span className="text-white/30 text-xs">REKLAM ALANI</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* EPG Section */}
+            {/* EPG Section - 40% Ad + 60% EPG */}
             <div className="flex-1 flex min-h-0 bg-[var(--iptv-surface-dark)] overflow-hidden">
-              {/* Channel Info + EPG List */}
-              <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+              {/* Ad Section - 40% or 100% if no EPG/content info (LEFT SIDE) */}
+              <div className={`flex items-center justify-center border-r border-white/5 ${activeContent && (activeContent.type === 'live' && currentEpg.length > 0 || activeContent.type !== 'live') ? 'w-[40%]' : 'flex-1'}`}>
+                <div className="text-center p-6 w-full h-full flex flex-col items-center justify-center">
+                  <div className="w-full h-full min-h-[150px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10">
+                    <span className="text-white/30 text-xs">REKLAM ALANI</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Channel Info + EPG List - 60% or hidden if no active content (RIGHT SIDE) */}
+              <div className={`flex flex-col min-h-0 overflow-hidden ${activeContent && (activeContent.type === 'live' && currentEpg.length > 0 || activeContent.type !== 'live') ? 'w-[60%]' : 'w-0 hidden'}`}>
                 {activeContent ? (
                   <>
                     {activeContent.type === 'live' ? (
@@ -519,7 +536,7 @@ export default function DashboardPage() {
                           <div className="p-2 space-y-1.5">
                             {currentEpg.length > 0 ? (
                               currentEpg.map((program, idx) => (
-                                <div 
+                                <div
                                   key={`${program.id}_${idx}`}
                                   onClick={() => handleProgramClick(program)}
                                   className={`rounded-lg p-2.5 cursor-pointer transition-colors ${
@@ -528,30 +545,20 @@ export default function DashboardPage() {
                                       : 'bg-[var(--iptv-surface)] hover:bg-white/5'
                                   }`}
                                 >
-                                  <div className="flex items-center justify-between mb-1">
-                                    <span className={`text-[10px] font-bold ${
-                                      isCurrentProgram(program) ? 'text-[var(--iptv-primary)]' : 'text-white/40'
-                                    }`}>
-                                      {isCurrentProgram(program) ? 'ŞU AN' : 'SONRAKİ'}
-                                    </span>
-                                    <span className="text-[10px] text-white/50">
-                                      {formatTime(program.start)} - {formatTime(program.end)}
-                                    </span>
+                                  <div className="flex items-center gap-2">
+                                    <p className={`text-sm ${isCurrentProgram(program) ? 'text-[var(--iptv-primary)] font-bold' : 'text-white/70 font-medium'}`}>{formatTime(program.start)}</p>
+                                    <p className="text-white text-sm truncate flex-1">{program.title}</p>
+                                    {isCurrentProgram(program) && (
+                                      <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-medium animate-pulse">CANLI</span>
+                                    )}
                                   </div>
-                                  <p className="text-white text-sm font-medium truncate">{program.title}</p>
-                                  {isCurrentProgram(program) && (
-                                    <div className="mt-2 h-1 bg-black/30 rounded-full">
-                                      <div 
-                                        className="h-full bg-[var(--iptv-primary)] rounded-full transition-all" 
-                                        style={{ width: `${Math.min(getProgress(program), 100)}%` }}
-                                      />
-                                    </div>
-                                  )}
+                                  {program.description && <p className="text-white/40 text-xs mt-1 line-clamp-1">{program.description}</p>}
                                 </div>
                               ))
                             ) : (
-                              <div className="text-center py-8">
-                                <p className="text-white/40 text-xs">EPG bilgisi yükleniyor...</p>
+                              <div className="py-8 text-center">
+                                <Calendar className="w-8 h-8 text-white/20 mx-auto mb-2" />
+                                <p className="text-white/40 text-sm">EPG bilgisi yok</p>
                               </div>
                             )}
                           </div>
@@ -573,15 +580,7 @@ export default function DashboardPage() {
                       </div>
                     )}
                   </>
-                ) : (
-                  <div className="flex-1 flex items-center justify-center text-center">
-                    <div>
-                      <Tv className="w-16 h-16 text-white/20 mx-auto mb-4" />
-                      <p className="text-white/60">Bir kanal seçin</p>
-                      <p className="text-white/40 text-sm mt-1">Listeden izlemek istediğiniz kanalı seçin</p>
-                    </div>
-                  </div>
-                )}
+                ) : null}
               </div>
             </div>
           </div>

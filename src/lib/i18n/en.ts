@@ -22,14 +22,12 @@ export const en: Translations = {
   landing: {
     hero: {
       badge: 'No Download Required',
-      title1: 'Your TV, Anywhere.',
-      title2: 'The Ultimate Web IPTV Player',
-      subtitle: 'Stream Live TV, Movies, and Series directly in your browser.',
-      compatible: 'Compatible with Xtream Codes and M3U Playlists.',
-      ctaStart: 'Start Watching Now',
-      ctaDashboard: 'Go to Dashboard',
+      headline: 'Your Content. Framed Perfectly.',
+      subheadline: 'Stop struggling with clunky players. Meet **Frame**—the fastest, most elegant way to stream your content on any browser.',
+      ctaStart: 'Get Started',
+      ctaDashboard: 'Open Frame',
       ctaNewService: 'Add New Service',
-      ctaLearnMore: 'Learn More',
+      ctaDemo: 'View Demo',
       statHls: 'HLS Streaming',
       statXtream: 'Codes Support',
       statBrowser: 'Browser Based',
@@ -80,7 +78,7 @@ export const en: Translations = {
       login: 'Login',
       features: 'Features',
       privacy: 'Privacy',
-      copyright: 'Web IPTV Player. All rights reserved.',
+      copyright: 'Frame Player. All rights reserved.',
     },
   },
 

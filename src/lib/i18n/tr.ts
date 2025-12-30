@@ -20,14 +20,12 @@ export const tr = {
   landing: {
     hero: {
       badge: 'İndirme Gerektirmez',
-      title1: 'TV\'niz, Her Yerde.',
-      title2: 'En Gelişmiş Web IPTV Player',
-      subtitle: 'Canlı TV, Film ve Dizileri doğrudan tarayıcınızda izleyin.',
-      compatible: 'Xtream Codes ve M3U Playlist destekli.',
-      ctaStart: 'İzlemeye Başla',
-      ctaDashboard: 'Dashboard\'a Git',
+      headline: 'İçeriğiniz. Mükemmel Çerçevede.',
+      subheadline: 'Hantal oynatıcılarla uğraşmayı bırakın. **Frame** ile tanışın—içeriğinizi herhangi bir tarayıcıda izlemenin en hızlı ve en şık yolu.',
+      ctaStart: 'Başla',
+      ctaDashboard: 'Frame\'i Aç',
       ctaNewService: 'Yeni Servis Ekle',
-      ctaLearnMore: 'Daha Fazla Bilgi',
+      ctaDemo: 'Demo İzle',
       statHls: 'HLS Streaming',
       statXtream: 'Codes Desteği',
       statBrowser: 'Tarayıcı Tabanlı',
@@ -78,7 +76,7 @@ export const tr = {
       login: 'Giriş',
       features: 'Özellikler',
       privacy: 'Gizlilik',
-      copyright: 'Web IPTV Player. Tüm hakları saklıdır.',
+      copyright: 'Frame Player. Tüm hakları saklıdır.',
     },
   },
 

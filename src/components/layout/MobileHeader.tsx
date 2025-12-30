@@ -44,7 +44,7 @@ export function MobileHeader({ sidebarContent }: MobileHeaderProps) {
             <div className="w-8 h-8 rounded-full bg-[var(--iptv-primary)] flex items-center justify-center">
               <Tv className="w-4 h-4 text-white" />
             </div>
-            <span className="text-white font-bold text-lg">IPTV Player</span>
+            <span className="text-white font-bold tracking-[0.2em] text-lg">FRAME</span>
           </div>
 
           {/* Right: Search Toggle */}

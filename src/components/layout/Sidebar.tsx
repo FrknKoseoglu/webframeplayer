@@ -30,7 +30,7 @@ function ChannelList() {
           <div className="p-2 rounded-lg bg-gradient-to-br from-purple-600 to-blue-600">
             <Radio className="w-5 h-5 text-white" />
           </div>
-          <span className="text-lg font-bold text-white">IPTV Player</span>
+          <span className="text-lg font-bold tracking-[0.2em] text-white">FRAME</span>
         </div>
         
         {/* Search */}
