@@ -273,3 +273,20 @@ html, body {
   text-overflow: unset;
   animation: marquee 3s linear infinite alternate;
 }
+
+/* Global cursor pointer for all interactive elements */
+button,
+a,
+[role="button"],
+[onclick],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+select,
+label[for],
+summary,
+.cursor-pointer {
+  cursor: pointer;
+}

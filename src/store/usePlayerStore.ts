@@ -63,6 +63,15 @@ interface PlayerState {
   
   // Volume (0-1)
   volume: number;
+  
+  // Subtitle preferences
+  preferredSubtitle1: string;
+  preferredSubtitle2: string;
+  subtitlesEnabled: boolean;
+  
+  // Audio preferences
+  preferredAudio1: string;
+  preferredAudio2: string;
 }
 
 // Store actions interface
@@ -113,6 +122,12 @@ interface PlayerActions {
   // Volume
   setVolume: (volume: number) => void;
   
+  // Subtitle preferences
+  setSubtitlePreferences: (sub1: string, sub2: string, enabled: boolean) => void;
+  
+  // Audio preferences
+  setAudioPreferences: (audio1: string, audio2: string) => void;
+  
   // Reset
   reset: () => void;
 }
@@ -143,6 +158,11 @@ const initialState: PlayerState = {
   bufferMode: 'low',
   cacheExpiry: 24, // 1 day default
   volume: 1, // Full volume default
+  preferredSubtitle1: 'tr',
+  preferredSubtitle2: 'en',
+  subtitlesEnabled: true,
+  preferredAudio1: 'en',
+  preferredAudio2: 'tr',
 };
 
 export const usePlayerStore = create<PlayerStore>()(
@@ -348,6 +368,20 @@ export const usePlayerStore = create<PlayerStore>()(
         set({ volume: Math.max(0, Math.min(1, volume)) });
       },
       
+      // Subtitle preferences
+      setSubtitlePreferences: (sub1, sub2, enabled) => {
+        set({ 
+          preferredSubtitle1: sub1, 
+          preferredSubtitle2: sub2, 
+          subtitlesEnabled: enabled 
+        });
+      },
+      
+      // Audio preferences
+      setAudioPreferences: (audio1, audio2) => {
+        set({ preferredAudio1: audio1, preferredAudio2: audio2 });
+      },
+      
       // Reset
       reset: () => set(initialState),
     }),
@@ -366,6 +400,11 @@ export const usePlayerStore = create<PlayerStore>()(
         bufferMode: state.bufferMode,
         cacheExpiry: state.cacheExpiry,
         volume: state.volume,
+        preferredSubtitle1: state.preferredSubtitle1,
+        preferredSubtitle2: state.preferredSubtitle2,
+        subtitlesEnabled: state.subtitlesEnabled,
+        preferredAudio1: state.preferredAudio1,
+        preferredAudio2: state.preferredAudio2,
       }),
     }
   )

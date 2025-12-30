@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Play, Star, Calendar, Clock, Lock, Download, ChevronRight, Loader2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Play, Star, Calendar, Clock, Lock, Download, ChevronRight, Loader2, Copy, Check, MonitorPlay, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { usePlayerStore } from '@/store/usePlayerStore';
@@ -140,6 +141,10 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
                   </Button>
                 )}
 
+                {content.type === 'movie' && (
+                  <VlcOpenButton url={content.url} />
+                )}
+
                 {content.type === 'movie' && content.downloadUrl && (
                   <Button 
                     size="lg"
@@ -264,5 +269,100 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
         )}
       </div>
     </div>
+  );
+}
+
+// VLC Open Button with fallback popup
+function VlcOpenButton({ url }: { url: string }) {
+  const [clickCount, setClickCount] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const handleClick = async () => {
+    if (clickCount === 0) {
+      // First click: try to open VLC
+      setClickCount(1);
+      window.location.href = `vlc://${url}`;
+      
+      // Reset after 3 seconds if user comes back
+      setTimeout(() => setClickCount(0), 5000);
+    } else {
+      // Second click: copy link and show popup
+      try {
+        await navigator.clipboard.writeText(url);
+        setShowPopup(true);
+      } catch (error) {
+        console.error('Failed to copy:', error);
+      }
+    }
+  };
+
+  return (
+    <>
+      <div className="relative">
+        <Button 
+          size="lg"
+          variant="outline"
+          onClick={handleClick}
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+          className="h-14 px-6 border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 rounded-xl gap-2 backdrop-blur-sm transition-all hover:scale-105"
+        >
+          <MonitorPlay className="w-5 h-5" />
+          <span className="hidden sm:inline">VLC'de Aç</span>
+          <span className="sm:hidden">VLC</span>
+        </Button>
+        
+        {/* Tooltip */}
+        {showTooltip && (
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-4 py-2 bg-zinc-800 text-white text-sm rounded-lg shadow-xl border border-white/10 whitespace-nowrap z-50 animate-fade-in">
+            <p>İçeriği VLC Player'da açar.</p>
+            <p className="text-white/60 text-xs mt-1">VLC kurulu olmalıdır.</p>
+            <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-zinc-800" />
+          </div>
+        )}
+      </div>
+
+      {/* Fallback Popup - rendered via portal to document.body */}
+      {showPopup && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in">
+          <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
+                <AlertCircle className="w-6 h-6 text-orange-400" />
+              </div>
+              <h3 className="text-white font-bold text-lg">VLC Açılamadı</h3>
+            </div>
+            
+            <p className="text-white/70 mb-4">
+              VLC Player otomatik olarak açılamadı ancak içerik bağlantısı kopyalandı.
+            </p>
+            
+            <div className="bg-white/5 rounded-lg p-3 mb-4">
+              <p className="text-white/60 text-sm">
+                <strong className="text-white">Nasıl izlerim?</strong><br/>
+                1. VLC Player'ı açın<br/>
+                2. Medya → Ağ Akışı Aç (Ctrl+N)<br/>
+                3. Kopyalanan bağlantıyı yapıştırın<br/>
+                4. Oynat'a tıklayın
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-2 text-green-400 text-sm mb-4">
+              <Check className="w-4 h-4" />
+              <span>Bağlantı panoya kopyalandı</span>
+            </div>
+            
+            <Button 
+              onClick={() => setShowPopup(false)}
+              className="w-full bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white"
+            >
+              Tamam
+            </Button>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 }

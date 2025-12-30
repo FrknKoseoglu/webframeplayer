@@ -102,12 +102,16 @@ export default function DashboardPage() {
     if (navItem) {
       handleNavClick(navItem);
     } else if (nav === 'settings') {
-      // Handle settings
+      setActiveNav('settings');
     }
   };
 
   const handleCategoryClick = (category: Category | null) => {
     setActiveCategory(category?.id || null);
+    // Close settings when a category is selected, go to current content type
+    if (activeNav === 'settings') {
+      setActiveNav(contentType);
+    }
   };
 
   useEffect(() => {
