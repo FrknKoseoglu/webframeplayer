@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { usePlayerStore } from '@/store/usePlayerStore';
+import { usePlayerStore, useHistory } from '@/store/usePlayerStore';
 import type { ContentItem } from '@/types/iptv';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -133,7 +133,8 @@ function ChannelList() {
 }
 
 function HistoryList() {
-  const { history, activeContent, playContent, clearHistory } = usePlayerStore();
+  const history = useHistory();
+  const { activeContent, playContent, clearHistory } = usePlayerStore();
   const { t } = useTranslation();
 
   return (
