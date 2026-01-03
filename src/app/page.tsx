@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { usePlayerStore } from '@/store/usePlayerStore';
-import { Hero, Features, HowItWorks, FAQ, FAQSchema, Footer } from '@/components/landing';
+import { Hero, Features, HowItWorks, FAQ, FAQSchema, Footer, MagicLink } from '@/components/landing';
 import { ImportHandler } from '@/components/import/ImportHandler';
 
 function HomeContent() {
@@ -49,6 +49,7 @@ function HomeContent() {
       {/* Landing Page Content - visible to everyone */}
       <main>
         <Hero hasProfiles={hasProfiles} isHydrated={isHydrated} />
+        <MagicLink />
         <Features />
         <HowItWorks />
         <FAQ />
