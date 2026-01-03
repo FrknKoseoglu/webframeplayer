@@ -216,7 +216,7 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
                 )}
 
                 {content.type === 'movie' && (
-                  <VlcOpenButton url={content.url} />
+                  <CopyLinkButton url={content.url} />
                 )}
 
                 {content.type === 'movie' && content.downloadUrl && (
