@@ -197,6 +197,20 @@ export default function DashboardPage() {
           <span className="text-white font-bold">Frame Player</span>
         </div>
         
+        {/* Service Logo (if available) */}
+        {activeProfile?.logoUrl && (
+          <div className="mb-3 flex items-center justify-center p-2 bg-white/5 rounded-lg border border-white/10">
+            <img 
+              src={activeProfile.logoUrl} 
+              alt={activeProfile.name}
+              className="max-h-[85px] max-w-full object-contain"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
+        
         {/* Service Selector */}
         {profiles.length > 1 && (
           <button 
@@ -303,6 +317,20 @@ export default function DashboardPage() {
             </div>
             {sidebarOpen && <span className="text-white font-bold">Frame Player</span>}
           </div>
+          
+          {/* Service Logo (if available) */}
+          {sidebarOpen && activeProfile?.logoUrl && (
+            <div className="mb-3 flex items-center justify-center p-2 bg-white/5 rounded-lg border border-white/10">
+              <img 
+                src={activeProfile.logoUrl} 
+                alt={activeProfile.name}
+                className="max-h-[85px] max-w-full object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
           
           {/* Service Selector */}
           {sidebarOpen && profiles.length > 1 && (

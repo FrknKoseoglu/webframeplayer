@@ -17,6 +17,7 @@ export default function ImportLinkCreatorPage() {
   const [serviceName, setServiceName] = useState('');
   const [customMessage, setCustomMessage] = useState('');
   const [supportUrl, setSupportUrl] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
   const [encryptLink, setEncryptLink] = useState(true); // Default: ON
   const [generatedLink, setGeneratedLink] = useState('');
   const [copied, setCopied] = useState(false);
@@ -53,6 +54,10 @@ export default function ImportLinkCreatorPage() {
     
     if (supportUrl) {
       data.supportUrl = supportUrl;
+    }
+    
+    if (logoUrl) {
+      data.logoUrl = logoUrl;
     }
     
     let link: string;
@@ -242,6 +247,40 @@ export default function ImportLinkCreatorPage() {
               <p className="text-xs text-white/40 mt-1">
                 {language === 'tr' ? 'Bu link ayarlarda destek butonu olarak görünür' : 'This link will appear as a support button in settings'}
               </p>
+            </div>
+            
+            <div>
+              <label className="text-sm text-white/70 mb-2 block font-medium">
+                {language === 'tr' ? 'Logo URL (Opsiyonel)' : 'Logo URL (Optional)'}
+              </label>
+              <input
+                type="url"
+                value={logoUrl}
+                onChange={(e) => setLogoUrl(e.target.value)}
+                placeholder="https://example.com/logo.png"
+                className="w-full px-4 py-3 rounded-xl bg-[var(--iptv-input-bg)] border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--iptv-primary)] transition-colors"
+              />
+              <p className="text-xs text-white/40 mt-1">
+                {language === 'tr' ? 'Önerilen: 200x85px veya daha küçük, PNG/SVG formatı' : 'Recommended: 200x85px or smaller, PNG/SVG format'}
+              </p>
+              {logoUrl && (
+                <div className="mt-3 p-3 bg-white/5 rounded-lg border border-white/10">
+                  <p className="text-xs text-white/50 mb-2">
+                    {language === 'tr' ? 'Önizleme:' : 'Preview:'}
+                  </p>
+                  <div className="flex items-center justify-center bg-black/30 rounded-lg p-4" style={{ maxHeight: '85px' }}>
+                    <img 
+                      src={logoUrl} 
+                      alt="Logo preview" 
+                      className="max-h-[85px] max-w-full object-contain"
+                      onError={(e) => {
+                        e.currentTarget.src = '';
+                        e.currentTarget.alt = language === 'tr' ? 'Logo yüklenemedi' : 'Logo failed to load';
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Encrypt Toggle */}

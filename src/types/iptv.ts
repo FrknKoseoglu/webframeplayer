@@ -13,6 +13,7 @@ export interface Profile {
   m3uUrl?: string;
   credentials?: XtreamCredentials;
   supportUrl?: string; // Optional support URL from service provider
+  logoUrl?: string; // Optional logo URL from service provider
   active: boolean;
   createdAt: number;
   lastRefresh?: number; // Timestamp of last content refresh
