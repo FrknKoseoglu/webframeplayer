@@ -135,6 +135,7 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
             ...credentials,
             exp_date: authResponse.user_info.exp_date,
           },
+          lastRefresh: Date.now(),
         });
         switchProfile(editProfile.id);
       } else {
@@ -149,6 +150,7 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
           },
           active: true,
           createdAt: Date.now(),
+          lastRefresh: Date.now(),
         };
         addProfile(profile);
         switchProfile(profile.id);

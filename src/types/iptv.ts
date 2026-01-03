@@ -61,12 +61,12 @@ export interface XtreamUserInfo {
   password: string;
   message: string;
   auth: number;
-  status: string;
-  exp_date: string;
-  is_trial: string;
-  active_cons: string;
-  created_at: string;
-  max_connections: string;
+  status: string; // e.g., "Active", "Expired"
+  exp_date: string; // Unix timestamp or null
+  is_trial: string; // "0" or "1"
+  active_cons: string | number; // Current active connections
+  created_at: string; // Unix timestamp
+  max_connections: string; // Maximum allowed connections
   allowed_output_formats: string[];
 }
 
@@ -74,11 +74,13 @@ export interface XtreamServerInfo {
   url: string;
   port: string;
   https_port: string;
-  server_protocol: string;
+  server_protocol: string; // "http" or "https"
   rtmp_port: string;
   timezone: string;
   timestamp_now: number;
   time_now: string;
+  xui?: boolean; // XUI panel available
+  version?: string; // Server version
 }
 
 export interface XtreamAuthResponse {

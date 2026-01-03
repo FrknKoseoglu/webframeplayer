@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe, Gauge, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, Subtitles, ExternalLink } from 'lucide-react';
+import { Globe, Gauge, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, Subtitles, ExternalLink, Infinity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { 
@@ -85,6 +85,9 @@ export function SettingsPanel() {
       if (profile.type === 'xtream' && profile.credentials) {
         const credentials = profile.credentials;
         
+        // Re-authenticate to get fresh exp_date
+        const authResponse = await authenticateXtream(credentials);
+        
         const [liveCategories, vodCategories, seriesCategories] = await Promise.all([
           getLiveCategories(credentials),
           getVodCategories(credentials),
@@ -110,7 +113,15 @@ export function SettingsPanel() {
 
         setCategories(categories);
         setContent(content);
-        updateProfile(profile.id, { lastRefresh: Date.now() });
+        
+        // Update profile with fresh exp_date and lastRefresh
+        updateProfile(profile.id, { 
+          credentials: {
+            ...credentials,
+            exp_date: authResponse.user_info.exp_date,
+          },
+          lastRefresh: Date.now() 
+        });
 
       } else if (profile.type === 'm3u' && profile.m3uUrl) {
         const { content, categories } = await processM3UPlaylist(profile.m3uUrl);
@@ -386,98 +397,161 @@ export function SettingsPanel() {
                   key={profile.id}
                   onClick={() => handleProfileClick(profile.id)}
                   className={cn(
-                    'flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer',
+                    'flex flex-col gap-2 p-4 rounded-lg border transition-all cursor-pointer',
                     activeProfile?.id === profile.id
                       ? 'bg-[var(--iptv-primary)]/10 border-[var(--iptv-primary)]/30'
                       : 'bg-white/5 border-white/10 hover:bg-white/10'
                   )}
                 >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium truncate">{profile.name}</p>
-                    <p className="text-white/40 text-xs truncate">
-                      {profile.type === 'xtream' ? 'Xtream Codes' : 'M3U Playlist'}
+                  {/* Line 1: Service Name | Active Status ---------- Service Type */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <p className="text-white font-medium truncate">{profile.name}</p>
                       {activeProfile?.id === profile.id && (
-                        <span className="ml-2 text-green-400">● {language === 'tr' ? 'Aktif' : 'Active'}</span>
-                      )}
-                      <span className="ml-2 text-white/30">• {formatLastRefresh(profile.lastRefresh)}</span>
-                      {profile.type === 'xtream' && (
-                        <>
-                          <br />
-                          <span className="text-white/40">
-                            {language === 'tr' ? 'Bitiş: ' : 'Expires: '}
-                            {profile.credentials?.exp_date ? (
-                              <span className={cn(
-                                "font-medium",
-                                (() => {
-                                  const expDate = new Date(profile.credentials.exp_date);
-                                  const daysLeft = Math.floor((expDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-                                  if (daysLeft < 0) return "text-red-400";
-                                  if (daysLeft < 7) return "text-orange-400";
-                                  return "text-green-400";
-                                })()
-                              )}>
-                                {(() => {
-                                  const expDate = new Date(profile.credentials.exp_date);
-                                  const daysLeft = Math.floor((expDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-                                  if (daysLeft < 0) {
-                                    return language === 'tr' ? 'Süresi dolmuş' : 'Expired';
-                                  } else if (daysLeft === 0) {
-                                    return language === 'tr' ? 'Bugün' : 'Today';
-                                  } else if (daysLeft < 30) {
-                                    return language === 'tr' ? `${daysLeft} gün` : `${daysLeft} days`;
-                                  } else {
-                                    return expDate.toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US');
-                                  }
-                                })()}
-                              </span>
-                            ) : (
-                              <span className="text-white/40">
-                                {language === 'tr' ? 'Bilinmiyor' : 'Unknown'}
-                              </span>
-                            )}
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-green-500/10 border border-green-500/20 shrink-0">
+                          <span className="text-green-400 text-xs">●</span>
+                          <span className="text-green-400 text-xs font-medium">
+                            {language === 'tr' ? 'Aktif' : 'Active'}
                           </span>
-                        </>
+                        </span>
                       )}
+                    </div>
+                    <p className="text-white/60 text-sm shrink-0">
+                      {profile.type === 'xtream' ? 'Xtream Codes' : 'M3U Playlist'}
                     </p>
-                    {profile.supportUrl && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleSupportUrlClick(profile.supportUrl!, profile.name); }}
-                        className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                        {language === 'tr' ? 'Destek' : 'Support'}
-                      </button>
-                    )}
                   </div>
-                  
-                  <div className="flex items-center gap-1">
+
+                  {/* Line 2: Expiration Date | Remaining Time (for Xtream only) */}
+                  {profile.type === 'xtream' && (() => {
+                    const expDate = profile.credentials?.exp_date;
+                    
+                    // Check for lifetime subscription
+                    if (!expDate || expDate === '0' || expDate === '') {
+                      return (
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-yellow-500/10 border border-yellow-500/20">
+                            <Infinity className="w-3.5 h-3.5 text-yellow-400" />
+                            <span className="text-sm font-medium text-yellow-400">
+                              {language === 'tr' ? 'Sınırsız Üyelik' : 'Lifetime Membership'}
+                            </span>
+                          </span>
+                        </div>
+                      );
+                    }
+                    
+                    // Parse expiration date
+                    const exp = new Date(parseInt(expDate) * 1000);
+                    const now = Date.now();
+                    const diffMs = exp.getTime() - now;
+                    const daysLeft = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                    const monthsLeft = Math.floor(daysLeft / 30);
+                    
+                    // Determine status color
+                    const isExpired = daysLeft < 0;
+                    const isExpiringSoon = daysLeft >= 0 && daysLeft < 7;
+                    
+                    let colorClass = "text-green-400";
+                    if (isExpired) colorClass = "text-red-400";
+                    else if (isExpiringSoon) colorClass = "text-orange-400";
+
+                    // Format date
+                    const formattedDate = exp.toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    });
+
+                    // Format remaining time
+                    let remainingText = '';
+                    if (isExpired) {
+                      const expiredDays = Math.abs(daysLeft);
+                      remainingText = language === 'tr' 
+                        ? `${expiredDays} gün önce doldu` 
+                        : `Expired ${expiredDays} days ago`;
+                    } else if (monthsLeft >= 1) {
+                      remainingText = language === 'tr'
+                        ? `${monthsLeft} ay (${daysLeft} gün)`
+                        : `${monthsLeft} months (${daysLeft} days)`;
+                    } else {
+                      remainingText = language === 'tr'
+                        ? `${daysLeft} gün`
+                        : `${daysLeft} days`;
+                    }
+
+                    return (
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white/50">
+                            {language === 'tr' ? 'Üyelik Bitiş:' : 'Expires:'}
+                          </span>
+                          <span className={cn("font-medium", colorClass)}>
+                            {formattedDate}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-white/50">
+                            {language === 'tr' ? 'Kalan:' : 'Remaining:'}
+                          </span>
+                          <span className={cn("font-medium", colorClass)}>
+                            {remainingText}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-2 pt-2 border-t border-white/5">
                     <Button
                       variant="ghost"
-                      size="icon"
-                      onClick={(e) => { e.stopPropagation(); handleRefreshProfile(profile); }}
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRefreshProfile(profile);
+                      }}
                       disabled={refreshingId === profile.id}
-                      className="h-8 w-8 text-white/40 hover:text-green-400"
-                      title={language === 'tr' ? 'Şimdi Güncelle' : 'Refresh Now'}
+                      className="text-white/60 hover:text-green-400"
                     >
-                      <RefreshCw className={cn("w-4 h-4", refreshingId === profile.id && "animate-spin")} />
+                      <RefreshCw className={cn("w-4 h-4 mr-2", refreshingId === profile.id && "animate-spin")} />
+                      {language === 'tr' ? 'Güncelle' : 'Refresh'}
                     </Button>
                     <Button
                       variant="ghost"
-                      size="icon"
-                      onClick={(e) => { e.stopPropagation(); handleEditProfile(profile.id); }}
-                      className="h-8 w-8 text-white/40 hover:text-blue-400"
-                      title={language === 'tr' ? 'Düzenle' : 'Edit'}
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/login?edit=${profile.id}`);
+                      }}
+                      className="text-white/60 hover:text-white"
                     >
-                      <Edit className="w-4 h-4" />
+                      <Edit className="w-4 h-4 mr-2" />
+                      {language === 'tr' ? 'Düzenle' : 'Edit'}
                     </Button>
+                    {profile.supportUrl && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSupportUrlClick(profile.supportUrl!, profile.name);
+                        }}
+                        className="text-white/60 hover:text-blue-400"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        {language === 'tr' ? 'Destek' : 'Support'}
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
-                      size="icon"
-                      onClick={(e) => { e.stopPropagation(); handleDeleteClick(profile.id); }}
-                      className="h-8 w-8 text-white/40 hover:text-red-400"
-                      title={language === 'tr' ? 'Sil' : 'Delete'}
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(profile.id);
+                      }}
+                      className="text-white/60 hover:text-red-400"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      {language === 'tr' ? 'Sil' : 'Delete'}
                     </Button>
                   </div>
                 </div>
