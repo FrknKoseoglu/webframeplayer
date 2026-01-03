@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Home, Tv, Film, Video, Heart, Settings, Search, Menu, X, 
-  Play, Radio, ChevronDown, Eye, EyeOff, Calendar
+  Play, Radio, ChevronDown, Eye, EyeOff, Calendar, History
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,9 @@ import { SeriesInfoPanel } from '@/components/details/SeriesInfoPanel';
 import { HomeView } from '@/components/home/HomeView';
 import { MobileHeader } from '@/components/layout/MobileHeader';
 import { SettingsPanel } from '@/components/settings/SettingsPanel';
+import { HistoryView } from '@/components/history/HistoryView';
 import { getShortEPG, convertEpgListings } from '@/lib/xtream-adapter';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import type { ContentType, ContentItem, Category, EpgProgram } from '@/types/iptv';
 
 type NavItem = {
@@ -28,7 +30,7 @@ type NavItem = {
   label: string;
   icon: React.ReactNode;
   contentType?: ContentType;
-  special?: 'favorites' | 'home';
+  special?: 'favorites' | 'home' | 'history';
 };
 
 const NAV_ITEMS: NavItem[] = [
@@ -37,6 +39,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'movies', label: 'Filmler', icon: <Film className="w-5 h-5" />, contentType: 'movie' },
   { id: 'series', label: 'Diziler', icon: <Video className="w-5 h-5" />, contentType: 'series' },
   { id: 'favorites', label: 'Favoriler', icon: <Heart className="w-5 h-5" />, special: 'favorites' },
+  { id: 'history', label: 'Geçmiş', icon: <History className="w-5 h-5" />, special: 'history' },
 ];
 
 export default function DashboardPage() {
@@ -71,6 +74,7 @@ export default function DashboardPage() {
   const filteredContent = useFilteredContent();
   const [activeNav, setActiveNav] = useState<string>('home');
   const profiles = usePlayerStore((s) => s.profiles);
+  const isDesktop = useMediaQuery('(min-width: 768px)'); // md breakpoint
 
   useEffect(() => {
     if (!activeProfile) {
@@ -90,7 +94,15 @@ export default function DashboardPage() {
     if (item.special === 'home') {
       // Stay on home, don't change content type
     } else if (item.special === 'favorites') {
-      setActiveCategory('favorites');
+      // For favorites, ensure content type is set FIRST, then set category
+      const currentType = contentType;
+      if (currentType !== 'movie' && currentType !== 'series' && currentType !== 'live') {
+        setContentType('live');
+      }
+      // Use setTimeout to ensure contentType state update completes first
+      setTimeout(() => setActiveCategory('favorites'), 0);
+    } else if (item.special === 'history') {
+      // History has its own view
     } else if (item.contentType) {
       setContentType(item.contentType);
       setActiveCategory(null);
@@ -121,6 +133,13 @@ export default function DashboardPage() {
   }, [activeProfile]);
 
   const handleContentClick = async (item: ContentItem) => {
+    // When clicking from history, navigate to appropriate content type
+    if (activeNav === 'history') {
+      // Set the content type and navigate away from history
+      setContentType(item.type);
+      setActiveNav(item.type); // Navigate to the content type view
+    }
+    
     // For movies/series, don't auto-play (show preview)
     const autoPlay = item.type === 'live';
     playContent(item, autoPlay);
@@ -175,7 +194,7 @@ export default function DashboardPage() {
           <div className="w-10 h-10 rounded-full bg-[var(--iptv-primary)] flex items-center justify-center shrink-0">
             <Tv className="w-5 h-5 text-white" />
           </div>
-          <span className="text-white font-bold">IPTV Player</span>
+          <span className="text-white font-bold">Frame Player</span>
         </div>
         
         {/* Service Selector */}
@@ -282,7 +301,7 @@ export default function DashboardPage() {
             <div className="w-10 h-10 rounded-full bg-[var(--iptv-primary)] flex items-center justify-center shrink-0">
               <Tv className="w-5 h-5 text-white" />
             </div>
-            {sidebarOpen && <span className="text-white font-bold">IPTV Player</span>}
+            {sidebarOpen && <span className="text-white font-bold">Frame Player</span>}
           </div>
           
           {/* Service Selector */}
@@ -383,6 +402,9 @@ export default function DashboardPage() {
         <div className="flex-1 overflow-auto">
           <SettingsPanel />
         </div>
+      ) : activeNav === 'history' ? (
+        /* History View - Full width */
+        <HistoryView onPlayContent={handleContentClick} />
       ) : (
         /* Mobile: flex-col (player on top, content below) | Desktop: flex-row */
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
@@ -392,9 +414,9 @@ export default function DashboardPage() {
             <div className="aspect-video bg-black relative">
               {activeContent ? (
                 activeContent.type === 'live' || isPlaying ? (
-                  <MasterPlayer />
+                  <MasterPlayer key="mobile-player" />
                 ) : (
-                  <PlayerPreview content={activeContent} />
+                  <PlayerPreview key="mobile-preview" content={activeContent} />
                 )
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-zinc-900">
@@ -472,8 +494,9 @@ export default function DashboardPage() {
             <div className="p-2 border-t border-white/5 text-center text-xs text-white/40">{filteredContent.length} kanal</div>
           </div>
 
-          {/* Col 3: Player + EPG - Hidden on mobile (shown via sticky player above) */}
-          <div className="hidden md:flex flex-1 flex-col">
+          {/* Col 3: Player + EPG - Desktop only, conditionally rendered */}
+          {isDesktop && (
+            <div className="flex-1 flex flex-col">
             {/* Video Row: Player + Ad */}
             <div className="shrink-0 flex bg-black">
               {/* Video Player or Preview - 16:9, 75% width */}
@@ -481,19 +504,17 @@ export default function DashboardPage() {
                 <div className="aspect-video bg-black relative">
                   {activeContent ? (
                     activeContent.type === 'live' || isPlaying ? (
-                      <MasterPlayer />
+                      <MasterPlayer key="desktop-player" />
                     ) : (
-                      <PlayerPreview content={activeContent} />
+                      <PlayerPreview key="desktop-preview" content={activeContent} />
                     )
                   ) : null}
                 </div>
               </div>
               {/* Ad Area - Right of Player */}
               <div className="w-[25%] bg-zinc-900 flex items-center justify-center border-l border-white/5">
-                <div className="text-center p-4">
-                  <div className="w-full h-full min-h-[200px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10">
-                    <span className="text-white/30 text-xs">REKLAM ALANI</span>
-                  </div>
+                <div className="w-full h-full min-h-[200px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10 m-4">
+                  <span className="text-white/30 text-xs">REKLAM ALANI</span>
                 </div>
               </div>
             </div>
@@ -502,10 +523,8 @@ export default function DashboardPage() {
             <div className="flex-1 flex min-h-0 bg-[var(--iptv-surface-dark)] overflow-hidden">
               {/* Ad Section - 40% or 100% if no EPG/content info (LEFT SIDE) */}
               <div className={`flex items-center justify-center border-r border-white/5 ${activeContent && (activeContent.type === 'live' && currentEpg.length > 0 || activeContent.type !== 'live') ? 'w-[40%]' : 'flex-1'}`}>
-                <div className="text-center p-6 w-full h-full flex flex-col items-center justify-center">
-                  <div className="w-full h-full min-h-[150px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10">
-                    <span className="text-white/30 text-xs">REKLAM ALANI</span>
-                  </div>
+                <div className="w-full h-full min-h-[150px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10 m-6">
+                  <span className="text-white/30 text-xs">REKLAM ALANI</span>
                 </div>
               </div>
               
@@ -564,7 +583,7 @@ export default function DashboardPage() {
                           </div>
                         </ScrollArea>
                       </>
-                    ) : activeContent.type === 'series' && isPlaying ? (
+                    ) : activeContent.type === 'series' ? (
                       <SeriesInfoPanel content={activeContent} />
                     ) : (
                       <div className={`h-full ${isPlaying ? 'bg-[var(--iptv-surface-dark)]' : 'p-4'}`}>
@@ -583,7 +602,8 @@ export default function DashboardPage() {
                 ) : null}
               </div>
             </div>
-          </div>
+            </div>
+          )}
         </div>
       )}
     </div>

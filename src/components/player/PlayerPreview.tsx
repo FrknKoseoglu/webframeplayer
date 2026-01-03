@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Play, Star, Calendar, Clock, Lock, Download, ChevronRight, Loader2, Copy, Check, MonitorPlay, AlertCircle } from 'lucide-react';
+import { Play, Star, Calendar, Clock, Lock, Download, ChevronRight, Loader2, Copy, Check, MonitorPlay, AlertCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { getSeriesInfo } from '@/lib/xtream-adapter';
+import { ContentDetailsDialog } from '@/components/details/ContentDetailsDialog';
 import type { ContentItem, Season, Episode } from '@/types/iptv';
 
 interface PlayerPreviewProps {
@@ -14,10 +15,12 @@ interface PlayerPreviewProps {
 }
 
 export function PlayerPreview({ content }: PlayerPreviewProps) {
-  const { startPlayback, activeProfile, playEpisode } = usePlayerStore();
+  const { startPlayback, activeProfile, playEpisode, activeContent } = usePlayerStore();
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeason, setSelectedSeason] = useState<Season | null>(null);
   const [loading, setLoading] = useState(false);
+  const [copiedEpisodeId, setCopiedEpisodeId] = useState<string | null>(null);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
   // Store the original series info (without episode modifications)
   const [originalSeries] = useState(() => ({
@@ -66,6 +69,16 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
     return dur.includes(':') ? dur : `${dur} dk`;
   };
 
+  const copyToClipboard = async (url: string, episodeId: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedEpisodeId(episodeId);
+      setTimeout(() => setCopiedEpisodeId(null), 2000);
+    } catch (err) {
+      console.error('Kopyalama başarısız:', err);
+    }
+  };
+
   return (
     <div className="w-full h-full relative overflow-hidden bg-black group flex flex-col">
       {/* Background Image with Blur */}
@@ -83,24 +96,81 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
-        {/* Left Side: Poster + Info */}
+        {/* Left Side: Poster + Info for Series */}
         <div className="flex-1 flex gap-6 p-8 md:p-12 min-w-0 overflow-hidden">
-          {/* Poster Image */}
-          {content.logo && (
-            <div className="hidden md:block shrink-0 w-48">
-              <img 
-                src={content.logo} 
-                alt={content.name}
-                className="w-full h-auto rounded-xl shadow-2xl object-cover"
-              />
+          {/* Series/Movie Layout: Check if it has series data */}
+          {content.seriesId ? (
+            /* Series Layout: Poster top-left, content below */
+            <div className="flex-1 flex flex-col min-w-0">
+              {/* Poster at top */}
+              {content.logo && (
+                <div className="w-32 mb-4">
+                  <img 
+                    src={content.logo} 
+                    alt={content.name}
+                    className="w-full h-auto rounded-lg shadow-2xl"
+                  />
+                </div>
+              )}
+              
+              {/* Content below poster */}
+              <div className="flex-1 min-w-0">
+                <div className="max-w-2xl">
+                  {/* Metadata */}
+                  <div className="flex items-center gap-3 mb-4 text-sm font-medium flex-wrap">
+                    {content.rating && (
+                      <div className="flex items-center gap-1.5 text-yellow-500">
+                        <Star className="w-4 h-4 fill-current" />
+                        <span>{content.rating}</span>
+                      </div>
+                    )}
+                    {content.year && (
+                      <span className="text-white/80 border-l border-white/20 pl-3">{content.year}</span>
+                    )}
+                    {content.duration && (
+                      <span className="text-white/80 border-l border-white/20 pl-3">{formatDuration(content.duration)}</span>
+                    )}
+                    <span className="text-[var(--iptv-primary)] font-bold border-l border-white/20 pl-3 uppercase tracking-wider">
+                      DİZİ
+                    </span>
+                  </div>
+
+                  {/* Title - Clickable */}
+                  <h1 
+                    onClick={() => setShowDetailsDialog(true)}
+                    className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight drop-shadow-xl cursor-pointer hover:text-[var(--iptv-primary)] transition-colors flex items-center gap-3 group"
+                  >
+                    {content.name}
+                    <Info className="w-6 h-6 text-white/40 group-hover:text-[var(--iptv-primary)] transition-colors" />
+                  </h1>
+
+                  {/* Plot */}
+                  <p className="text-white/80 text-base mb-6 line-clamp-3 leading-relaxed">
+                    {content.plot || "Açıklama bulunmuyor."}
+                  </p>
+
+                  {/* Actions for Series */}
+                  {seasons.length === 0 && !loading && (
+                    <div className="flex items-center gap-4 flex-wrap">
+                      <Button 
+                        size="lg"
+                        variant="outline"
+                        className="h-14 px-8 border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl gap-2 backdrop-blur-sm"
+                      >
+                        <Lock className="w-5 h-5 text-white/60" />
+                        <span className="text-white/80">FRAGMAN (YAKINDA)</span>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          )}
-          
-          {/* Info */}
-          <div className="flex-1 flex flex-col justify-end min-w-0">
-            <div className="max-w-2xl animate-fade-in-up">
+          ) : (
+            /* Movie Layout: Centered info */
+            <div className="flex-1 flex flex-col justify-center min-w-0">
+              <div className="max-w-2xl">
               {/* Metadata */}
-              <div className="flex items-center gap-3 mb-4 text-sm font-medium">
+              <div className="flex items-center gap-3 mb-4 text-sm font-medium flex-wrap">
                 {content.rating && (
                   <div className="flex items-center gap-1.5 text-yellow-500">
                     <Star className="w-4 h-4 fill-current" />
@@ -114,22 +184,26 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
                   <span className="text-white/80 border-l border-white/20 pl-3">{formatDuration(content.duration)}</span>
                 )}
                 <span className="text-[var(--iptv-primary)] font-bold border-l border-white/20 pl-3 uppercase tracking-wider">
-                  {content.type === 'series' ? 'Di̇zi̇' : 'Fi̇lm'}
+                  {content.type === 'series' ? 'DİZİ' : 'FİLM'}
                 </span>
               </div>
 
-              {/* Title - Full display, no truncate */}
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight drop-shadow-xl">
+              {/* Title - Clickable, Left-aligned */}
+              <h1 
+                onClick={() => setShowDetailsDialog(true)}
+                className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight drop-shadow-xl cursor-pointer hover:text-[var(--iptv-primary)] transition-colors flex items-center gap-3 group"
+              >
                 {content.name}
+                <Info className="w-6 h-6 text-white/40 group-hover:text-[var(--iptv-primary)] transition-colors" />
               </h1>
 
-              {/* Plot */}
-              <p className="text-white/80 text-base mb-6 line-clamp-3 leading-relaxed max-w-2xl">
+              {/* Plot - Left-aligned */}
+              <p className="text-white/80 text-base mb-6 line-clamp-3 leading-relaxed">
                 {content.plot || "Açıklama bulunmuyor."}
               </p>
 
               {/* Actions (Movies only, or quick play for series) */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
                 {content.type === 'movie' && (
                   <Button 
                     size="lg"
@@ -167,107 +241,19 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
                     <span className="text-white/80">FRAGMAN (YAKINDA)</span>
                   </Button>
                 )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
-
-        {/* Right Side: Seasons and Episodes for Series */}
-        {content.type === 'series' && (
-          <div className="w-full md:w-[440px] flex flex-col bg-black/40 backdrop-blur-xl border-l border-white/10 overflow-hidden">
-            {loading ? (
-              <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                <Loader2 className="w-10 h-10 text-[var(--iptv-primary)] animate-spin" />
-                <p className="text-white/60 text-sm">Bölümler yükleniyor...</p>
-              </div>
-            ) : (
-              <>
-                {/* Seasons List */}
-                <div className="p-4 border-b border-white/10">
-                  <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-[var(--iptv-primary)]" />
-                    Sezonlar
-                  </h3>
-                  <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-                    {seasons.map((season) => (
-                      <button
-                        key={season.number}
-                        onClick={() => setSelectedSeason(season)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                          selectedSeason?.number === season.number
-                            ? 'bg-[var(--iptv-primary)] text-white shadow-lg'
-                            : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
-                        }`}
-                      >
-                        S{season.number}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Episodes List */}
-                <div className="flex-1 min-h-0">
-                  <ScrollArea className="h-full">
-                    <div className="p-4 space-y-2">
-                      <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-[var(--iptv-primary)]" />
-                        Bölümler ({selectedSeason?.episodes.length || 0})
-                      </h3>
-                      {selectedSeason?.episodes.map((episode) => (
-                        <div
-                          key={episode.id}
-                          onClick={() => playEpisode(originalSeries, episode)}
-                          className="group/item flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-transparent hover:bg-white/10 hover:border-white/10 cursor-pointer transition-all active:scale-[0.98]"
-                        >
-                          <div className="relative w-24 aspect-video bg-zinc-800 rounded-lg overflow-hidden shrink-0">
-                            {episode.image ? (
-                              <img 
-                                src={episode.image} 
-                                alt={episode.title}
-                                className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <Play className="w-4 h-4 text-white/20" />
-                              </div>
-                            )}
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/item:opacity-100 flex items-center justify-center transition-opacity">
-                              <Play className="w-6 h-6 text-white fill-current" />
-                            </div>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-white text-sm font-medium truncate">
-                              {episode.episodeNum}. {episode.title}
-                            </h4>
-                            <p className="text-white/40 text-xs mt-1">
-                              {episode.duration ? episode.duration : 'Süre bilinmiyor'}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            {episode.downloadUrl && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  window.open(episode.downloadUrl, '_blank');
-                                }}
-                                className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
-                                title="İndir"
-                              >
-                                <Download className="w-4 h-4" />
-                              </button>
-                            )}
-                            <ChevronRight className="w-4 h-4 text-white/20 group-hover/item:text-[var(--iptv-primary)] transition-colors" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-              </>
-            )}
-          </div>
-        )}
       </div>
+
+      {/* Details Dialog */}
+      <ContentDetailsDialog 
+        content={content}
+        open={showDetailsDialog}
+        onOpenChange={setShowDetailsDialog}
+      />
     </div>
   );
 }

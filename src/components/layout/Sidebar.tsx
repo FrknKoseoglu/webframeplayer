@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import type { ContentItem } from '@/types/iptv';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -12,15 +13,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Search, Menu, Radio, X } from 'lucide-react';
+import { Search, Menu, Radio, X, History, Tv, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/i18n';
 
-function ChannelList() {
-  const { content, activeContent, searchQuery, playContent, setSearchQuery } = usePlayerStore();
+type SidebarTab = 'channels' | 'history';
 
-  const filteredChannels = content.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) && item.type === 'live'
-  );
+function SidebarContent() {
+  const [activeTab, setActiveTab] = useState<SidebarTab>('channels');
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col h-full">
@@ -33,11 +34,57 @@ function ChannelList() {
           <span className="text-lg font-bold tracking-[0.2em] text-white">FRAME</span>
         </div>
         
-        {/* Search */}
+        {/* Tab Navigation */}
+        <div className="flex gap-1 p-1 bg-zinc-800/50 rounded-lg">
+          <button
+            onClick={() => setActiveTab('channels')}
+            className={cn(
+              'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all',
+              activeTab === 'channels'
+                ? 'bg-purple-600 text-white'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-700/50'
+            )}
+          >
+            <Tv className="w-4 h-4" />
+            {t.dashboard.channels}
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            className={cn(
+              'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all',
+              activeTab === 'history'
+                ? 'bg-purple-600 text-white'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-700/50'
+            )}
+          >
+            <History className="w-4 h-4" />
+            {t.dashboard.nav.history}
+          </button>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'channels' ? <ChannelList /> : <HistoryList />}
+    </div>
+  );
+}
+
+function ChannelList() {
+  const { content, activeContent, searchQuery, playContent, setSearchQuery } = usePlayerStore();
+  const { t } = useTranslation();
+
+  const filteredChannels = content.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()) && item.type === 'live'
+  );
+
+  return (
+    <>
+      {/* Search */}
+      <div className="p-4 border-b border-zinc-800">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
           <Input
-            placeholder="Search channels..."
+            placeholder={t.dashboard.searchChannels}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-purple-600"
@@ -60,7 +107,7 @@ function ChannelList() {
         <div className="p-2">
           {filteredChannels.length === 0 ? (
             <div className="p-4 text-center text-zinc-500">
-              {searchQuery ? 'No channels found' : 'No channels loaded'}
+              {searchQuery ? t.dashboard.noContent : t.dashboard.noContent}
             </div>
           ) : (
             filteredChannels.map((channel) => (
@@ -78,10 +125,59 @@ function ChannelList() {
       {/* Footer */}
       <div className="p-4 border-t border-zinc-800">
         <p className="text-xs text-zinc-500 text-center">
-          {filteredChannels.length} channels
+          {filteredChannels.length} {t.common.channels}
         </p>
       </div>
-    </div>
+    </>
+  );
+}
+
+function HistoryList() {
+  const { history, activeContent, playContent, clearHistory } = usePlayerStore();
+  const { t } = useTranslation();
+
+  return (
+    <>
+      {/* History List */}
+      <ScrollArea className="flex-1">
+        <div className="p-2">
+          {history.length === 0 ? (
+            <div className="p-4 text-center text-zinc-500">
+              {t.dashboard.historyEmpty}
+            </div>
+          ) : (
+            history.map((item) => (
+              <ChannelItem
+                key={`${item.content.id}-${item.watchedAt}`}
+                channel={item.content}
+                isActive={activeContent?.id === item.content.id}
+                onClick={() => playContent(item.content, true)}
+                timestamp={item.watchedAt}
+              />
+            ))
+          )}
+        </div>
+      </ScrollArea>
+
+      {/* Footer */}
+      <div className="p-4 border-t border-zinc-800">
+        {history.length > 0 ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full text-zinc-400 hover:text-red-400 hover:bg-red-500/10"
+            onClick={clearHistory}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            {t.dashboard.clearHistory}
+          </Button>
+        ) : (
+          <p className="text-xs text-zinc-500 text-center">
+            0 {t.common.channels}
+          </p>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -89,9 +185,23 @@ interface ChannelItemProps {
   channel: ContentItem;
   isActive: boolean;
   onClick: () => void;
+  timestamp?: number;
 }
 
-function ChannelItem({ channel, isActive, onClick }: ChannelItemProps) {
+function ChannelItem({ channel, isActive, onClick, timestamp }: ChannelItemProps) {
+  const formatTime = (ts: number) => {
+    const date = new Date(ts);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    
+    if (diffMins < 1) return 'Az önce';
+    if (diffMins < 60) return `${diffMins} dk önce`;
+    if (diffHours < 24) return `${diffHours} saat önce`;
+    return date.toLocaleDateString();
+  };
+
   return (
     <button
       onClick={onClick}
@@ -125,8 +235,12 @@ function ChannelItem({ channel, isActive, onClick }: ChannelItemProps) {
         <p className={cn('font-medium truncate', isActive ? 'text-white' : 'text-zinc-300')}>
           {channel.name}
         </p>
-        {channel.group && (
-          <p className="text-xs text-zinc-500 truncate">{channel.group}</p>
+        {timestamp ? (
+          <p className="text-xs text-zinc-500 truncate">{formatTime(timestamp)}</p>
+        ) : (
+          channel.group && (
+            <p className="text-xs text-zinc-500 truncate">{channel.group}</p>
+          )
         )}
       </div>
 
@@ -149,7 +263,7 @@ export function Sidebar() {
         sidebarOpen ? 'w-72' : 'w-0 overflow-hidden'
       )}
     >
-      <ChannelList />
+      <SidebarContent />
     </aside>
   );
 }
@@ -173,8 +287,9 @@ export function MobileSidebar() {
         <SheetHeader className="sr-only">
           <SheetTitle>Channel List</SheetTitle>
         </SheetHeader>
-        <ChannelList />
+        <SidebarContent />
       </SheetContent>
     </Sheet>
   );
 }
+

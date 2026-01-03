@@ -9,7 +9,7 @@ import { useTranslation } from '@/lib/i18n';
 export function FAQSchema() {
   // Static English schema for SEO bots (they don't execute JS)
   const faqs = [
-    { q: 'Is this player free to use?', a: 'Yes! The Web IPTV Player is completely free to use.' },
+    { q: 'Is this player free to use?', a: 'Yes! The Web Frame Player is completely free to use.' },
     { q: 'Does it support MKV and MP4 files?', a: 'Yes, the player supports MKV, MP4, and HLS streams.' },
     { q: 'Can I use it on iPhone or Android?', a: 'Absolutely! Works on any device with a modern browser.' },
     { q: 'What is Xtream Codes?', a: 'Xtream Codes is a popular IPTV panel system.' },

@@ -3,6 +3,7 @@ export interface XtreamCredentials {
   url: string;
   username: string;
   password: string;
+  exp_date?: string; // Expiration date from authentication
 }
 
 export interface Profile {
@@ -11,6 +12,7 @@ export interface Profile {
   type: 'm3u' | 'xtream';
   m3uUrl?: string;
   credentials?: XtreamCredentials;
+  supportUrl?: string; // Optional support URL from service provider
   active: boolean;
   createdAt: number;
   lastRefresh?: number; // Timestamp of last content refresh

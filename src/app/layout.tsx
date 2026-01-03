@@ -11,7 +11,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Frame | The Ultimate Web Media Player",
   description: "Experience your content in its purest form. Frame is a high-performance, cloud-synced web player for your m3u playlists and Xtream Codes. No clutter, just focus.",
-  keywords: "frame player, web frame, minimalist iptv player, cloud media player, iptv web player, online tv player, m3u player, xtream codes login, hls player",
+  keywords: "frame player, web frame, minimalist Frame Player, cloud media player, iptv web player, online tv player, m3u player, xtream codes login, hls player",
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },

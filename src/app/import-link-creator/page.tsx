@@ -16,12 +16,18 @@ export default function ImportLinkCreatorPage() {
   const [xtreamPassword, setXtreamPassword] = useState('');
   const [serviceName, setServiceName] = useState('');
   const [customMessage, setCustomMessage] = useState('');
+  const [supportUrl, setSupportUrl] = useState('');
   const [encryptLink, setEncryptLink] = useState(true); // Default: ON
   const [generatedLink, setGeneratedLink] = useState('');
   const [copied, setCopied] = useState(false);
 
   const generateLink = () => {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    
+    // Helper function for UTF-8 safe Base64 encoding
+    const utf8ToBase64 = (str: string) => {
+      return btoa(unescape(encodeURIComponent(str)));
+    };
     
     // Build data object
     const data: Record<string, string> = {};
@@ -42,7 +48,11 @@ export default function ImportLinkCreatorPage() {
     }
     
     if (customMessage) {
-      data.message = btoa(customMessage);
+      data.message = utf8ToBase64(customMessage);
+    }
+    
+    if (supportUrl) {
+      data.supportUrl = supportUrl;
     }
     
     let link: string;
@@ -215,6 +225,22 @@ export default function ImportLinkCreatorPage() {
               />
               <p className="text-xs text-white/40 mt-1">
                 {language === 'tr' ? 'Bu mesaj import sırasında kullanıcıya gösterilir' : 'This message will be shown to the user during import'}
+              </p>
+            </div>
+            
+            <div>
+              <label className="text-sm text-white/70 mb-2 block font-medium">
+                {language === 'tr' ? 'Destek URL (Opsiyonel)' : 'Support URL (Optional)'}
+              </label>
+              <input
+                type="url"
+                value={supportUrl}
+                onChange={(e) => setSupportUrl(e.target.value)}
+                placeholder="https://support.example.com"
+                className="w-full px-4 py-3 rounded-xl bg-[var(--iptv-input-bg)] border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--iptv-primary)] transition-colors"
+              />
+              <p className="text-xs text-white/40 mt-1">
+                {language === 'tr' ? 'Bu link ayarlarda destek butonu olarak görünür' : 'This link will appear as a support button in settings'}
               </p>
             </div>
 

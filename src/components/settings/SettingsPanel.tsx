@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe, Gauge, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, Subtitles } from 'lucide-react';
+import { Globe, Gauge, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, Subtitles, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { 
@@ -45,6 +45,7 @@ export function SettingsPanel() {
   
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [refreshingId, setRefreshingId] = useState<string | null>(null);
+  const [supportUrlDialog, setSupportUrlDialog] = useState<{ url: string; name: string } | null>(null);
 
   const handleDeleteClick = (id: string) => {
     setDeleteConfirmId(id);
@@ -125,6 +126,17 @@ export function SettingsPanel() {
     }
   };
 
+  const handleSupportUrlClick = (url: string, name: string) => {
+    setSupportUrlDialog({ url, name });
+  };
+
+  const handleSupportUrlConfirm = () => {
+    if (supportUrlDialog) {
+      window.open(supportUrlDialog.url, '_blank', 'noopener,noreferrer');
+      setSupportUrlDialog(null);
+    }
+  };
+
   const formatLastRefresh = (timestamp?: number) => {
     if (!timestamp) return language === 'tr' ? 'Hiç' : 'Never';
     const diff = Date.now() - timestamp;
@@ -173,6 +185,55 @@ export function SettingsPanel() {
                 className="flex-1 bg-red-500 hover:bg-red-600 text-white"
               >
                 {language === 'tr' ? 'Sil' : 'Delete'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Support URL Confirmation Dialog */}
+      {supportUrlDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="bg-[var(--iptv-surface-dark)] border border-white/10 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                <ExternalLink className="w-6 h-6 text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold">
+                  {language === 'tr' ? 'Harici Bağlantı' : 'External Link'}
+                </h3>
+                <p className="text-white/50 text-sm">
+                  {supportUrlDialog.name}
+                </p>
+              </div>
+            </div>
+            <p className="text-white/70 text-sm mb-6">
+              {language === 'tr' 
+                ? 'Hizmet sağlayıcınızın destek sayfasına yönlendirileceksiniz. Bu sayfa FRAME Web Player ile ilişkili değildir ve üçüncü taraf bir hizmettir.'
+                : "You will be redirected to your service provider's support page. This page is not affiliated with FRAME Web Player and is a third-party service."}
+            </p>
+            <div className="mb-6 p-3 bg-white/5 rounded-lg border border-white/10">
+              <p className="text-xs text-white/40 mb-1">
+                {language === 'tr' ? 'Yönlendirilecek adres:' : 'Destination:'}
+              </p>
+              <p className="text-sm text-white/80 font-mono break-all">
+                {supportUrlDialog.url}
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setSupportUrlDialog(null)}
+                className="flex-1 border-white/10 text-white/60 hover:text-white"
+              >
+                {language === 'tr' ? 'İptal' : 'Cancel'}
+              </Button>
+              <Button
+                onClick={handleSupportUrlConfirm}
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                {language === 'tr' ? 'Devam Et' : 'Continue'}
               </Button>
             </div>
           </div>
@@ -339,7 +400,54 @@ export function SettingsPanel() {
                         <span className="ml-2 text-green-400">● {language === 'tr' ? 'Aktif' : 'Active'}</span>
                       )}
                       <span className="ml-2 text-white/30">• {formatLastRefresh(profile.lastRefresh)}</span>
+                      {profile.type === 'xtream' && (
+                        <>
+                          <br />
+                          <span className="text-white/40">
+                            {language === 'tr' ? 'Bitiş: ' : 'Expires: '}
+                            {profile.credentials?.exp_date ? (
+                              <span className={cn(
+                                "font-medium",
+                                (() => {
+                                  const expDate = new Date(profile.credentials.exp_date);
+                                  const daysLeft = Math.floor((expDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                                  if (daysLeft < 0) return "text-red-400";
+                                  if (daysLeft < 7) return "text-orange-400";
+                                  return "text-green-400";
+                                })()
+                              )}>
+                                {(() => {
+                                  const expDate = new Date(profile.credentials.exp_date);
+                                  const daysLeft = Math.floor((expDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                                  if (daysLeft < 0) {
+                                    return language === 'tr' ? 'Süresi dolmuş' : 'Expired';
+                                  } else if (daysLeft === 0) {
+                                    return language === 'tr' ? 'Bugün' : 'Today';
+                                  } else if (daysLeft < 30) {
+                                    return language === 'tr' ? `${daysLeft} gün` : `${daysLeft} days`;
+                                  } else {
+                                    return expDate.toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US');
+                                  }
+                                })()}
+                              </span>
+                            ) : (
+                              <span className="text-white/40">
+                                {language === 'tr' ? 'Bilinmiyor' : 'Unknown'}
+                              </span>
+                            )}
+                          </span>
+                        </>
+                      )}
                     </p>
+                    {profile.supportUrl && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleSupportUrlClick(profile.supportUrl!, profile.name); }}
+                        className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        {language === 'tr' ? 'Destek' : 'Support'}
+                      </button>
+                    )}
                   </div>
                   
                   <div className="flex items-center gap-1">

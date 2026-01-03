@@ -66,6 +66,7 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
   const xtreamHost = parsedData?.host || searchParams.get('host');
   const serviceName = parsedData?.serviceName || searchParams.get('serviceName');
   const messageParam = parsedData?.message || searchParams.get('message');
+  const supportUrl = parsedData?.supportUrl || searchParams.get('supportUrl');
 
   // Set display service name
   useEffect(() => {
@@ -78,11 +79,12 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
     }
   }, [serviceName, importUrl, importXtream]);
 
-  // Decode Base64 message if present
+  // Decode Base64 message if present (UTF-8 safe)
   useEffect(() => {
     if (messageParam) {
       try {
-        const decoded = atob(messageParam);
+        // Reverse the encoding: base64 -> Latin1 -> percent-encoded -> UTF-8
+        const decoded = decodeURIComponent(escape(atob(messageParam)));
         setCustomMessage(decoded);
       } catch {
         // Invalid base64, ignore
@@ -127,6 +129,7 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
         name: serviceName ? decodeURIComponent(serviceName) : 'M3U Playlist',
         type: 'm3u',
         m3uUrl: importUrl,
+        supportUrl: supportUrl || undefined,
         active: true,
         createdAt: Date.now(),
         lastRefresh: Date.now(),
@@ -202,7 +205,11 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
         id: crypto.randomUUID(),
         name: serviceName ? decodeURIComponent(serviceName) : authResponse.user_info.username || 'Xtream Hizmet',
         type: 'xtream',
-        credentials,
+        credentials: {
+          ...credentials,
+          exp_date: authResponse.user_info.exp_date,
+        },
+        supportUrl: supportUrl || undefined,
         active: true,
         createdAt: Date.now(),
         lastRefresh: Date.now(),

@@ -19,6 +19,12 @@ const storage: StateStorage = {
   },
 };
 
+// History item type
+export interface HistoryItem {
+  content: ContentItem;
+  watchedAt: number;
+}
+
 // Store state interface
 interface PlayerState {
   // Profile management
@@ -46,6 +52,9 @@ interface PlayerState {
   // Player state
   activeContent: ContentItem | null;
   isPlaying: boolean;
+  
+  // History state (per profile)
+  historyByProfile: Record<string, HistoryItem[]>;
   
   // EPG state
   epgData: Record<string, EpgProgram[]>;
@@ -128,6 +137,10 @@ interface PlayerActions {
   // Audio preferences
   setAudioPreferences: (audio1: string, audio2: string) => void;
   
+  // History actions
+  addToHistory: (content: ContentItem) => void;
+  clearHistory: () => void;
+  
   // Reset
   reset: () => void;
 }
@@ -151,6 +164,7 @@ const initialState: PlayerState = {
   loadingProgress: 0,
   activeContent: null,
   isPlaying: false,
+  historyByProfile: {},
   epgData: {},
   lastEpgSync: 0,
   selectedProgram: null,
@@ -284,6 +298,9 @@ export const usePlayerStore = create<PlayerStore>()(
       
       // Player actions
       playContent: (content, autoPlay = true) => {
+        // Add to history
+        get().addToHistory(content);
+        
         set({ 
           activeContent: content,
           isPlaying: autoPlay,
@@ -382,6 +399,38 @@ export const usePlayerStore = create<PlayerStore>()(
         set({ preferredAudio1: audio1, preferredAudio2: audio2 });
       },
       
+      // History actions
+      addToHistory: (content) => {
+        const profileId = get().activeProfile?.id;
+        if (!profileId) return;
+        
+        set((state) => {
+          const currentHistory = state.historyByProfile[profileId] || [];
+          // Remove duplicate if exists
+          const filtered = currentHistory.filter((h) => h.content.id !== content.id);
+          // Add to beginning and limit to 15 items
+          const newHistory = [{ content, watchedAt: Date.now() }, ...filtered].slice(0, 15);
+          return { 
+            historyByProfile: {
+              ...state.historyByProfile,
+              [profileId]: newHistory
+            }
+          };
+        });
+      },
+      
+      clearHistory: () => {
+        const profileId = get().activeProfile?.id;
+        if (!profileId) return;
+        
+        set((state) => ({
+          historyByProfile: {
+            ...state.historyByProfile,
+            [profileId]: []
+          }
+        }));
+      },
+      
       // Reset
       reset: () => set(initialState),
     }),
@@ -405,6 +454,7 @@ export const usePlayerStore = create<PlayerStore>()(
         subtitlesEnabled: state.subtitlesEnabled,
         preferredAudio1: state.preferredAudio1,
         preferredAudio2: state.preferredAudio2,
+        historyByProfile: state.historyByProfile,
       }),
     }
   )
@@ -418,6 +468,16 @@ export const useCategories = () => usePlayerStore((state) => state.categories);
 export const useFavorites = () => usePlayerStore((state) => state.favorites);
 export const useActiveContent = () => usePlayerStore((state) => state.activeContent);
 export const useIsLoading = () => usePlayerStore((state) => state.isLoading);
+
+export const useHistory = () => {
+  const historyByProfile = usePlayerStore((state) => state.historyByProfile);
+  const activeProfile = usePlayerStore((state) => state.activeProfile);
+  
+  return useMemo(() => {
+    const profileId = activeProfile?.id;
+    return profileId ? (historyByProfile[profileId] || []) : [];
+  }, [historyByProfile, activeProfile]);
+};
 
 // Filtered content selector with performance optimization
 const CONTENT_LIMIT = 100; // Max items to render at once

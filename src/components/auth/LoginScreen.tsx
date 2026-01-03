@@ -131,7 +131,10 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
         // Update existing profile
         updateProfile(editProfile.id, {
           name: serviceName || authResponse.user_info.username || 'Xtream Hizmet',
-          credentials,
+          credentials: {
+            ...credentials,
+            exp_date: authResponse.user_info.exp_date,
+          },
         });
         switchProfile(editProfile.id);
       } else {
@@ -140,7 +143,10 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
           id: crypto.randomUUID(),
           name: serviceName || authResponse.user_info.username || 'Xtream Hizmet',
           type: 'xtream',
-          credentials,
+          credentials: {
+            ...credentials,
+            exp_date: authResponse.user_info.exp_date,
+          },
           active: true,
           createdAt: Date.now(),
         };
@@ -235,7 +241,7 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
               <Tv className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-white">
-              {isEditMode ? 'Hizmeti Düzenle' : onBack ? 'Yeni Hizmet Ekle' : 'IPTV Player'}
+              {isEditMode ? 'Hizmeti Düzenle' : onBack ? 'Yeni Hizmet Ekle' : 'Frame Player'}
             </h1>
             <p className="text-gray-400 text-sm font-medium">
               {isEditMode ? 'Hizmet bilgilerini güncelleyin' : onBack ? 'Yeni bir IPTV hizmeti ekleyin' : 'Hesabınıza giriş yaparak yayınların keyfini çıkarın'}
