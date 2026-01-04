@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Star, Play, ChevronRight, Loader2, Clock, CheckCircle, Download, Copy, Check, ImageIcon } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { usePlayerStore } from '@/store/usePlayerStore';
@@ -20,7 +20,8 @@ export function SeriesInfoPanel({ content }: SeriesInfoPanelProps) {
   const [hoveredEpisode, setHoveredEpisode] = useState<string | null>(null);
   
   // Store the original series info (without episode modifications)
-  const [originalSeries] = useState(() => ({
+  // Use useMemo to recalculate when content changes
+  const originalSeries = useMemo(() => ({
     id: content.id.split('_ep_')[0], // Remove any episode suffix
     name: content.name.split(' - S')[0], // Get original name before episode info
     group: content.group,
@@ -31,7 +32,7 @@ export function SeriesInfoPanel({ content }: SeriesInfoPanelProps) {
     rating: content.rating,
     plot: content.plot,
     seriesId: content.seriesId,
-  } as ContentItem));
+  } as ContentItem), [content.id, content.name, content.group, content.groupId, content.logo, content.url, content.type, content.rating, content.plot, content.seriesId]);
 
   // Get currently playing season/episode from activeContent
   const currentlyPlayingSeason = activeContent?.seasonNumber;
@@ -40,6 +41,9 @@ export function SeriesInfoPanel({ content }: SeriesInfoPanelProps) {
   useEffect(() => {
     async function fetchData() {
       if (content.seriesId && activeProfile?.credentials) {
+        // Clear old seasons immediately when seriesId changes
+        setSeasons([]);
+        setSelectedSeason(null);
         setLoading(true);
         try {
           const data = await getSeriesInfo(activeProfile.credentials, content.seriesId);

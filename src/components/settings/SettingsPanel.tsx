@@ -630,7 +630,7 @@ export function SettingsPanel() {
                   })()}
 
                   {/* Action Buttons */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/5">
                     <Button
                       variant="ghost"
                       size="sm"

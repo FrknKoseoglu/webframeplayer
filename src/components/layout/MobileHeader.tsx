@@ -1,26 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { Menu, Search, X, Tv } from 'lucide-react';
+import { Menu, Tv } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { usePlayerStore } from '@/store/usePlayerStore';
-import { cn } from '@/lib/utils';
 
 interface MobileHeaderProps {
   sidebarContent: (closeSidebar: () => void) => React.ReactNode;
 }
 
 export function MobileHeader({ sidebarContent }: MobileHeaderProps) {
-  const [searchOpen, setSearchOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { searchQuery, setSearchQuery } = usePlayerStore();
 
   const closeSidebar = () => setSidebarOpen(false);
 
@@ -47,46 +42,8 @@ export function MobileHeader({ sidebarContent }: MobileHeaderProps) {
             <span className="text-white font-bold tracking-[0.2em] text-lg">FRAME</span>
           </div>
 
-          {/* Right: Search Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSearchOpen(!searchOpen)}
-            className="text-white/80 hover:text-white hover:bg-white/10 min-h-[44px] min-w-[44px]"
-          >
-            {searchOpen ? <X className="w-6 h-6" /> : <Search className="w-6 h-6" />}
-          </Button>
-        </div>
-
-        {/* Expandable Search Bar */}
-        <div
-          className={cn(
-            'overflow-hidden transition-all duration-300',
-            searchOpen ? 'max-h-16 opacity-100' : 'max-h-0 opacity-0'
-          )}
-        >
-          <div className="px-4 pb-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-              <Input
-                placeholder="Kanal ara..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-10 bg-[var(--iptv-input-bg)] border-[var(--iptv-border)] text-white"
-                autoFocus={searchOpen}
-              />
-              {searchQuery && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-white/40 hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
-          </div>
+          {/* Right: Empty space for symmetry */}
+          <div className="w-10"></div>
         </div>
       </header>
 

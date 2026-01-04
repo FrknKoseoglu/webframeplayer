@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Home, Tv, Film, Video, Heart, Settings, Search, Menu, X, 
-  Play, Radio, ChevronDown, Eye, EyeOff, Calendar, History
+  Play, Radio, ChevronDown, Eye, EyeOff, Calendar, History, ArrowLeft,
+  Copy, Download
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -19,11 +20,12 @@ import { ContentDetails } from '@/components/details/ContentDetails';
 import { SeriesInfoPanel } from '@/components/details/SeriesInfoPanel';
 import { HomeView } from '@/components/home/HomeView';
 import { MobileHeader } from '@/components/layout/MobileHeader';
+import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { SettingsPanel } from '@/components/settings/SettingsPanel';
 import { HistoryView } from '@/components/history/HistoryView';
 import { getShortEPG, convertEpgListings } from '@/lib/xtream-adapter';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import type { ContentType, ContentItem, Category, EpgProgram } from '@/types/iptv';
+import type { ContentType, ContentItem, Category, EpgProgram, Season } from '@/types/iptv';
 
 type NavItem = {
   id: string;
@@ -63,6 +65,7 @@ export default function DashboardPage() {
     setSearchQuery,
     playContent,
     stopContent,
+    playEpisode,
     toggleFavorite,
     toggleHiddenGroup,
     toggleSidebar,
@@ -72,9 +75,19 @@ export default function DashboardPage() {
   } = usePlayerStore();
 
   const filteredContent = useFilteredContent();
-  const [activeNav, setActiveNav] = useState<string>('home');
+  const [activeNav, setActiveNav] = useState<string>('live'); // Start with Live TV
   const profiles = usePlayerStore((s) => s.profiles);
   const isDesktop = useMediaQuery('(min-width: 768px)'); // md breakpoint
+  
+  // Mobile-specific states
+  const [showMobileCategories, setShowMobileCategories] = useState(true);
+  const [lastSelectedCategory, setLastSelectedCategory] = useState<string | null>(null);
+  
+  // Mobile series episode view states
+  const [selectedSeries, setSelectedSeries] = useState<ContentItem | null>(null);
+  const [seriesSeasons, setSeriesSeasons] = useState<Season[]>([]);
+  const [selectedSeasonNum, setSelectedSeasonNum] = useState<number>(1);
+  const [loadingSeries, setLoadingSeries] = useState(false);
 
   useEffect(() => {
     if (!activeProfile) {
@@ -119,10 +132,49 @@ export default function DashboardPage() {
   };
 
   const handleCategoryClick = (category: Category | null) => {
-    setActiveCategory(category?.id || null);
+    const categoryId = category?.id || null;
+    setActiveCategory(categoryId);
+    
+    // Mobile: Hide categories when one is selected, store it for back navigation
+    if (!isDesktop) {
+      setShowMobileCategories(false);
+      setLastSelectedCategory(categoryId);
+    }
+    
     // Close settings when a category is selected, go to current content type
     if (activeNav === 'settings') {
       setActiveNav(contentType);
+    }
+  };
+  
+  // Mobile bottom nav handler
+  const handleMobileNavClick = (navId: string, contentType?: ContentType) => {
+    stopContent();
+    setActiveNav(navId);
+    
+    if (navId === 'favorites') {
+      // Favorites special handling
+      const currentType = contentType || 'live';
+      setContentType(currentType);
+      setTimeout(() => setActiveCategory('favorites'), 0);
+      setShowMobileCategories(false);
+      setSelectedSeries(null); // Clear series view
+    } else if (contentType) {
+      // Content type changed - reset all mobile states to show categories
+      setContentType(contentType);
+      setActiveCategory(null);
+      setShowMobileCategories(true); // Show categories for new type
+      setLastSelectedCategory(null);
+      setSelectedSeries(null); // Clear any open series episode view
+    }
+  };
+  
+  // Back button handler for mobile
+  const handleBackToCategories = () => {
+    setShowMobileCategories(true);
+    // Restore last selected category
+    if (lastSelectedCategory) {
+      setActiveCategory(lastSelectedCategory);
     }
   };
 
@@ -133,6 +185,32 @@ export default function DashboardPage() {
   }, [activeProfile]);
 
   const handleContentClick = async (item: ContentItem) => {
+    // Mobile: Series clicked - show episode view
+    if (!isDesktop && item.type === 'series') {
+      setSelectedSeries(item);
+      setShowMobileCategories(false);
+      
+      // Clear old series data immediately to prevent showing wrong episodes
+      setSeriesSeasons([]);
+      setSelectedSeasonNum(1);
+      
+      // Fetch series info
+      if (item.seriesId && activeProfile?.credentials) {
+        setLoadingSeries(true);
+        try {
+          const { getSeriesInfo } = await import('@/lib/xtream-adapter');
+          const seasons = await getSeriesInfo(activeProfile.credentials, item.seriesId);
+          setSeriesSeasons(seasons);
+          setSelectedSeasonNum(seasons[0]?.number || 1);
+        } catch (e) {
+          console.error('Failed to fetch series info:', e);
+        } finally {
+          setLoadingSeries(false);
+        }
+      }
+      return;
+    }
+    
     // When clicking from history, navigate to appropriate content type
     if (activeNav === 'history') {
       // Set the content type and navigate away from history
@@ -437,27 +515,269 @@ export default function DashboardPage() {
         /* Mobile: flex-col (player on top, content below) | Desktop: flex-row */
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           
-          {/* Mobile: Sticky Player at Top */}
-          <div className="md:hidden sticky top-0 z-40 bg-black">
-            <div className="aspect-video bg-black relative">
-              {activeContent ? (
-                activeContent.type === 'live' || isPlaying ? (
-                  <MasterPlayer key="mobile-player" />
+          {/* Mobile: Sticky Player at Top - Only on mobile */}
+          {!isDesktop && (
+            <div className="md:hidden sticky top-0 z-40 bg-black">
+              <div className="aspect-video bg-black relative">
+                {activeContent ? (
+                  activeContent.type === 'live' || isPlaying ? (
+                    <MasterPlayer key="mobile-player" />
+                  ) : (
+                    <PlayerPreview key="mobile-preview" content={activeContent} />
+                  )
                 ) : (
-                  <PlayerPreview key="mobile-preview" content={activeContent} />
-                )
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-zinc-900">
-                  <Tv className="w-12 h-12 text-white/20" />
-                </div>
-              )}
+                  <div className="w-full h-full flex items-center justify-center bg-zinc-900">
+                    <Tv className="w-12 h-12 text-white/20" />
+                  </div>
+                )}
+              </div>
             </div>
+          )}
+          
+          {/* Mobile Bottom Navigation - Icon only */}
+          <MobileBottomNav activeNav={activeNav} onNavClick={handleMobileNavClick} />
+          
+          
+          {/* Mobile: Categories OR Content List OR Series Episodes */}
+          <div className="md:hidden flex-1 overflow-hidden bg-[var(--iptv-background)]">
+            {selectedSeries ? (
+              /* Series Episode View */
+              <div className="h-full flex flex-col">
+                {/* Header with Back Button */}
+                <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border-b border-white/10">
+                  <button
+                    onClick={() => setSelectedSeries(null)}
+                    className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                  >
+                    <ArrowLeft className="w-5 h-5 text-white" />
+                  </button>
+                  <span className="text-sm font-medium text-white truncate flex-1">
+                    {selectedSeries.name}
+                  </span>
+                </div>
+                
+                {loadingSeries ? (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-8 h-8 border-2 border-[var(--iptv-primary)] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                      <p className="text-white/50 text-sm">Bölümler yükleniyor...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {/* Season Tabs */}
+                    <div className="px-4 py-3 border-b border-white/10 overflow-x-auto">
+                      <div className="flex gap-2">
+                        {seriesSeasons.map((season) => (
+                          <button
+                            key={season.number}
+                            onClick={() => setSelectedSeasonNum(season.number)}
+                            className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
+                              selectedSeasonNum === season.number
+                                ? 'bg-[var(--iptv-primary)] text-white'
+                                : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+                            }`}
+                          >
+                            Sezon {season.number}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Episodes List */}
+                    <div className="flex-1 overflow-y-auto">
+                      {seriesSeasons.find(s => s.number === selectedSeasonNum)?.episodes.map((episode) => {
+                        const isPlaying = activeContent?.seasonNumber === episode.seasonNum && 
+                                         activeContent?.episodeNumber === episode.episodeNum;
+                        const episodeInfo = (episode as any).info; // Type assertion for runtime info property
+                        
+                        return (
+                          <div
+                            key={episode.id}
+                            onClick={() => playEpisode(selectedSeries, episode)}
+                            className={`flex gap-3 p-3 border-b border-white/5 cursor-pointer transition-colors ${
+                              isPlaying ? 'bg-[var(--iptv-primary)]/10' : 'hover:bg-white/5'
+                            }`}
+                          >
+                            {/* Episode Thumbnail - Compact */}
+                            <div className="relative w-32 h-18 bg-white/10 rounded overflow-hidden flex-shrink-0">
+                              {episode.image ? (
+                                <img 
+                                  src={episode.image} 
+                                  alt={episode.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
+                                  <Video className="w-6 h-6 text-white/30" />
+                                </div>
+                              )}
+                              
+                              {/* Playing indicator badge */}
+                              {isPlaying && (
+                                <div className="absolute inset-0 bg-[var(--iptv-primary)]/20 border-2 border-[var(--iptv-primary)] flex items-center justify-center">
+                                  <Play className="w-6 h-6 text-white" />
+                                </div>
+                              )}
+                              
+                              {/* Duration */}
+                              {episodeInfo?.duration && (
+                                <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 rounded text-xs text-white">
+                                  {episodeInfo.duration}
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Episode Info */}
+                            <div className="flex-1 min-w-0 flex flex-col justify-between">
+                              <div>
+                                <p className="text-white font-semibold text-sm mb-1 line-clamp-1">
+                                  E{episode.episodeNum} - {episode.title}
+                                </p>
+                                {episodeInfo?.plot && (
+                                  <p className="text-white/50 text-xs line-clamp-2">
+                                    {episodeInfo.plot}
+                                  </p>
+                                )}
+                              </div>
+                              
+                              {/* Action buttons - Inline bottom */}
+                              <div className="flex gap-2 mt-2">
+                                <button
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
+                                    try {
+                                      await navigator.clipboard.writeText(episode.url);
+                                    } catch (err) {
+                                      console.error('Copy failed:', err);
+                                    }
+                                  }}
+                                  className="flex items-center gap-1 px-2 py-1 bg-white/5 hover:bg-white/10 rounded text-xs text-white/70 hover:text-white transition-colors"
+                                >
+                                  <Copy className="w-3 h-3" />
+                                  Kopyala
+                                </button>
+                                <a
+                                  href={episode.url}
+                                  download
+                                  className="flex items-center gap-1 px-2 py-1 bg-white/5 hover:bg-white/10 rounded text-xs text-white/70 hover:text-white transition-colors"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Download className="w-3 h-3" />
+                                  İndir
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }) || (
+                        <div className="py-16 text-center">
+                          <Video className="w-10 h-10 text-white/20 mx-auto mb-2" />
+                          <p className="text-white/50 text-sm">Bu sezonda bölüm bulunamadı</p>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : showMobileCategories ? (
+              /* Categories List */
+              <div className="h-full overflow-y-auto">
+                <div className="p-4">
+                  <h3 className="text-sm font-semibold text-white/60 uppercase mb-3">Kategoriler</h3>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => handleCategoryClick(null)}
+                      className={`w-full px-4 py-3 rounded-lg text-left font-medium transition-all ${
+                        !activeCategory 
+                          ? 'bg-[var(--iptv-primary)] text-white' 
+                          : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      Tümü
+                    </button>
+                    {filteredCategories.map((cat, index) => (
+                      <button
+                        key={`${cat.id}_${index}`}
+                        onClick={() => handleCategoryClick(cat)}
+                        className={`w-full px-4 py-3 rounded-lg text-left font-medium transition-all ${
+                          activeCategory === cat.id
+                            ? 'bg-[var(--iptv-primary)] text-white'
+                            : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+                        }`}
+                      >
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Content List with Back Button */
+              <div className="h-full flex flex-col">
+                {/* Back Button Header */}
+                <div className="flex items-center gap-3 px-4 py-3 bg-white/5 border-b border-white/10">
+                  <button
+                    onClick={handleBackToCategories}
+                    className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                  >
+                    <ArrowLeft className="w-5 h-5 text-white" />
+                  </button>
+                  <span className="text-sm font-medium text-white/80">
+                    {activeCategory && activeCategory !== 'favorites' 
+                      ? `${filteredCategories.find(c => c.id === activeCategory)?.name || 'Tümü'} - ${filteredContent.length} İçerik`
+                      : activeCategory === 'favorites'
+                      ? `Favoriler - ${filteredContent.length} İçerik`
+                      : `Tümü - ${filteredContent.length} İçerik`
+                    }
+                  </span>
+                </div>
+                
+                {/* Content List */}
+                <div className="flex-1 overflow-y-auto">
+                  <div className="p-2 space-y-1">
+                    {filteredContent.length === 0 ? (
+                      <div className="py-16 text-center">
+                        <Tv className="w-10 h-10 text-white/20 mx-auto mb-2" />
+                        <p className="text-white/50 text-sm">İçerik bulunamadı</p>
+                      </div>
+                    ) : (
+                      filteredContent.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => handleContentClick(item)}
+                          className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all min-h-[56px] ${
+                            activeContent?.id === item.id 
+                              ? 'bg-[var(--iptv-primary)]/20 border border-[var(--iptv-primary)]/50' 
+                              : 'hover:bg-white/5 border border-transparent'
+                          }`}
+                        >
+                          <div className="w-10 h-10 rounded bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
+                            {item.logo ? <img src={item.logo} alt="" className="w-8 h-8 object-contain" /> : <Radio className="w-5 h-5 text-white/50" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white text-sm font-medium truncate">{item.name}</p>
+                            <p className="text-white/40 text-xs truncate">{item.group}</p>
+                          </div>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }} 
+                            className={`min-w-[44px] min-h-[44px] flex items-center justify-center ${favorites.includes(item.id) ? 'text-[var(--iptv-primary)]' : 'text-white/20 hover:text-white/50'}`}
+                          >
+                            <Heart className={`w-5 h-5 ${favorites.includes(item.id) ? 'fill-current' : ''}`} />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           
-          {/* Channel List - Full width on mobile, fixed 400px on desktop */}
-          <div className="w-full md:w-[400px] flex-1 md:flex-initial flex flex-col min-h-0 border-r border-white/5 bg-[var(--iptv-background)] overflow-hidden">
-            {/* Search - Hidden on mobile (already in MobileHeader) */}
-            <div className="hidden md:flex p-3 border-b border-white/5 items-center gap-2 shrink-0">
+          {/* Desktop: Channel List - Fixed 400px */}
+          <div className="hidden md:flex w-[400px] flex-col min-h-0 border-r border-white/5 bg-[var(--iptv-background)] overflow-hidden">
+            {/* Search */}
+            <div className="flex p-3 border-b border-white/5 items-center gap-2 shrink-0">
               <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-white/60 hover:text-white shrink-0 min-h-[44px] min-w-[44px]">
                 <Menu className="w-5 h-5" />
               </Button>
