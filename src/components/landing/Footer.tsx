@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { Tv, Github, Mail } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n';
+import { usePlayerStore } from '@/store/usePlayerStore';
 
 export function Footer() {
   const { t } = useTranslation();
   const f = t.landing.footer;
+  const language = usePlayerStore((s) => s.language);
 
   return (
     <footer className="py-12 bg-[var(--iptv-background)] border-t border-white/10">
@@ -21,15 +23,17 @@ export function Footer() {
           </div>
 
           {/* Links */}
-          <div className="flex items-center gap-6 text-sm text-white/60">
-            <Link href="/login" className="hover:text-white transition-colors">
-              {f.login}
+          <div className="flex items-center gap-4 text-sm text-white/60">
+            <Link href="/legal/terms" className="hover:text-white transition-colors">
+              {language === 'tr' ? 'Kullanım Şartları' : 'Terms of Service'}
             </Link>
-            <Link href="#features" className="hover:text-white transition-colors">
-              {f.features}
+            <span className="text-white/20">·</span>
+            <Link href="/legal/privacy" className="hover:text-white transition-colors">
+              {language === 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy'}
             </Link>
-            <Link href="#" className="hover:text-white transition-colors">
-              {f.privacy}
+            <span className="text-white/20">·</span>
+            <Link href="/legal/faq" className="hover:text-white transition-colors">
+              {language === 'tr' ? 'Sıkça Sorulan Sorular' : 'FAQ'}
             </Link>
           </div>
 
@@ -53,9 +57,9 @@ export function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="mt-8 pt-8 border-t border-white/5 text-center">
+        <div className="border-t border-white/5 pt-6 mt-6 text-center">
           <p className="text-sm text-white/40">
-            © {new Date().getFullYear()} {f.copyright}
+            &copy; 2025 FRAME. {language === 'tr' ? 'Tüm hakları saklıdır' : 'All rights reserved'}.
           </p>
         </div>
       </div>
