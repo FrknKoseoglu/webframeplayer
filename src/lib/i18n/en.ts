@@ -151,4 +151,22 @@ export const en: Translations = {
     movies: 'Movies',
     series: 'Series',
   },
+  
+  // Settings
+  settings: {
+    proxy: {
+      title: 'Proxy Settings',
+      enableCustom: 'Use Proxy',
+      serverAddress: 'Proxy Server Address',
+      placeholder: 'https://proxy.com or 192.168.1.1:8080',
+      helperText: 'Paste your proxy server address. No need to add ?url=, we handle it automatically.',
+      testConnection: 'Test Connection',
+      testing: 'Testing...',
+      testSuccess: 'Connection successful!',
+      testFailed: 'Proxy not working, please check the URL.',
+      invalidUrl: 'Invalid format. Example: https://proxy.com or 192.168.1.1:8080',
+      corsError: 'CORS Error',
+      corsErrorMessage: 'To watch this stream, try adding a proxy server in Settings → Proxy Settings.',
+    },
+  },
 };

@@ -149,6 +149,24 @@ export const tr = {
     movies: 'Film',
     series: 'Dizi',
   },
+  
+  // Settings
+  settings: {
+    proxy: {
+      title: 'Proxy Ayarları',
+      enableCustom: 'Proxy Kullan',
+      serverAddress: 'Proxy Sunucu Adresi',
+      placeholder: 'https://proxy.com veya 192.168.1.1:8080',
+      helperText: 'Proxy sunucu adresinizi yapıştırın. Sonuna ?url= eklemenize gerek yoktur, otomatik eklenir.',
+      testConnection: 'Bağlantıyı Test Et',
+      testing: 'Test ediliyor...',
+      testSuccess: 'Bağlantı başarılı!',
+      testFailed: 'Proxy çalışmıyor, lütfen URL\'i kontrol edin.',
+      invalidUrl: 'Geçersiz format. Örnek: https://proxy.com veya 192.168.1.1:8080',
+      corsError: 'CORS Hatası',
+      corsErrorMessage: 'Yayını izlemek için Ayarlar → Proxy Ayarları bölümünden bir proxy sunucusu eklemeyi deneyebilirsiniz.',
+    },
+  },
 };
 
 export type Translations = typeof tr;

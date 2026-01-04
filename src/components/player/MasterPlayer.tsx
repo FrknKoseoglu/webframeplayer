@@ -4,6 +4,7 @@ import { usePlayerStore } from '@/store/usePlayerStore';
 import { VideoPlayer } from './VideoPlayer';
 import { VodPlayer } from './VodPlayer';
 import { Tv } from 'lucide-react';
+import { getStreamUrl } from '@/lib/url-helper';
 
 interface MasterPlayerProps {
   autoPlay?: boolean;
@@ -26,10 +27,10 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
     );
   }
 
-  // Build the stream URL
+  // Build the stream URL using smart proxy helper
   const streamUrl = activeContent.type === 'live'
     ? activeContent.url
-    : `/api/stream?url=${encodeURIComponent(activeContent.url)}`;
+    : getStreamUrl(activeContent.url);
 
   // Live TV → Vidstack
   if (activeContent.type === 'live') {

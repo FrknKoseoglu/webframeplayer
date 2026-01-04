@@ -81,6 +81,10 @@ interface PlayerState {
   // Audio preferences
   preferredAudio1: string;
   preferredAudio2: string;
+  
+  // Proxy settings
+  customProxyUrl: string;
+  enableCustomProxy: boolean;
 }
 
 // Store actions interface
@@ -119,23 +123,15 @@ interface PlayerActions {
   fetchGlobalEpg: () => Promise<void>;
   setSelectedProgram: (program: EpgProgram | null) => void;
   
-  // Language
-  setLanguage: (lang: Language) => void;
-  
-  // Buffer
+  // Settings actions
+  setLanguage: (language: Language) => void;
   setBufferMode: (mode: 'instant' | 'low' | 'medium' | 'high') => void;
-  
-  // Cache
-  setCacheExpiry: (hours: 4 | 24 | 72 | 168) => void;
-  
-  // Volume
+  setCacheExpiry: (expiry: 4 | 24 | 72 | 168) => void;
   setVolume: (volume: number) => void;
-  
-  // Subtitle preferences
-  setSubtitlePreferences: (sub1: string, sub2: string, enabled: boolean) => void;
-  
-  // Audio preferences
+  setSubtitlePreferences: (subtitle1: string, subtitle2: string, enabled: boolean) => void;
   setAudioPreferences: (audio1: string, audio2: string) => void;
+  setCustomProxyUrl: (url: string) => void;
+  toggleCustomProxy: () => void;
   
   // History actions
   addToHistory: (content: ContentItem) => void;
@@ -177,6 +173,8 @@ const initialState: PlayerState = {
   subtitlesEnabled: true,
   preferredAudio1: 'en',
   preferredAudio2: 'tr',
+  customProxyUrl: '',
+  enableCustomProxy: false,
 };
 
 export const usePlayerStore = create<PlayerStore>()(
@@ -396,7 +394,19 @@ export const usePlayerStore = create<PlayerStore>()(
       
       // Audio preferences
       setAudioPreferences: (audio1, audio2) => {
-        set({ preferredAudio1: audio1, preferredAudio2: audio2 });
+        set({ 
+          preferredAudio1: audio1, 
+          preferredAudio2: audio2 
+        });
+      },
+      
+      // Proxy settings
+      setCustomProxyUrl: (url) => {
+        set({ customProxyUrl: url });
+      },
+      
+      toggleCustomProxy: () => {
+        set((state) => ({ enableCustomProxy: !state.enableCustomProxy }));
       },
       
       // History actions
@@ -455,6 +465,8 @@ export const usePlayerStore = create<PlayerStore>()(
         preferredAudio1: state.preferredAudio1,
         preferredAudio2: state.preferredAudio2,
         historyByProfile: state.historyByProfile,
+        customProxyUrl: state.customProxyUrl,
+        enableCustomProxy: state.enableCustomProxy,
       }),
     }
   )

@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe, Gauge, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, Subtitles, ExternalLink, Infinity } from 'lucide-react';
+import { Globe, Gauge, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, Subtitles, ExternalLink, Infinity, Wifi, CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { 
   authenticateXtream, 
@@ -20,6 +21,8 @@ import {
 } from '@/lib/xtream-adapter';
 import { processM3UPlaylist } from '@/lib/m3u-parser';
 import { cn } from '@/lib/utils';
+import { validateProxyUrl, testProxyConnection } from '@/lib/url-helper';
+import { useTranslation } from '@/lib/i18n';
 
 const BUFFER_OPTIONS = [
   { id: 'instant', label: { tr: 'Anlık', en: 'Instant' }, desc: { tr: '~0.5s gecikme', en: '~0.5s delay' } },
@@ -37,15 +40,21 @@ const CACHE_OPTIONS = [
 
 export function SettingsPanel() {
   const router = useRouter();
+  const { t } = useTranslation();
+  const proxy = t.settings.proxy;
+  
   const { 
-    language, bufferMode, cacheExpiry, profiles, activeProfile, 
+    language, bufferMode, cacheExpiry, profiles, activeProfile,
+    customProxyUrl, enableCustomProxy,
     setLanguage, setBufferMode, setCacheExpiry, removeProfile, switchProfile, updateProfile,
-    setCategories, setContent, setLoading
+    setCategories, setContent, setLoading, setCustomProxyUrl, toggleCustomProxy
   } = usePlayerStore();
   
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [refreshingId, setRefreshingId] = useState<string | null>(null);
   const [supportUrlDialog, setSupportUrlDialog] = useState<{ url: string; name: string } | null>(null);
+  const [isTestingProxy, setIsTestingProxy] = useState(false);
+  const [proxyTestResult, setProxyTestResult] = useState<'success' | 'error' | null>(null);
 
   const handleDeleteClick = (id: string) => {
     setDeleteConfirmId(id);
@@ -146,6 +155,25 @@ export function SettingsPanel() {
       window.open(supportUrlDialog.url, '_blank', 'noopener,noreferrer');
       setSupportUrlDialog(null);
     }
+  };
+  
+  const handleTestProxy = async () => {
+    if (!customProxyUrl || !validateProxyUrl(customProxyUrl)) {
+      setProxyTestResult('error');
+      setTimeout(() => setProxyTestResult(null), 3000);
+      return;
+    }
+    
+    setIsTestingProxy(true);
+    setProxyTestResult(null);
+    
+    const success = await testProxyConnection(customProxyUrl);
+    
+    setIsTestingProxy(false);
+    setProxyTestResult(success ? 'success' : 'error');
+    
+    // Clear result after 3 seconds
+    setTimeout(() => setProxyTestResult(null), 3000);
   };
 
   const formatLastRefresh = (timestamp?: number) => {
@@ -357,6 +385,107 @@ export function SettingsPanel() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Proxy Settings Section */}
+        <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+              <Wifi className="w-5 h-5 text-cyan-400" />
+            </div>
+            <div>
+              <h2 className="text-white font-semibold">{proxy.title}</h2>
+              <p className="text-white/50 text-sm">
+                {language === 'tr' 
+                  ? 'CORS sorunlarını çözmek için proxy sunucusu kullanın' 
+                  : 'Use a proxy server to solve CORS issues'}
+              </p>
+            </div>
+          </div>
+          
+          {/* Toggle Switch */}
+          <button
+            onClick={toggleCustomProxy}
+            className={cn(
+              'w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all mb-4',
+              enableCustomProxy
+                ? 'bg-cyan-500/10 border-cyan-500/30'
+                : 'bg-white/5 border-white/10'
+            )}
+          >
+            <span className={cn('font-medium', enableCustomProxy ? 'text-cyan-400' : 'text-white/60')}>
+              {proxy.enableCustom}
+            </span>
+            <div className={cn(
+              'w-12 h-6 rounded-full transition-all relative',
+              enableCustomProxy ? 'bg-cyan-500' : 'bg-white/20'
+            )}>
+              <div className={cn(
+                'absolute top-1 w-4 h-4 rounded-full bg-white transition-all',
+                enableCustomProxy ? 'right-1' : 'left-1'
+              )} />
+            </div>
+          </button>
+          
+          {/* Proxy URL Input - visible when enabled */}
+          {enableCustomProxy && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">
+                  {proxy.serverAddress}
+                </label>
+                <Input
+                  type="url"
+                  value={customProxyUrl}
+                  onChange={(e) => setCustomProxyUrl(e.target.value)}
+                  placeholder={proxy.placeholder}
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                />
+                <p className="text-xs text-white/40 mt-2">
+                  {proxy.helperText}
+                </p>
+                {customProxyUrl && !validateProxyUrl(customProxyUrl) && (
+                  <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                    <XCircle className="w-3 h-3" />
+                    {proxy.invalidUrl}
+                  </p>
+                )}
+              </div>
+              
+              {/* Test Connection Button */}
+              <Button
+                onClick={handleTestProxy}
+                disabled={isTestingProxy || !customProxyUrl}
+                className={cn(
+                  'w-full',
+                  proxyTestResult === 'success' && 'bg-green-500 hover:bg-green-600',
+                  proxyTestResult === 'error' && 'bg-red-500 hover:bg-red-600'
+                )}
+              >
+                {isTestingProxy ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    {proxy.testing}
+                  </>
+                ) : proxyTestResult === 'success' ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    {proxy.testSuccess}
+                  </>
+                ) : proxyTestResult === 'error' ? (
+                  <>
+                    <XCircle className="w-4 h-4 mr-2" />
+                    {proxy.testFailed}
+                  </>
+                ) : (
+                  <>
+                    <Wifi className="w-4 h-4 mr-2" />
+                    {proxy.testConnection}
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Audio & Subtitles Section */}
