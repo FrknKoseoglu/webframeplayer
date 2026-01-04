@@ -103,15 +103,11 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
         {/* Legal Disclaimer Link */}
         <div className="mt-8">
           <p className="text-xs text-white/30">
-            {h.legalDisclaimer || (
-              <>
-                Frame is a software tool only. See{' '}
-                <Link href="/legal/terms" className="underline hover:text-white/50">
-                  Terms
-                </Link>
-                {' '}for legal responsibilities.
-              </>
-            )}
+            Frame is a software tool only. See{' '}
+            <Link href="/legal/terms" className="underline hover:text-white/50">
+              Terms
+            </Link>
+            {' '}for legal responsibilities.
           </p>
         </div>
       </div>
