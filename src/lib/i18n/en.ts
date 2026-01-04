@@ -80,6 +80,20 @@ export const en: Translations = {
       privacy: 'Privacy',
       copyright: 'Frame Player. All rights reserved.',
     },
+    magicLink: {
+      badge: 'For Service Providers',
+      title: 'Magic Link with',
+      titleHighlight: 'Instant Setup',
+      subtitle: 'Provide service to your customers with one click. Eliminate complex setup steps.',
+      benefit1Title: 'One-Click Customer Onboarding',
+      benefit1Desc: 'Send a link, customer clicks. Service loads automatically. It\'s that simple.',
+      benefit2Title: 'Automatic Configuration',
+      benefit2Desc: 'Logo, support URL, message - everything loads automatically. No hassle for your customers.',
+      benefit3Title: 'Professional Impression',
+      benefit3Desc: 'Strengthen your brand. Give your customers a modern and professional experience.',
+      ctaCreate: 'Create Magic Link',
+      ctaLearnMore: 'Learn More',
+    },
   },
 
   // Dashboard

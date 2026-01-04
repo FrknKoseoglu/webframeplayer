@@ -78,6 +78,20 @@ export const tr = {
       privacy: 'Gizlilik',
       copyright: 'Frame Player. Tüm hakları saklıdır.',
     },
+    magicLink: {
+      badge: 'Hizmet Sağlayıcılar İçin',
+      title: 'Magic Link ile',
+      titleHighlight: 'Anında Kurulum',
+      subtitle: 'Müşterilerinize tek tıkla hizmet sunun. Karmaşık kurulum adımlarını ortadan kaldırın.',
+      benefit1Title: 'Tek Tıkla Müşteri Ekleme',
+      benefit1Desc: 'Link gönderin, müşteriniz tıklasın. Hizmet otomatik olarak yüklensin. Bu kadar basit.',
+      benefit2Title: 'Otomatik Yapılandırma',
+      benefit2Desc: 'Logo, destek URL\'si, mesaj - hepsi otomatik yüklenir. Müşteriniz hiç uğraşmaz.',
+      benefit3Title: 'Profesyonel İzlenim',
+      benefit3Desc: 'Markanızı güçlendirin. Müşterilerinize modern ve profesyonel bir deneyim sunun.',
+      ctaCreate: 'Magic Link Oluştur',
+      ctaLearnMore: 'Daha Fazla Bilgi',
+    },
   },
 
   // Dashboard
