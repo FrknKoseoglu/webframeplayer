@@ -11,10 +11,10 @@ const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
   // In production, this might crash if env var is missing
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('DATABASE_URL is not defined in environment variables');
+    console.warn('⚠️ DATABASE_URL is not defined in environment variables. Database connections will fail.');
+  } else {
+    console.warn('⚠️ DATABASE_URL not found in db.ts initialization');
   }
-  // In dev, Next.js load order might mean it's undefined initially during static analysis
-  console.warn('⚠️ DATABASE_URL not found in db.ts initialization');
 }
 
 const pool = new Pool({ connectionString: connectionString || '' });
