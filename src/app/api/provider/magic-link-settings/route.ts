@@ -15,6 +15,7 @@ export async function GET() {
       defaultMagicMessage: true,
       defaultMagicLogo: true,
       defaultMagicHost: true,
+      defaultSupportUrl: true,
     },
   });
 
@@ -22,6 +23,7 @@ export async function GET() {
     defaultMagicMessage: provider?.defaultMagicMessage || '',
     defaultMagicLogo: provider?.defaultMagicLogo || '',
     defaultMagicHost: provider?.defaultMagicHost || '',
+    defaultSupportUrl: provider?.defaultSupportUrl || '',
   });
 }
 
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { defaultMagicMessage, defaultMagicLogo, defaultMagicHost } = body;
+  const { defaultMagicMessage, defaultMagicLogo, defaultMagicHost, defaultSupportUrl } = body;
 
   await db.serviceProvider.update({
     where: { id: session.user.id },
@@ -41,6 +43,7 @@ export async function POST(request: NextRequest) {
       defaultMagicMessage: defaultMagicMessage || null,
       defaultMagicLogo: defaultMagicLogo || null,
       defaultMagicHost: defaultMagicHost || null,
+      defaultSupportUrl: defaultSupportUrl || null,
     },
   });
 

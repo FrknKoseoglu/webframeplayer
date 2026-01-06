@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Tv, Trash2, Play, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { 
   getLiveCategories, 
@@ -26,6 +28,7 @@ interface ServiceSelectorProps {
 
 export function ServiceSelector({ onAddNew }: ServiceSelectorProps) {
   const router = useRouter();
+  const { confirm } = useConfirm();
   const { profiles, removeProfile, switchProfile, setCategories, setContent, setLoading } = usePlayerStore();
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
@@ -98,10 +101,19 @@ export function ServiceSelector({ onAddNew }: ServiceSelectorProps) {
     }
   };
 
-  const handleDelete = (e: React.MouseEvent, profileId: string) => {
+  const handleDelete = async (e: React.MouseEvent, profileId: string) => {
     e.stopPropagation();
-    if (confirm('Bu hizmeti silmek istediğinize emin misiniz?')) {
+    const proceed = await confirm({
+      title: 'Hizmeti Sil',
+      description: 'Bu hizmeti silmek istediğinize emin misiniz? Bu işlem geri alınamaz.',
+      confirmText: 'Sil',
+      cancelText: 'İptal',
+      type: 'danger',
+    });
+    
+    if (proceed) {
       removeProfile(profileId);
+      toast.success('Hizmet silindi');
     }
   };
 

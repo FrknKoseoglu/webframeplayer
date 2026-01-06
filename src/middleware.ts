@@ -9,7 +9,7 @@ export default auth((req) => {
   // Admin routes
   if (nextUrl.pathname.startsWith('/admin')) {
     if (!isLoggedIn) {
-      return NextResponse.redirect(new URL('/admin/login', nextUrl));
+      return NextResponse.redirect(new URL('/adm/login', nextUrl));
     }
     if (userRole !== 'SUPER_ADMIN') {
       return NextResponse.redirect(new URL('/', nextUrl));

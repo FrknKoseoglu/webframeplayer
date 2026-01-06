@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Shield } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -41,11 +42,20 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="w-full max-w-md p-8 bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20">
+    <div className="relative min-h-screen flex items-center justify-center bg-[var(--iptv-background)] overflow-hidden">
+      {/* Ambient Background Effect */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[var(--iptv-primary)]/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-cyan-500/10 blur-[100px] rounded-full" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-md p-8 bg-[var(--iptv-surface)] backdrop-blur-lg rounded-2xl shadow-2xl border border-white/5">
         <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-[var(--iptv-primary)]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Shield className="w-8 h-8 text-[var(--iptv-primary)]" />
+          </div>
           <h1 className="text-3xl font-bold text-white mb-2">Yönetici Girişi</h1>
-          <p className="text-gray-300">IPTV Yönetim Paneli</p>
+          <p className="text-white/40">Frame Yönetim Paneli</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -59,7 +69,7 @@ export default function AdminLoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+              className="bg-[var(--iptv-input-bg)] border-white/10 text-white placeholder:text-gray-400 focus:border-[var(--iptv-primary)]"
               placeholder="Admin kullanıcı adı"
             />
           </div>
@@ -74,13 +84,13 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+              className="bg-[var(--iptv-input-bg)] border-white/10 text-white placeholder:text-gray-400 focus:border-[var(--iptv-primary)]"
               placeholder="••••••••"
             />
           </div>
 
           {error && (
-            <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
               {error}
             </div>
           )}
@@ -88,14 +98,14 @@ export default function AdminLoginPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-6"
+            className="w-full bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white font-semibold py-6 transition-colors shadow-lg shadow-[var(--iptv-primary)]/20"
           >
             {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
           </Button>
         </form>
 
         <div className="mt-6 text-center">
-          <a href="/provider/login" className="text-sm text-purple-300 hover:text-purple-200">
+          <a href="/provider/login" className="text-sm text-white/40 hover:text-white transition-colors">
             Hizmet Sağlayıcı mısınız? Buradan giriş yapın
           </a>
         </div>

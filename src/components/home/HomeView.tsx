@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { Tv, Film, Video, Settings, ChevronDown, LogOut } from 'lucide-react';
 import { usePlayerStore } from '@/store/usePlayerStore';
+import { toast } from 'sonner';
 
 interface HomeViewProps {
   onNavigate: (nav: string) => void;
@@ -95,7 +96,7 @@ export function HomeView({ onNavigate, backgroundImage }: HomeViewProps) {
                 key={cat.id}
                 onClick={() => {
                   if (isEmpty && (cat.id === 'movies' || cat.id === 'series')) {
-                    alert(`Bu hizmette ${cat.label.toLowerCase()} mevcut değildir.`);
+                    toast.error(`Bu hizmette ${cat.label.toLowerCase()} mevcut değildir.`);
                     return;
                   }
                   onNavigate(cat.id);

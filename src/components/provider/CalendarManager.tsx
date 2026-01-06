@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Plus, Trash2, Calendar } from 'lucide-react';
+import { toast } from 'sonner';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 
 type CalendarEvent = {
   id: string;
@@ -18,6 +20,7 @@ type CalendarEvent = {
 };
 
 export default function CalendarManager() {
+  const { confirm } = useConfirm();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -62,6 +65,9 @@ export default function CalendarManager() {
         setIsCreateOpen(false);
         setFormData({ title: '', channel: '', channelId: '', eventDate: '', description: '' });
         fetchEvents();
+        toast.success('Etkinlik oluşturuldu');
+      } else {
+        toast.error('Hata oluştu');
       }
     } finally {
       setCreating(false);
@@ -69,7 +75,14 @@ export default function CalendarManager() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu etkinliği silmek istediğinizden emin misiniz?')) return;
+    const proceed = await confirm({
+      title: 'Etkinliği Sil',
+      description: 'Bu etkinliği silmek istediğinizden emin misiniz?',
+      confirmText: 'Sil',
+      cancelText: 'İptal',
+      type: 'danger',
+    });
+    if (!proceed) return;
 
     try {
       await fetch('/api/provider/calendar', {
@@ -77,9 +90,10 @@ export default function CalendarManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
       });
+      toast.success('Etkinlik silindi');
       fetchEvents();
     } catch (err) {
-      alert('Hata oluştu');
+      toast.error('Hata oluştu');
     }
   };
 

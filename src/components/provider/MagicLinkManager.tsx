@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Sparkles, Trash2, Copy, Save, Settings, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 
 type MagicLink = {
   id: string;
@@ -24,9 +26,11 @@ type MagicLink = {
 type DefaultSettings = {
   defaultMagicMessage: string;
   defaultMagicLogo: string;
+  defaultSupportUrl: string;
 };
 
 export default function MagicLinkManager() {
+  const { confirm } = useConfirm();
   const [links, setLinks] = useState<MagicLink[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -38,6 +42,7 @@ export default function MagicLinkManager() {
   const [defaultSettings, setDefaultSettings] = useState<DefaultSettings>({
     defaultMagicMessage: '',
     defaultMagicLogo: '',
+    defaultSupportUrl: '',
   });
 
   const [formData, setFormData] = useState({
@@ -66,6 +71,7 @@ export default function MagicLinkManager() {
         setDefaultSettings({
           defaultMagicMessage: data.defaultMagicMessage || '',
           defaultMagicLogo: data.defaultMagicLogo || '',
+          defaultSupportUrl: data.defaultSupportUrl || '',
         });
       }
     } catch (err) {
@@ -85,9 +91,10 @@ export default function MagicLinkManager() {
       if (res.ok) {
         setSettingsSaved(true);
         setTimeout(() => setSettingsSaved(false), 3000);
+        toast.success('Varsayılan ayarlar kaydedildi');
       }
     } catch (err) {
-      alert('Ayarlar kaydedilemedi');
+      toast.error('Ayarlar kaydedilemedi');
     } finally {
       setSavingSettings(false);
     }
@@ -115,9 +122,12 @@ export default function MagicLinkManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          // Use default settings if not provided
+          // Service name prefix enforcement happens in form state or here
+          serviceName: formData.serviceName,
+          // Use default settings logic
           message: formData.message || defaultSettings.defaultMagicMessage || 'IPTV hizmetiniz hazır!',
           logoUrl: formData.logoUrl || defaultSettings.defaultMagicLogo || null,
+          supportUrl: formData.supportUrl || defaultSettings.defaultSupportUrl || null,
         }),
       });
 
@@ -143,7 +153,14 @@ export default function MagicLinkManager() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu magic linki silmek istediğinizden emin misiniz?')) return;
+    const proceed = await confirm({
+      title: 'Magic Linki Sil',
+      description: 'Bu magic linki silmek istediğinizden emin misiniz? Link artık kullanılamayacak.',
+      confirmText: 'Sil',
+      cancelText: 'İptal',
+      type: 'danger',
+    });
+    if (!proceed) return;
 
     try {
       await fetch('/api/provider/magic-links', {
@@ -151,9 +168,10 @@ export default function MagicLinkManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
       });
+      toast.success('Magic link silindi');
       fetchLinks();
     } catch (err) {
-      alert('Hata oluştu');
+      toast.error('Hata oluştu');
     }
   };
 
@@ -162,6 +180,7 @@ export default function MagicLinkManager() {
     navigator.clipboard.writeText(magicUrl);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+    toast.success('Link kopyalandı');
   };
 
   if (loading) return <div className="text-white">Yükleniyor...</div>;
@@ -198,6 +217,17 @@ export default function MagicLinkManager() {
               value={defaultSettings.defaultMagicLogo}
               onChange={(e) => setDefaultSettings({ ...defaultSettings, defaultMagicLogo: e.target.value })}
               placeholder="https://example.com/logo.png"
+              className="bg-white/10 border-white/20 text-white"
+            />
+          </div>
+          <div>
+            <Label htmlFor="defaultSupport">Varsayılan Destek URL</Label>
+            <Input
+              id="defaultSupport"
+              type="url"
+              value={defaultSettings.defaultSupportUrl}
+              onChange={(e) => setDefaultSettings({ ...defaultSettings, defaultSupportUrl: e.target.value })}
+              placeholder="https://t.me/example"
               className="bg-white/10 border-white/20 text-white"
             />
           </div>

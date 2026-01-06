@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import { Toaster } from 'sonner';
+import { ConfirmProvider } from '@/components/ui/confirm-dialog';
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -82,7 +84,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </noscript>
         {/* End Google Tag Manager (noscript) */}
         
-        {children}
+        <Toaster 
+          position="top-center"
+          richColors
+          closeButton
+          theme="dark"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: 'rgba(30, 30, 40, 0.95)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+            },
+          }}
+        />
+        <ConfirmProvider>
+          {children}
+        </ConfirmProvider>
       </body>
     </html>
   );

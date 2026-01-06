@@ -18,7 +18,7 @@ export default function ImportLinkCreatorPage() {
   const [customMessage, setCustomMessage] = useState('');
   const [supportUrl, setSupportUrl] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
-  const [encryptLink, setEncryptLink] = useState(true); // Default: ON
+  const [encryptLink, setEncryptLink] = useState(false); // Default: OFF for free users
   const [generatedLink, setGeneratedLink] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -208,115 +208,84 @@ export default function ImportLinkCreatorPage() {
               <label className="text-sm text-white/70 mb-2 block font-medium">
                 {language === 'tr' ? 'Hizmet Adı (Opsiyonel)' : 'Service Name (Optional)'}
               </label>
-              <input
-                type="text"
-                value={serviceName}
-                onChange={(e) => setServiceName(e.target.value)}
-                placeholder={language === 'tr' ? 'Premium IPTV' : 'Premium IPTV'}
-                className="w-full px-4 py-3 rounded-xl bg-[var(--iptv-input-bg)] border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--iptv-primary)] transition-colors"
-              />
+              <div className="relative flex items-center">
+                <span className="absolute left-4 text-white/40 select-none">Frame - </span>
+                <input
+                  type="text"
+                  value={serviceName.replace(/^Frame - /, '')}
+                  onChange={(e) => setServiceName(`Frame - ${e.target.value}`)}
+                  placeholder={language === 'tr' ? 'IPTV' : 'IPTV'}
+                  className="w-full pl-[4.5rem] pr-4 py-3 rounded-xl bg-[var(--iptv-input-bg)] border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--iptv-primary)] transition-colors"
+                />
+              </div>
             </div>
             
-            <div>
-              <label className="text-sm text-white/70 mb-2 block font-medium">
-                {language === 'tr' ? 'Özel Mesaj (Opsiyonel)' : 'Custom Message (Optional)'}
-              </label>
-              <textarea
-                value={customMessage}
-                onChange={(e) => setCustomMessage(e.target.value)}
-                placeholder={language === 'tr' ? 'Hizmetiniz yükleniyor, bizi tercih ettiğiniz için teşekkürler!' : 'Your service is loading, thank you for choosing us!'}
-                rows={3}
-                className="w-full px-4 py-3 rounded-xl bg-[var(--iptv-input-bg)] border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--iptv-primary)] transition-colors resize-none"
-              />
-              <p className="text-xs text-white/40 mt-1">
-                {language === 'tr' ? 'Bu mesaj import sırasında kullanıcıya gösterilir' : 'This message will be shown to the user during import'}
-              </p>
-            </div>
-            
-            <div>
-              <label className="text-sm text-white/70 mb-2 block font-medium">
-                {language === 'tr' ? 'Destek URL (Opsiyonel)' : 'Support URL (Optional)'}
-              </label>
-              <input
-                type="url"
-                value={supportUrl}
-                onChange={(e) => setSupportUrl(e.target.value)}
-                placeholder="https://support.example.com"
-                className="w-full px-4 py-3 rounded-xl bg-[var(--iptv-input-bg)] border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--iptv-primary)] transition-colors"
-              />
-              <p className="text-xs text-white/40 mt-1">
-                {language === 'tr' ? 'Bu link ayarlarda destek butonu olarak görünür' : 'This link will appear as a support button in settings'}
-              </p>
-            </div>
-            
-            <div>
-              <label className="text-sm text-white/70 mb-2 block font-medium">
-                {language === 'tr' ? 'Logo URL (Opsiyonel)' : 'Logo URL (Optional)'}
-              </label>
-              <input
-                type="url"
-                value={logoUrl}
-                onChange={(e) => setLogoUrl(e.target.value)}
-                placeholder="https://example.com/logo.png"
-                className="w-full px-4 py-3 rounded-xl bg-[var(--iptv-input-bg)] border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--iptv-primary)] transition-colors"
-              />
-              <p className="text-xs text-white/40 mt-1">
-                {language === 'tr' ? 'Önerilen: 200x85px veya daha küçük, PNG/SVG formatı' : 'Recommended: 200x85px or smaller, PNG/SVG format'}
-              </p>
-              {logoUrl && (
-                <div className="mt-3 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <p className="text-xs text-white/50 mb-2">
-                    {language === 'tr' ? 'Önizleme:' : 'Preview:'}
-                  </p>
-                  <div className="flex items-center justify-center bg-black/30 rounded-lg p-4" style={{ maxHeight: '85px' }}>
-                    <img 
-                      src={logoUrl} 
-                      alt="Logo preview" 
-                      className="max-h-[85px] max-w-full object-contain"
-                      onError={(e) => {
-                        e.currentTarget.src = '';
-                        e.currentTarget.alt = language === 'tr' ? 'Logo yüklenemedi' : 'Logo failed to load';
-                      }}
-                    />
-                  </div>
+            <div className="p-4 bg-orange-500/5 rounded-xl border border-orange-500/10 space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Lock className="w-4 h-4 text-orange-400" />
+                <span className="text-sm font-medium text-orange-400">
+                  {language === 'tr' ? 'Premium Özellikler' : 'Premium Features'}
+                </span>
+              </div>
+
+              <div className="opacity-60 pointer-events-none select-none space-y-4">
+                <div>
+                  <label className="text-sm text-white/70 mb-2 block font-medium">
+                    {language === 'tr' ? 'Özel Mesaj' : 'Custom Message'}
+                  </label>
+                  <textarea
+                    disabled
+                    placeholder={language === 'tr' ? 'Sadece Premium üyelere özeldir' : 'Premium users only'}
+                    rows={2}
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white/30 resize-none"
+                  />
                 </div>
-              )}
+                
+                <div className="grid grid-cols-2 gap-4">
+                   <div>
+                    <label className="text-sm text-white/70 mb-2 block font-medium">
+                      {language === 'tr' ? 'Destek URL' : 'Support URL'}
+                    </label>
+                    <input disabled placeholder="Premium..." className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white/30" />
+                   </div>
+                   <div>
+                    <label className="text-sm text-white/70 mb-2 block font-medium">
+                      {language === 'tr' ? 'Logo URL' : 'Logo URL'}
+                    </label>
+                    <input disabled placeholder="Premium..." className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white/30" />
+                   </div>
+                </div>
+              </div>
+
+              <div className="text-center text-xs text-orange-300/80">
+                <p>
+                  {language === 'tr' ? 'Premium özellikler için ' : 'For premium features contact: '}
+                  <a href="https://t.me/unfnamed" target="_blank" rel="noopener noreferrer" className="underline hover:text-orange-200 font-medium">
+                    https://t.me/unfnamed
+                  </a>
+                </p>
+              </div>
             </div>
 
-            {/* Encrypt Toggle */}
-            <div className="pt-4 border-t border-white/5">
+            {/* Encrypt Toggle (Disabled) */}
+            <div className="pt-4 border-t border-white/5 opacity-60">
               <button
-                onClick={() => setEncryptLink(!encryptLink)}
-                className={cn(
-                  'w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all',
-                  encryptLink
-                    ? 'bg-green-500/10 border-green-500/30'
-                    : 'bg-white/5 border-white/10'
-                )}
+                disabled
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/5 bg-white/5 cursor-not-allowed"
               >
                 <div className="flex items-center gap-3">
-                  {encryptLink ? (
-                    <Lock className="w-5 h-5 text-green-400" />
-                  ) : (
-                    <Unlock className="w-5 h-5 text-white/40" />
-                  )}
+                  <Unlock className="w-5 h-5 text-white/40" />
                   <div className="text-left">
-                    <p className={cn('font-medium', encryptLink ? 'text-green-400' : 'text-white/60')}>
-                      {language === 'tr' ? 'Linki Şifrele' : 'Encrypt Link'}
+                    <p className="font-medium text-white/40">
+                      {language === 'tr' ? 'Linki Şifrele (Premium)' : 'Encrypt Link (Premium)'}
                     </p>
-                    <p className="text-xs text-white/40">
-                      {language === 'tr' ? 'Kullanıcı bilgilerini URL\'de gizler' : 'Hides user credentials in URL'}
+                    <p className="text-xs text-white/30">
+                      {language === 'tr' ? 'Sadece Premium üyelere özeldir' : 'Premium users only'}
                     </p>
                   </div>
                 </div>
-                <div className={cn(
-                  'w-12 h-6 rounded-full transition-all relative',
-                  encryptLink ? 'bg-green-500' : 'bg-white/20'
-                )}>
-                  <div className={cn(
-                    'absolute top-1 w-4 h-4 rounded-full bg-white transition-all',
-                    encryptLink ? 'right-1' : 'left-1'
-                  )} />
+                <div className="w-12 h-6 rounded-full bg-white/10 relative">
+                  <div className="absolute top-1 left-1 w-4 h-4 rounded-full bg-white/20" />
                 </div>
               </button>
             </div>

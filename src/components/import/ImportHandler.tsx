@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, Tv, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { 
   authenticateXtream, 
@@ -31,8 +32,9 @@ const MIN_DISPLAY_TIME = 3000; // 3 seconds minimum
 
 export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
   const router = useRouter();
+  const { confirm } = useConfirm();
   const searchParams = useSearchParams();
-  const { addProfile, switchProfile, setCategories, setContent, setLoading, language } = usePlayerStore();
+  const { profiles, addProfile, switchProfile, setCategories, setContent, setLoading, language } = usePlayerStore();
   
   const [loadingStep, setLoadingStep] = useState<LoadingStep>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -113,9 +115,44 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
     setLoading(false);
   };
 
+  // Check for duplicate M3U profile
+  const findDuplicateM3UProfile = (url: string): Profile | undefined => {
+    return profiles.find(p => p.type === 'm3u' && p.m3uUrl === url);
+  };
+
+  // Check for duplicate Xtream profile
+  const findDuplicateXtreamProfile = (url: string, user: string, password: string): Profile | undefined => {
+    return profiles.find(p => 
+      p.type === 'xtream' && 
+      p.credentials?.url === url && 
+      p.credentials?.username === user && 
+      p.credentials?.password === password
+    );
+  };
+
   // Handle M3U import
   const handleM3UImport = async () => {
     if (!importUrl || importStartedRef.current) return;
+    
+    // Check for duplicate
+    const existingProfile = findDuplicateM3UProfile(importUrl);
+    if (existingProfile) {
+      importStartedRef.current = true; // Prevent double trigger
+      const proceed = await confirm({
+        title: '⚠️ Bu playlist zaten eklenmiş!',
+        description: `"${existingProfile.name}" isimli profile aynı URL ile kayıtlı.\n\nMevcut profile geçiş yapmak ister misiniz?`,
+        confirmText: 'Mevcut Profile Geç',
+        cancelText: 'Vazgeç',
+        type: 'info',
+      });
+      if (proceed) {
+        switchProfile(existingProfile.id);
+        onComplete();
+      } else {
+        onCancel();
+      }
+      return;
+    }
     
     importStartedRef.current = true;
     startTimeRef.current = Date.now();
@@ -158,6 +195,26 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
   // Handle Xtream import
   const handleXtreamImport = async () => {
     if (!xtreamHost || !xtreamUser || !xtreamPassword || importStartedRef.current) return;
+    
+    // Check for duplicate
+    const existingProfile = findDuplicateXtreamProfile(xtreamHost, xtreamUser, xtreamPassword);
+    if (existingProfile) {
+      importStartedRef.current = true; // Prevent double trigger
+      const proceed = await confirm({
+        title: '⚠️ Bu servis zaten eklenmiş!',
+        description: `"${existingProfile.name}" isimli profile aynı giriş bilgileri ile kayıtlı.\n\nMevcut profile geçiş yapmak ister misiniz?`,
+        confirmText: 'Mevcut Profile Geç',
+        cancelText: 'Vazgeç',
+        type: 'info',
+      });
+      if (proceed) {
+        switchProfile(existingProfile.id);
+        onComplete();
+      } else {
+        onCancel();
+      }
+      return;
+    }
     
     importStartedRef.current = true;
     startTimeRef.current = Date.now();

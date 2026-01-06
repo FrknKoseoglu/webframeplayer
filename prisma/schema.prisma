@@ -38,9 +38,11 @@ model ServiceProvider {
   username      String         @unique
   password      String
   email         String?
-  userLimit     Int            @default(10)
+  credits       Int            @default(0)  // Prepaid credits (1 credit = 1 user)
+  userLimit     Int            @default(10) // @deprecated - kept for migration
   defaultMagicMessage String?
   defaultMagicLogo    String?
+  defaultSupportUrl   String?
   defaultMagicHost    String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -50,6 +52,7 @@ model ServiceProvider {
   calendarEvents CalendarEvent[]
   notifications Notification[]
   magicLinks    MagicLink[]
+  creditLogs    CreditLog[]
 }
 
 model Customer {
@@ -160,4 +163,17 @@ model MagicLink {
   customer    Customer?
   
   @@index([providerId])
+}
+
+model CreditLog {
+  id          String   @id @default(cuid())
+  amount      Int      // Positive = credit added, Negative = credit used
+  description String
+  createdAt   DateTime @default(now())
+  
+  providerId  String
+  provider    ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  
+  @@index([providerId])
+  @@index([createdAt])
 }

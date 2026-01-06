@@ -8,7 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Pencil, Trash2, AlertCircle, Copy, Sparkles, Settings, Save, Check } from 'lucide-react';
+import { Plus, Pencil, Trash2, AlertCircle, Copy, Sparkles, Settings, Save, Check, Lock } from 'lucide-react';
+import { toast } from 'sonner';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 
 type MagicLink = {
   id: string;
@@ -38,11 +40,14 @@ type DefaultSettings = {
 type Props = {
   customers: Customer[];
   currentCount: number;
-  userLimit: number;
+  credits: number;
 };
 
-export default function CustomerManager({ customers, currentCount, userLimit }: Props) {
+const LOCK_MINUTES = 15; // Minutes after which critical fields are locked
+
+export default function CustomerManager({ customers, currentCount, credits }: Props) {
   const router = useRouter();
+  const { confirm } = useConfirm();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -69,6 +74,7 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
     createMagicLink: true,
     customMessage: '',
     customLogo: '',
+    regenerateMagicLink: false,
   });
 
   useEffect(() => {
@@ -103,9 +109,10 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
       if (res.ok) {
         setSettingsSaved(true);
         setTimeout(() => setSettingsSaved(false), 3000);
+        toast.success('Varsayılan ayarlar kaydedildi');
       }
     } catch (err) {
-      alert('Ayarlar kaydedilemedi');
+      toast.error('Ayarlar kaydedilemedi');
     } finally {
       setSavingSettings(false);
     }
@@ -123,6 +130,7 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
       createMagicLink: true,
       customMessage: '',
       customLogo: '',
+      regenerateMagicLink: false,
     });
     setError('');
   };
@@ -149,11 +157,12 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
         setIsCreateOpen(false);
         resetForm();
         router.refresh();
+        toast.success('Kullanıcı başarıyla oluşturuldu');
       } else {
-        setError(data.error || 'Hata oluştu');
+        toast.error(data.error || 'Hata oluştu');
       }
     } catch (err) {
-      setError('Bağlantı hatası');
+      toast.error('Bağlantı hatası');
     } finally {
       setLoading(false);
     }
@@ -162,6 +171,18 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingCustomer) return;
+    
+    // If regenerating magic link, warn about old link invalidation
+    if (formData.regenerateMagicLink && editingCustomer.magicLink) {
+      const proceed = await confirm({
+        title: '⚠️ Eski Magic Link Geçersiz Olacak!',
+        description: 'Yeni bir magic link oluşturulacak ve eski link artık çalışmayacaktır.\n\nKullanıcınıza yeni linki iletmeniz gerekecektir.\n\nDevam etmek istiyor musunuz?',
+        confirmText: 'Evet, Yenile',
+        cancelText: 'İptal',
+        type: 'warning',
+      });
+      if (!proceed) return;
+    }
     
     setLoading(true);
     setError('');
@@ -182,18 +203,26 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
         setEditingCustomer(null);
         resetForm();
         router.refresh();
+        toast.success('Kullanıcı güncellendi');
       } else {
-        setError(data.error || 'Hata oluştu');
+        toast.error(data.error || 'Hata oluştu');
       }
     } catch (err) {
-      setError('Bağlantı hatası');
+      toast.error('Bağlantı hatası');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) return;
+    const proceed = await confirm({
+      title: 'Kullanıcıyı Sil',
+      description: 'Bu kullanıcıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
+      confirmText: 'Sil',
+      cancelText: 'İptal',
+      type: 'danger',
+    });
+    if (!proceed) return;
 
     try {
       const res = await fetch('/api/provider/customers', {
@@ -203,14 +232,29 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
       });
 
       if (res.ok) {
+        toast.success('Kullanıcı silindi');
         router.refresh();
+      } else {
+        toast.error('Silme işlemi başarısız');
       }
     } catch (err) {
-      alert('Hata oluştu');
+      toast.error('Hata oluştu');
     }
   };
 
-  const openEdit = (customer: Customer) => {
+  const openEdit = async (customer: Customer) => {
+    // Check if edit is locked (15 min rule)
+    if (isFieldLocked(customer)) {
+      const proceed = await confirm({
+        title: '⚠️ Düzenleme Süresi Doldu',
+        description: 'Bu kullanıcı 15 dakikadan önce oluşturulduğu için kritik alanlar (kullanıcı adı, sunucu adresi) kilitlenmiştir.\n\nSadece şifre, not ve bitiş tarihi düzenlenebilir.\n\nFarklı bilgiler için yeni kullanıcı oluşturmanız gerekir.\n\nDevam etmek istiyor musunuz?',
+        confirmText: 'Devam Et',
+        cancelText: 'İptal',
+        type: 'warning',
+      });
+      if (!proceed) return;
+    }
+
     setEditingCustomer(customer);
     let hostWithPort = customer.xtreamHost || '';
     if (customer.xtreamHost && customer.xtreamPort) {
@@ -229,7 +273,17 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
       createMagicLink: false,
       customMessage: '',
       customLogo: '',
+      regenerateMagicLink: true, // Mandatory regeneration on edit
     });
+  };
+
+  // Check if editing fields should be locked (15 min rule)
+  const isFieldLocked = (customer: Customer | null): boolean => {
+    if (!customer) return false;
+    const now = new Date();
+    const createdAt = new Date(customer.createdAt);
+    const diffMinutes = (now.getTime() - createdAt.getTime()) / (1000 * 60);
+    return diffMinutes > LOCK_MINUTES;
   };
 
   const copyMagicLink = (shortCode: string, customerId: string) => {
@@ -257,7 +311,7 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
     return <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">{days} Gün</Badge>;
   };
 
-  const canAddMore = currentCount < userLimit;
+  const canAddMore = credits > 0;
 
   // Input styling consistent with site design
   const inputStyles = "bg-[var(--iptv-surface)]/50 border-white/10 text-white placeholder:text-zinc-500 focus:border-purple-500 focus:ring-purple-500/20";
@@ -267,9 +321,16 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
     <>
       {/* Header with buttons */}
       <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
-        <div className="text-white">
-          <span className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{currentCount}</span>
-          <span className="text-zinc-400"> / {userLimit} Kullanıcı</span>
+        <div className="text-white flex items-center gap-4">
+          <div>
+            <span className="text-sm text-zinc-400">Aktif Kullanıcı</span>
+            <p className="text-2xl font-bold">{currentCount}</p>
+          </div>
+          <div className="w-px h-10 bg-white/10"></div>
+          <div>
+            <span className="text-sm text-zinc-400">Bakiye</span>
+            <p className="text-2xl font-bold text-emerald-400">{credits} <span className="text-sm text-zinc-500">Kredi</span></p>
+          </div>
         </div>
         <div className="flex gap-3">
           <Button
@@ -286,7 +347,7 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
                 resetForm();
                 setIsCreateOpen(true);
               } else {
-                alert('Kullanıcı limitinize ulaştınız. Yöneticinizle iletişime geçin.');
+                toast.error('Yetersiz bakiye. Kredi yüklemek için yöneticinizle iletişime geçin.');
               }
             }}
             disabled={!canAddMore}
@@ -457,6 +518,22 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
         <DialogContent className="bg-[var(--iptv-surface)] border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto backdrop-blur-xl">
           <DialogHeader>
             <DialogTitle className="text-lg">{editingCustomer ? 'Kullanıcı Düzenle' : 'Yeni Kullanıcı Ekle'}</DialogTitle>
+            {editingCustomer && (
+              <div className="text-sm space-y-1 pt-2">
+                <p className="text-zinc-400">
+                  Eklenme: <span className="text-white">{new Date(editingCustomer.createdAt).toLocaleString('tr-TR')}</span>
+                </p>
+                {isFieldLocked(editingCustomer) ? (
+                  <p className="text-amber-400 flex items-center gap-1">
+                    <Lock className="w-3 h-3" /> Kritik alanlar kilitli (15dk geçti)
+                  </p>
+                ) : (
+                  <p className="text-emerald-400">
+                    ⏱ Düzenleme süresi: {Math.max(0, Math.ceil(LOCK_MINUTES - ((Date.now() - new Date(editingCustomer.createdAt).getTime()) / 60000)))} dk kaldı
+                  </p>
+                )}
+              </div>
+            )}
           </DialogHeader>
           <form onSubmit={editingCustomer ? handleUpdate : handleCreate} className="space-y-5 pt-2">
             <div>
@@ -467,13 +544,14 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
                 className={inputStyles}
+                disabled={isFieldLocked(editingCustomer)}
               />
             </div>
 
             <Tabs value={formData.type} onValueChange={(v) => setFormData({ ...formData, type: v as 'XTREAM' | 'M3U' })}>
               <TabsList className="grid w-full grid-cols-2 bg-white/5 border border-white/10">
-                <TabsTrigger value="XTREAM" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">Xtream Codes</TabsTrigger>
-                <TabsTrigger value="M3U" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">M3U Playlist</TabsTrigger>
+                <TabsTrigger disabled={isFieldLocked(editingCustomer)} value="XTREAM" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">Xtream Codes</TabsTrigger>
+                <TabsTrigger disabled={isFieldLocked(editingCustomer)} value="M3U" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">M3U Playlist</TabsTrigger>
               </TabsList>
 
               <TabsContent value="XTREAM" className="space-y-4 mt-5">
@@ -486,6 +564,7 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
                       onChange={(e) => setFormData({ ...formData, xtreamUsername: e.target.value })}
                       required={formData.type === 'XTREAM'}
                       className={inputStyles}
+                      disabled={isFieldLocked(editingCustomer)}
                     />
                   </div>
                   <div>
@@ -508,6 +587,7 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
                     required={formData.type === 'XTREAM'}
                     placeholder="http://server.com:8080"
                     className={inputStyles}
+                    disabled={isFieldLocked(editingCustomer)}
                   />
                 </div>
               </TabsContent>
@@ -522,6 +602,7 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
                     required={formData.type === 'M3U'}
                     placeholder="http://server.com/playlist.m3u8"
                     className={inputStyles}
+                    disabled={isFieldLocked(editingCustomer)}
                   />
                 </div>
               </TabsContent>
@@ -591,6 +672,22 @@ export default function CustomerManager({ customers, currentCount, userLimit }: 
                   </div>
                 )}
               </>
+            )}
+
+            {/* Regenerate Magic Link - Mandatory / Warning */}
+            {editingCustomer && editingCustomer.magicLink && (
+              <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                <Sparkles className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-amber-200 font-medium text-sm mb-1">
+                    Magic Link Yenilenecek
+                  </h4>
+                  <p className="text-amber-400/70 text-xs leading-relaxed">
+                    Düzenleme işlemi sonrasında mevcut Magic Link geçersiz olacaktır. 
+                    Kullanıcınıza yeni oluşacak linki iletmeniz gerekecektir.
+                  </p>
+                </div>
+              </div>
             )}
 
             {error && (

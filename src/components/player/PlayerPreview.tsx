@@ -323,20 +323,12 @@ function CopyLinkButton({ url }: { url: string }) {
               <div className="bg-white/5 rounded-lg p-3">
                 <p className="text-white/60 text-sm">
                   <strong className="text-white">VLC Player:</strong><br/>
-                  1. VLC'yi açın<br/>
-                  2. Medya → Ağ Akışı Aç (Ctrl+N)<br/>
-                  3. Kopyalanan bağlantıyı yapıştırın<br/>
-                  4. Oynat'a tıklayın
-                </p>
-              </div>
-              
-              <div className="bg-white/5 rounded-lg p-3">
-                <p className="text-white/60 text-sm">
-                  <strong className="text-white">PotPlayer:</strong><br/>
-                  1. PotPlayer'ı açın<br/>
-                  2. Sağ tık → Aç → URL Aç (Ctrl+U)<br/>
-                  3. Kopyalanan bağlantıyı yapıştırın<br/>
-                  4. Oynat'a tıklayın
+                  1. VLC'yi açın.<br/>
+                  2. Doğrudan (Ctrl + V) yapın<br/>
+                  3. Medya Oynamaya başlayacaktır.
+                  <br/>
+                  <br/>
+                  Not: Diğer oynatıcılar için bu yöntemi kullanabilirsiniz.
                 </p>
               </div>
             </div>

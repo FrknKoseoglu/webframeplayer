@@ -115,9 +115,9 @@ export default async function ProviderDashboard() {
                 <Users className="w-8 h-8 text-purple-400" />
               </div>
               <div>
-                <p className="text-zinc-400 text-sm">Kullanıcılar</p>
+                <p className="text-zinc-400 text-sm">Aktif Kullanıcılar</p>
                 <p className="text-3xl font-bold text-white">
-                  {provider._count.customers} <span className="text-zinc-500 text-lg">/ {provider.userLimit}</span>
+                  {provider._count.customers}
                 </p>
               </div>
             </div>
@@ -129,8 +129,8 @@ export default async function ProviderDashboard() {
                 <Sparkles className="w-8 h-8 text-emerald-400" />
               </div>
               <div>
-                <p className="text-zinc-400 text-sm">Kalan Kullanım Hakkı</p>
-                <p className="text-3xl font-bold text-white">{provider.userLimit - provider._count.customers}</p>
+                <p className="text-zinc-400 text-sm">Bakiye</p>
+                <p className="text-3xl font-bold text-white">{provider.credits} <span className="text-lg text-zinc-500">Kredi</span></p>
               </div>
             </div>
           </div>

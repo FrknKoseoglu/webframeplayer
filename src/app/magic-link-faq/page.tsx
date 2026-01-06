@@ -117,6 +117,90 @@ export default function MagicLinkFAQ() {
           })}
         </div>
 
+        {/* Premium Features Section */}
+        <div className="mt-16 mb-8 relative overflow-hidden bg-orange-500/5 border border-orange-500/20 rounded-2xl p-8">
+           <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 blur-[100px] rounded-full pointer-events-none" />
+           
+           <div className="relative z-10">
+             <div className="flex items-center gap-3 mb-8">
+               <div className="p-3 bg-orange-500/20 rounded-xl">
+                 <Sparkles className="w-6 h-6 text-orange-400" />
+               </div>
+               <div>
+                 <h2 className="text-2xl font-bold text-orange-100">Premium Özellikler</h2>
+                 <p className="text-orange-200/60 text-sm mt-1">Hizmet sağlayıcılar için gelişmiş araçlar</p>
+               </div>
+             </div>
+
+             <div className="grid md:grid-cols-2 gap-8 mb-8">
+               <div className="space-y-6">
+                 <div className="flex gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
+                      <Image className="w-5 h-5 text-orange-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-orange-100 mb-1">Marka Özelleştirmesi</h3>
+                      <p className="text-sm text-orange-200/60 leading-relaxed">
+                        Kendi logonuzu ve hizmet adınızı ekleyerek kurumsal kimliğinizi yansıtın.
+                      </p>
+                    </div>
+                 </div>
+                 <div className="flex gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
+                      <HelpCircle className="w-5 h-5 text-orange-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-orange-100 mb-1">Özel Karşılama Mesajı</h3>
+                      <p className="text-sm text-orange-200/60 leading-relaxed">
+                        Müşterilerinize kurulum sırasında gösterilecek özel notlar ve duyurular ekleyin.
+                      </p>
+                    </div>
+                 </div>
+               </div>
+               
+               <div className="space-y-6">
+                 <div className="flex gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
+                      <Shield className="w-5 h-5 text-orange-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-orange-100 mb-1">Gelişmiş Güvenlik</h3>
+                      <p className="text-sm text-orange-200/60 leading-relaxed">
+                        Link şifreleme özelliği ile sunucu bilgilerinizi tamamen gizleyerek koruma altına alın.
+                      </p>
+                    </div>
+                 </div>
+                 <div className="flex gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
+                      <Link2 className="w-5 h-5 text-orange-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-orange-100 mb-1">Destek Hattı Entegrasyonu</h3>
+                      <p className="text-sm text-orange-200/60 leading-relaxed">
+                        Müşterilerinizin size tek tıkla ulaşabileceği Telegram/WhatsApp destek butonu ekleyin.
+                      </p>
+                    </div>
+                 </div>
+               </div>
+             </div>
+
+             <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-orange-500/10 rounded-xl p-6 border border-orange-500/20">
+               <div>
+                 <h4 className="text-orange-200 font-medium mb-1">Premium ayrıcalıklarına sahip olmak ister misiniz?</h4>
+                 <p className="text-sm text-orange-200/60">
+                   Detaylı bilgi ve fiyatlandırma için bizimle iletişime geçin.
+                 </p>
+               </div>
+               <Link href="https://t.me/unfnamed" target="_blank" className="shrink-0">
+                 <Button className="bg-orange-500 hover:bg-orange-600 text-white border-none w-full md:w-auto">
+                   İletişime Geç
+                   <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
+                 </Button>
+               </Link>
+             </div>
+           </div>
+        </div>
+
         {/* CTA */}
        <div className="mt-16 bg-gradient-to-r from-cyan-500/10 to-[var(--iptv-primary)]/10 border border-cyan-500/20 rounded-2xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Hemen Başlayın</h2>

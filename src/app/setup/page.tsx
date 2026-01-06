@@ -24,7 +24,7 @@ export default async function SetupPage() {
         },
       });
 
-      redirect('/admin/login?setup=success');
+      redirect('/adm/login?setup=success');
     } catch (error) {
       console.error('Setup error:', error);
     }
@@ -36,7 +36,7 @@ export default async function SetupPage() {
   });
 
   if (adminExists) {
-    redirect('/admin/login');
+    redirect('/adm/login');
   }
 
   return (
