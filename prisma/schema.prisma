@@ -177,3 +177,5 @@ model CreditLog {
   @@index([providerId])
   @@index([createdAt])
 }
+
+

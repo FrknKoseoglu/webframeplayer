@@ -73,8 +73,12 @@ export async function POST(request: NextRequest) {
     // Use transaction for atomic credit deduction
     const result = await db.$transaction(async (tx) => {
       // 1. Decrement credits
+      // 1. Decrement credits (Atomic check inside transaction)
       await tx.serviceProvider.update({
-        where: { id: session.user.id },
+        where: { 
+          id: session.user.id,
+          credits: { gt: 0 } // PREVENTS DOUBLE SPEND / RACE CONDITION
+        },
         data: { credits: { decrement: 1 } },
       });
 

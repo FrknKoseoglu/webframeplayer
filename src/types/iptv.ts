@@ -40,6 +40,7 @@ export interface ContentItem {
   seasonNumber?: number;
   episodeNumber?: number;
   downloadUrl?: string;
+  streamId?: number;
 }
 
 export interface Category {
