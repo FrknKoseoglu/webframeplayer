@@ -68,6 +68,7 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
   const messageParam = parsedData?.message || searchParams.get('message');
   const supportUrl = parsedData?.supportUrl || searchParams.get('supportUrl');
   const logoUrl = parsedData?.logoUrl || searchParams.get('logoUrl');
+  const xrkad = parsedData?.xrkad || searchParams.get('xrkad'); // Ad-free flag from provider magic links
 
   // Set display service name
   useEffect(() => {
@@ -132,6 +133,7 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
         m3uUrl: importUrl,
         supportUrl: supportUrl || undefined,
         logoUrl: logoUrl || undefined,
+        adFree: xrkad === '1', // Ad-free if from provider magic link
         active: true,
         createdAt: Date.now(),
         lastRefresh: Date.now(),
@@ -213,6 +215,7 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
         },
         supportUrl: supportUrl || undefined,
         logoUrl: logoUrl || undefined,
+        adFree: xrkad === '1', // Ad-free if from provider magic link
         active: true,
         createdAt: Date.now(),
         lastRefresh: Date.now(),

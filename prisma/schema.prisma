@@ -1,0 +1,163 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  SERVICE_PROVIDER
+}
+
+enum CustomerType {
+  XTREAM
+  M3U
+}
+
+enum NotificationTarget {
+  ALL_CUSTOMERS
+  SPECIFIC_CUSTOMERS
+}
+
+model SuperAdmin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ServiceProvider {
+  id            String         @id @default(cuid())
+  username      String         @unique
+  password      String
+  email         String?
+  userLimit     Int            @default(10)
+  defaultMagicMessage String?
+  defaultMagicLogo    String?
+  defaultMagicHost    String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  customers     Customer[]
+  shortLinks    ShortLink[]
+  calendarEvents CalendarEvent[]
+  notifications Notification[]
+  magicLinks    MagicLink[]
+}
+
+model Customer {
+  id          String       @id @default(cuid())
+  name        String
+  type        CustomerType
+  
+  // Xtream Code fields
+  xtreamUsername String?
+  xtreamPassword String?
+  xtreamHost     String?
+  xtreamPort     String?
+  
+  // M3U field
+  m3uUrl      String?
+  
+  expiryDate  DateTime?
+  isActive    Boolean      @default(true)
+  notes       String?
+  
+  // Magic Link relation
+  magicLinkId String?      @unique
+  magicLink   MagicLink?   @relation(fields: [magicLinkId], references: [id])
+  
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  providerId  String
+  provider    ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  
+  @@index([providerId])
+  @@index([expiryDate])
+}
+
+model ShortLink {
+  id          String   @id @default(cuid())
+  originalUrl String
+  shortCode   String   @unique
+  clicks      Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  
+  providerId  String
+  provider    ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  
+  @@index([providerId])
+}
+
+model CalendarEvent {
+  id          String   @id @default(cuid())
+  title       String   // e.g., "Barcelona vs Real Madrid"
+  channel     String   // e.g., "beIN Sports 1"
+  channelId   String?  // Channel ID for direct navigation
+  eventDate   DateTime
+  description String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  providerId  String
+  provider    ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  
+  @@index([providerId])
+  @@index([eventDate])
+}
+
+model Notification {
+  id          String             @id @default(cuid())
+  title       String
+  message     String
+  targetType  NotificationTarget
+  targetIds   String[]           // Customer IDs if specific target
+  
+  createdAt   DateTime           @default(now())
+  
+  providerId  String
+  provider    ServiceProvider    @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  
+  @@index([providerId])
+}
+
+model MagicLink {
+  id          String   @id @default(cuid())
+  shortCode   String   @unique
+  
+  // Link type and connection info
+  linkType    String   @default("XTREAM") // "M3U" or "XTREAM"
+  m3uUrl      String?
+  xtreamHost  String?
+  xtreamUser  String?
+  xtreamPassword String?
+  
+  // Branding
+  serviceName String?
+  logoUrl     String?
+  message     String
+  supportUrl  String?
+  
+  validUntil  DateTime?
+  clicks      Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  
+  providerId  String
+  provider    ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  
+  // Customer relation (one-to-one)
+  customer    Customer?
+  
+  @@index([providerId])
+}

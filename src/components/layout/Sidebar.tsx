@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePlayerStore, useHistory } from '@/store/usePlayerStore';
 import type { ContentItem } from '@/types/iptv';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -13,11 +13,19 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Search, Menu, Radio, X, History, Tv, Trash2 } from 'lucide-react';
+import { Search, Menu, Radio, X, History, Tv, Trash2, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n';
 
-type SidebarTab = 'channels' | 'history';
+type SidebarTab = 'channels' | 'events' | 'history';
+
+type CalendarEvent = {
+  id: string;
+  title: string;
+  channel: string;
+  channelId: string | null;
+  eventDate: string;
+};
 
 function SidebarContent() {
   const [activeTab, setActiveTab] = useState<SidebarTab>('channels');
@@ -39,32 +47,46 @@ function SidebarContent() {
           <button
             onClick={() => setActiveTab('channels')}
             className={cn(
-              'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all',
+              'flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-md text-sm font-medium transition-all',
               activeTab === 'channels'
                 ? 'bg-purple-600 text-white'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-700/50'
             )}
           >
             <Tv className="w-4 h-4" />
-            {t.dashboard.channels}
+            <span className="hidden sm:inline">{t.dashboard.channels}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('events')}
+            className={cn(
+              'flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-md text-sm font-medium transition-all',
+              activeTab === 'events'
+                ? 'bg-purple-600 text-white'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-700/50'
+            )}
+          >
+            <CalendarDays className="w-4 h-4" />
+            <span className="hidden sm:inline">Etkinlik</span>
           </button>
           <button
             onClick={() => setActiveTab('history')}
             className={cn(
-              'flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all',
+              'flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-md text-sm font-medium transition-all',
               activeTab === 'history'
                 ? 'bg-purple-600 text-white'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-700/50'
             )}
           >
             <History className="w-4 h-4" />
-            {t.dashboard.nav.history}
+            <span className="hidden sm:inline">{t.dashboard.nav.history}</span>
           </button>
         </div>
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'channels' ? <ChannelList /> : <HistoryList />}
+      {activeTab === 'channels' && <ChannelList />}
+      {activeTab === 'events' && <EventsList />}
+      {activeTab === 'history' && <HistoryList />}
     </div>
   );
 }
@@ -126,6 +148,118 @@ function ChannelList() {
       <div className="p-4 border-t border-zinc-800">
         <p className="text-xs text-zinc-500 text-center">
           {filteredChannels.length} {t.common.channels}
+        </p>
+      </div>
+    </>
+  );
+}
+
+function EventsList() {
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { playContent, content } = usePlayerStore();
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch('/api/public/events');
+        if (res.ok) {
+          const data = await res.json();
+          setEvents(data);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
+
+  const handleEventClick = (event: CalendarEvent) => {
+    if (event.channelId) {
+      // Find channel by ID and play it
+      const channel = content.find(c => c.id === event.channelId || c.streamId?.toString() === event.channelId);
+      if (channel) {
+        playContent(channel, true);
+      }
+    }
+  };
+
+  const formatEventTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const isTomorrow = date.toDateString() === tomorrow.toDateString();
+
+    const time = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+    
+    if (isToday) return `Bugün ${time}`;
+    if (isTomorrow) return `Yarın ${time}`;
+    return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) + ` ${time}`;
+  };
+
+  const isLive = (dateStr: string) => {
+    const eventDate = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - eventDate.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    return diffMins >= -10 && diffMins <= 120; // 10 min before to 2 hours after
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-zinc-500">Yükleniyor...</div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <ScrollArea className="flex-1">
+        <div className="p-2">
+          {events.length === 0 ? (
+            <div className="p-4 text-center text-zinc-500">
+              Henüz etkinlik yok
+            </div>
+          ) : (
+            events.map((event) => (
+              <button
+                key={event.id}
+                onClick={() => handleEventClick(event)}
+                disabled={!event.channelId}
+                className={cn(
+                  'w-full p-3 rounded-lg transition-all mb-2 text-left',
+                  event.channelId
+                    ? 'hover:bg-zinc-800/80 cursor-pointer'
+                    : 'cursor-default opacity-80',
+                  isLive(event.eventDate) && 'bg-red-500/10 border border-red-500/30'
+                )}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-white truncate">{event.title}</p>
+                    <p className="text-sm text-pink-300 truncate">{event.channel}</p>
+                  </div>
+                  {isLive(event.eventDate) && (
+                    <span className="shrink-0 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded animate-pulse">
+                      CANLI
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-zinc-500 mt-1">
+                  {formatEventTime(event.eventDate)}
+                </p>
+              </button>
+            ))
+          )}
+        </div>
+      </ScrollArea>
+
+      <div className="p-4 border-t border-zinc-800">
+        <p className="text-xs text-zinc-500 text-center">
+          {events.length} etkinlik
         </p>
       </div>
     </>
@@ -293,4 +427,3 @@ export function MobileSidebar() {
     </Sheet>
   );
 }
-
