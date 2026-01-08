@@ -164,7 +164,7 @@ export const tr = {
       testFailed: 'Proxy çalışmıyor, lütfen URL\'i kontrol edin.',
       invalidUrl: 'Geçersiz format. Örnek: https://proxy.com veya 192.168.1.1:8080',
       corsError: 'CORS Hatası',
-      corsErrorMessage: 'Yayını izlemek için Ayarlar → Proxy Ayarları bölümünden bir proxy sunucusu eklemeyi deneyebilirsiniz.',
+      corsErrorMessage: 'Geçici çözüm olarak proxy kullanabilirsiniz, ancak kesin çözüm yayıncı kuruluşunun bu siteye izin vermesidir. Detaylı bilgi için "Hata Detayı" butonuna tıklayın.',
     },
   },
 };

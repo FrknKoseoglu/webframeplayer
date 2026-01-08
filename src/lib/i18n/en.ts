@@ -166,7 +166,7 @@ export const en: Translations = {
       testFailed: 'Proxy not working, please check the URL.',
       invalidUrl: 'Invalid format. Example: https://proxy.com or 192.168.1.1:8080',
       corsError: 'CORS Error',
-      corsErrorMessage: 'To watch this stream, try adding a proxy server in Settings → Proxy Settings.',
+      corsErrorMessage: 'You can use a proxy as a workaround, but the permanent solution is for the broadcaster to whitelist this site. Click "Error Details" for more info.',
     },
   },
 };

@@ -11,6 +11,7 @@ import { usePlayerStore } from '@/store/usePlayerStore';
 import { useTranslation } from '@/lib/i18n';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { CorsErrorModal } from './CorsErrorModal';
 
 interface VideoPlayerProps {
   src: PlayerSrc | null;
@@ -25,6 +26,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
   const proxy = t.settings.proxy;
   const router = useRouter();
   const [hasError, setHasError] = useState(false);
+  const [showCorsError, setShowCorsError] = useState(false);
 
   // Set initial volume and listen for changes
   useEffect(() => {
@@ -37,7 +39,25 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
   // Reset error when source changes
   useEffect(() => {
     setHasError(false);
+    setShowCorsError(false);
   }, [src]);
+
+  // DEBUG: Press Ctrl+Shift+C to simulate CORS error
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Shift+C to simulate CORS error
+      if (e.ctrlKey && e.shiftKey && (e.key === 'c' || e.key === 'C')) {
+        e.preventDefault();
+        console.log('[DEBUG] Simulating CORS error - triggered!');
+        setHasError(true);
+        setShowCorsError(true);
+      }
+    };
+    
+    console.log('[DEBUG] CORS debug listener attached');
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Monitor player state and detect stuck loading
   useEffect(() => {
@@ -120,6 +140,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
     // Show error only if proxy is NOT enabled
     if (isCorsError && !enableCustomProxy) {
       setHasError(true);
+      setShowCorsError(true);
     }
   };
 
@@ -137,6 +158,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
           // Network error (code 2) often indicates CORS
           if (error.code === 2 && !enableCustomProxy) {
             setHasError(true);
+            setShowCorsError(true);
           }
         }
       };
@@ -154,6 +176,12 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
   if (hasError && !enableCustomProxy) {
     return (
       <div className="aspect-video w-full bg-gradient-to-br from-zinc-900 via-zinc-950 to-black flex items-center justify-center">
+        <CorsErrorModal 
+          isOpen={showCorsError} 
+          onClose={() => setShowCorsError(false)} 
+          domainName={typeof window !== 'undefined' ? window.location.host : 'Web Player'} 
+        />
+        
         <div className="relative max-w-2xl px-6">
           {/* Error glow effect */}
           <div className="absolute inset-0 blur-3xl bg-gradient-to-r from-red-600/20 via-orange-600/20 to-red-600/20 rounded-full scale-150" />
@@ -170,6 +198,15 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
                 {proxy.corsErrorMessage}
               </p>
               <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
+                <Button
+                  onClick={() => setShowCorsError(true)}
+                  variant="outline"
+                  className="border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                  size="lg"
+                >
+                  <AlertCircle className="w-5 h-5 mr-2" />
+                  Hata Detayı
+                </Button>
                 <Button
                   onClick={() => router.push('/settings')}
                   className="bg-[var(--iptv-primary)] hover:opacity-90 text-white px-6"
@@ -193,6 +230,8 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
       </div>
     );
   }
+
+  // ... rest of component ...
 
   if (!src) {
     return (
