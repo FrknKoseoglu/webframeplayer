@@ -15,10 +15,10 @@ export function validateProxyUrl(url: string): boolean {
   
   // If doesn't start with http:// or https://, check if it's an IP:port or localhost:port
   if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
-    // Check if it looks like IP:port or localhost:port
-    const ipPortPattern = /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|localhost)(:\d+)?$/;
-    if (ipPortPattern.test(trimmed)) {
-      return true; // Valid IP or localhost format
+    // Check if it looks like IP:port or localhost:port or hostname:port
+    const hostPortPattern = /^([\w.-]+)(:\d+)?$/;
+    if (hostPortPattern.test(trimmed)) {
+      return true; // Valid hostname/IP format
     }
     return false; // Invalid format
   }
@@ -38,13 +38,8 @@ function ensureProtocol(url: string): string {
     return trimmed;
   }
   
-  // Check if it's IP or localhost, add http://
-  const ipPortPattern = /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|localhost)(:\d+)?$/;
-  if (ipPortPattern.test(trimmed)) {
-    return `http://${trimmed}`;
-  }
-  
-  return trimmed;
+  // Add http:// for hostnames/IPs
+  return `http://${trimmed}`;
 }
 
 /**
@@ -74,24 +69,31 @@ function normalizeProxyUrl(customProxyUrl: string): string {
 
 /**
  * Get stream URL with proxy based on user settings
+ * 
+ * Logic:
+ * 1. If custom proxy is enabled and valid → use custom proxy
+ * 2. Otherwise → return direct URL (no auto-proxy)
+ * 
  * @param targetUrl - The original stream URL to proxy
- * @returns Proxied URL if enabled, or direct URL if disabled
+ * @returns Proxied URL if custom proxy enabled, or direct URL
  */
 export function getStreamUrl(targetUrl: string): string {
   const { enableCustomProxy, customProxyUrl } = usePlayerStore.getState();
   
-  // If proxy is disabled, return direct URL (no proxy at all)
-  if (!enableCustomProxy || !customProxyUrl || !validateProxyUrl(customProxyUrl)) {
-    return targetUrl;
+  // Only use proxy if custom proxy is explicitly enabled and valid
+  if (enableCustomProxy && customProxyUrl && validateProxyUrl(customProxyUrl)) {
+    const normalizedProxyUrl = normalizeProxyUrl(customProxyUrl);
+    return `${normalizedProxyUrl}${encodeURIComponent(targetUrl)}`;
   }
   
-  // Use custom proxy with smart normalization
-  const normalizedProxyUrl = normalizeProxyUrl(customProxyUrl);
-  return `${normalizedProxyUrl}${encodeURIComponent(targetUrl)}`;
+  // No proxy - return direct URL
+  return targetUrl;
 }
 
 /**
  * Test proxy connection by attempting to fetch a simple resource
+ * Uses GET request (more compatible than HEAD with free proxies)
+ * 
  * @param proxyUrl - The proxy URL to test
  * @returns Promise<boolean> - true if connection successful
  */
@@ -102,28 +104,34 @@ export async function testProxyConnection(proxyUrl: string): Promise<boolean> {
   }
   
   try {
-    // Test with a simple public resource (Google favicon)
-    const testUrl = 'https://www.google.com/favicon.ico';
+    // Test with a simple public resource that returns quickly
+    // Using httpbin which is designed for testing
+    const testUrl = 'https://httpbin.org/get?test=1';
     const normalizedProxyUrl = normalizeProxyUrl(proxyUrl);
     const proxiedUrl = `${normalizedProxyUrl}${encodeURIComponent(testUrl)}`;
     
     console.log('Testing proxy connection:', proxiedUrl);
     
-    // Create AbortController for timeout (more compatible than AbortSignal.timeout)
+    // Create AbortController for timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
     
     try {
+      // Use GET instead of HEAD - many proxies don't support HEAD
       const response = await fetch(proxiedUrl, {
-        method: 'HEAD', // HEAD request is faster
+        method: 'GET',
         signal: controller.signal,
         cache: 'no-cache',
+        // Don't follow redirects - we just want to know if proxy responds
+        redirect: 'follow',
       });
       
       clearTimeout(timeoutId);
       
       console.log('Proxy test response:', response.status, response.ok);
-      return response.ok;
+      
+      // Check if response is successful (2xx or 3xx)
+      return response.ok || (response.status >= 300 && response.status < 400);
     } catch (fetchError: any) {
       clearTimeout(timeoutId);
       
@@ -133,13 +141,10 @@ export async function testProxyConnection(proxyUrl: string): Promise<boolean> {
         return false;
       }
       
-      // Check if it's a network/CORS error
-      if (fetchError.message?.includes('fetch')) {
-        console.warn('Proxy test failed - network/CORS error:', fetchError.message);
-        return false;
-      }
-      
-      throw fetchError; // Re-throw if it's something else
+      // CORS error - the proxy itself might be blocking
+      // This is a common issue with free proxies
+      console.warn('Proxy test failed:', fetchError.message);
+      return false;
     }
   } catch (error: any) {
     console.error('Proxy test failed:', error);
