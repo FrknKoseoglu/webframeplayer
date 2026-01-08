@@ -15,7 +15,7 @@ interface PlayerPreviewProps {
 }
 
 export function PlayerPreview({ content }: PlayerPreviewProps) {
-  const { startPlayback, activeProfile, playEpisode, activeContent } = usePlayerStore();
+  const { startPlayback, activeProfile, playEpisode, activeContent, playbackError, clearPlaybackError } = usePlayerStore();
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeason, setSelectedSeason] = useState<Season | null>(null);
   const [loading, setLoading] = useState(false);
@@ -203,15 +203,31 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
               </p>
 
               {/* Actions (Movies only, or quick play for series) */}
+              {/* Error Banner */}
+              {playbackError && content.type === 'movie' && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4 flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-red-200 font-medium mb-1">Yayın Açılamadı</p>
+                    <p className="text-red-200/70 text-sm">
+                      İçerik oynatılamadı. Bağlantıyı kopyalayarak VLC veya başka bir oynatıcıda deneyebilirsiniz.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center gap-4 flex-wrap">
                 {content.type === 'movie' && (
                   <Button 
                     size="lg"
-                    onClick={startPlayback}
+                    onClick={() => {
+                      clearPlaybackError();
+                      startPlayback();
+                    }}
                     className="h-14 px-8 bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary)]/90 text-white rounded-xl gap-3 text-lg font-semibold shadow-lg shadow-[var(--iptv-primary)]/20 transition-all hover:scale-105"
                   >
                     <Play className="w-6 h-6 fill-current" />
-                    HEMEN İZLE
+                    {playbackError ? 'TEKRAR DENE' : 'HEMEN İZLE'}
                   </Button>
                 )}
 

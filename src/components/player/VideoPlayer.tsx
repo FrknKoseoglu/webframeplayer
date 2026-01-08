@@ -6,7 +6,7 @@ import '@vidstack/react/player/styles/default/layouts/video.css';
 import { useEffect, useRef, useState } from 'react';
 import { MediaPlayer, MediaProvider, type PlayerSrc, type MediaPlayerInstance } from '@vidstack/react';
 import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
-import { Tv, AlertCircle, Settings } from 'lucide-react';
+import { Tv, AlertCircle, Settings, Copy, Check } from 'lucide-react';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { useTranslation } from '@/lib/i18n';
 import { useRouter } from 'next/navigation';
@@ -27,6 +27,20 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
   const router = useRouter();
   const [hasError, setHasError] = useState(false);
   const [showCorsError, setShowCorsError] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // Copy stream URL to clipboard
+  const handleCopyLink = async () => {
+    if (!src) return;
+    try {
+      const url = typeof src === 'string' ? src : (src as any).src || '';
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
 
   // Set initial volume and listen for changes
   useEffect(() => {
@@ -214,6 +228,15 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
                 >
                   <Settings className="w-5 h-5 mr-2" />
                   {t.dashboard.nav.settings}
+                </Button>
+                <Button
+                  onClick={handleCopyLink}
+                  variant="outline"
+                  className="border-blue-500/20 text-blue-400 hover:bg-blue-500/10"
+                  size="lg"
+                >
+                  {copied ? <Check className="w-5 h-5 mr-2" /> : <Copy className="w-5 h-5 mr-2" />}
+                  {copied ? 'Kopyalandı!' : 'Bağlantıyı Kopyala'}
                 </Button>
                 <Button
                   onClick={() => setHasError(false)}

@@ -52,6 +52,7 @@ interface PlayerState {
   // Player state
   activeContent: ContentItem | null;
   isPlaying: boolean;
+  playbackError: boolean; // True when VOD playback fails
   
   // History state (per profile)
   historyByProfile: Record<string, HistoryItem[]>;
@@ -117,6 +118,8 @@ interface PlayerActions {
   playEpisode: (series: ContentItem, episode: Episode) => void;
   startPlayback: () => void;
   stopContent: () => void;
+  setPlaybackError: () => void;
+  clearPlaybackError: () => void;
   
   // EPG actions
   setEpgData: (channelId: string, programs: EpgProgram[]) => void;
@@ -160,6 +163,7 @@ const initialState: PlayerState = {
   loadingProgress: 0,
   activeContent: null,
   isPlaying: false,
+  playbackError: false,
   historyByProfile: {},
   epgData: {},
   lastEpgSync: 0,
@@ -319,7 +323,13 @@ export const usePlayerStore = create<PlayerStore>()(
         });
       },
 
-      startPlayback: () => set({ isPlaying: true }),
+      startPlayback: () => set({ isPlaying: true, playbackError: false }),
+      
+      // Called when VOD playback fails - goes back to preview with error state
+      setPlaybackError: () => set({ isPlaying: false, playbackError: true }),
+      
+      // Clear playback error
+      clearPlaybackError: () => set({ playbackError: false }),
       
       stopContent: () => {
         set({ 

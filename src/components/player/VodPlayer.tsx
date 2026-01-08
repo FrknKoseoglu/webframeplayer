@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Artplayer from 'artplayer';
 import Hls from 'hls.js';
 import { X, AlertTriangle, EyeOff } from 'lucide-react';
+import { usePlayerStore } from '@/store/usePlayerStore';
 
 const MKV_WARNING_KEY = 'iptv_mkv_warning_dismissed';
 
@@ -14,6 +15,7 @@ interface VodPlayerProps {
 }
 
 export function VodPlayer({ src, poster, title }: VodPlayerProps) {
+  const setPlaybackError = usePlayerStore((state) => state.setPlaybackError);
   const containerRef = useRef<HTMLDivElement>(null);
   const artRef = useRef<Artplayer | null>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -167,13 +169,20 @@ export function VodPlayer({ src, poster, title }: VodPlayerProps) {
                 console.error('HLS fatal error:', data);
                 switch (data.type) {
                   case Hls.ErrorTypes.NETWORK_ERROR:
-                    hls.startLoad();
+                    // Try to recover once, then give up
+                    if (!hls.media?.error) {
+                      hls.startLoad();
+                    } else {
+                      console.error('Network error - giving up');
+                      setPlaybackError();
+                    }
                     break;
                   case Hls.ErrorTypes.MEDIA_ERROR:
                     hls.recoverMediaError();
                     break;
                   default:
                     hls.destroy();
+                    setPlaybackError();
                     break;
                 }
               }
