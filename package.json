@@ -38,7 +38,7 @@
         "nsis",
         "portable"
       ],
-      "icon": "public/favicon.ico"
+      "icon": "public/web-app-manifest-512x512.png"
     }
   },
   "dependencies": {

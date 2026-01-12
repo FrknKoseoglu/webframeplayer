@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, session, dialog } = require('electron'); // 🚨 session ve dialog eklendi
 const path = require('path');
 
 // ============================================================================
@@ -6,16 +6,13 @@ const path = require('path');
 // ============================================================================
 
 // Your live Vercel production URL - Update this with your actual domain
-const PRODUCTION_URL = 'https://webframeplayer.com';
+const PRODUCTION_URL = 'https://www.webframeplayer.com';
 
 // Development server URL (Next.js dev server)
 const DEV_URL = 'http://localhost:3000';
 
-// Check if we're running in development mode
-const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
-
 // ============================================================================
-// APPLICATION MENU (Essential for keyboard shortcuts in wrapper mode)
+// APPLICATION MENU
 // ============================================================================
 
 function createApplicationMenu() {
@@ -55,7 +52,6 @@ function createApplicationMenu() {
     },
   ];
 
-  // macOS-specific menu adjustments
   if (process.platform === 'darwin') {
     template.unshift({
       label: app.getName(),
@@ -70,7 +66,7 @@ function createApplicationMenu() {
         { type: 'separator' },
         { role: 'quit' },
       ],
-    });
+    },);
   }
 
   const menu = Menu.buildFromTemplate(template);
@@ -82,75 +78,103 @@ function createApplicationMenu() {
 // ============================================================================
 
 function createWindow() {
+  let windowShown = false;
+
   const win = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 1024,
     minHeight: 600,
-    // App icon - uses 512x512 PNG for best quality
     icon: path.join(__dirname, 'public', 'web-app-manifest-512x512.png'),
     webPreferences: {
-      // CRITICAL: Disable web security to bypass CORS restrictions for IPTV streams
-      webSecurity: false,
-      // Allow HTTP IPTV streams inside HTTPS Vercel wrapper
-      allowRunningInsecureContent: true,
-      // Security best practices for remote content wrappers
+      webSecurity: false, // CORS kapalı
+      allowRunningInsecureContent: true, // HTTP izinli
       nodeIntegration: false,
       contextIsolation: true,
     },
-    // Don't show until ready to prevent visual flash
     show: false,
-    // Match app background color for smooth startup
     backgroundColor: '#0a0a0a',
-    // Hide menu bar by default (still accessible via Alt key on Windows/Linux)
     autoHideMenuBar: true,
     title: 'FRAME IPTV Player',
   });
 
-  // Show window when ready
-  win.once('ready-to-show', () => {
-    win.show();
+  // 🚨 YENİ EKLENEN 1: User-Agent Hilesi (Bot engelini aşar)
+  const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+  win.webContents.setUserAgent(userAgent);
+
+  // 🚨 YENİ EKLENEN 2: CSP (Güvenlik) Başlıklarını Temizle
+  // Siyah ekranın %99 çözümü burasıdır. Vercel'in "beni engelle" emrini siler.
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': ['default-src * \'unsafe-inline\' \'unsafe-eval\' data: blob:'], // Her şeye izin ver
+        'X-Frame-Options': ['ALLOWALL'] // Frame engelini kaldır
+      },
+    });
   });
 
-  // Load URL based on environment
-  const loadUrl = isDev ? DEV_URL : PRODUCTION_URL;
+  const showWindowOnce = (source) => {
+    if (!windowShown) {
+      windowShown = true;
+      console.log(`[Electron] Showing window via: ${source}`);
+      win.show();
+    }
+  };
+
+  win.once('ready-to-show', () => {
+    showWindowOnce('ready-to-show event');
+  });
+
+  setTimeout(() => {
+    showWindowOnce('FAILSAFE TIMEOUT (3s)');
+  }, 3000);
+
+  const loadUrl = app.isPackaged ? PRODUCTION_URL : DEV_URL;
   
-  console.log(`[Electron] Mode: ${isDev ? 'Development' : 'Production'}`);
+  console.log(`[Electron] Mode: ${app.isPackaged ? 'PRODUCTION' : 'DEVELOPMENT'}`);
   console.log(`[Electron] Loading URL: ${loadUrl}`);
   
-  win.loadURL(loadUrl);
+  win.loadURL(loadUrl).catch((error) => {
+    console.error(`[Electron] CRITICAL LOAD ERROR: ${error.message}`);
+    // Hata olsa bile pencereyi göster ki kullanıcı hatayı görsün
+    showWindowOnce('loadURL catch');
+    
+    // Basit bir hata dialogu göster (opsiyonel)
+    if(app.isPackaged) {
+        dialog.showErrorBox('Bağlantı Hatası', `Sunucuya bağlanılamadı.\nURL: ${loadUrl}\nHata: ${error.message}`);
+    }
+  });
 
-  // Open DevTools in development mode
-  if (isDev) {
-    win.webContents.openDevTools();
-  }
+  console.log(`[Electron] Opening DevTools...`);
+  win.webContents.openDevTools();
 
-  // Handle external links - open in default browser
   win.webContents.setWindowOpenHandler(({ url }) => {
     require('electron').shell.openExternal(url);
     return { action: 'deny' };
   });
 
-  // Handle navigation errors (e.g., when Vercel is down)
-  win.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
-    console.error(`[Electron] Failed to load: ${errorDescription} (${errorCode})`);
+  win.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    console.error(`[Electron] LOAD FAILED: ${errorDescription} (${errorCode})`);
+    showWindowOnce('did-fail-load event');
+  });
+
+  win.webContents.on('did-finish-load', () => {
+    console.log(`[Electron] Page loaded successfully!`);
   });
 }
 
-// Create window when Electron is ready
 app.whenReady().then(() => {
   createApplicationMenu();
   createWindow();
 });
 
-// Quit when all windows are closed (except on macOS)
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-// Recreate window when dock icon is clicked (macOS)
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
