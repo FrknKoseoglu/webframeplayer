@@ -860,8 +860,8 @@ export default function DashboardPage() {
                 </div>
               </div>
               {/* Ad Area - Right of Player */}
-              <div className="w-[25%] bg-zinc-900 flex items-center justify-center border-l border-white/5">
-                <div className="w-full h-full min-h-[200px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10 m-4">
+              <div className="w-[25%] bg-zinc-900 flex items-center justify-center border-l border-white/5 py-4">
+                <div className="w-full h-full min-h-[200px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10 mx-4">
                   <span className="text-white/30 text-xs">REKLAM ALANI</span>
                 </div>
               </div>
@@ -870,8 +870,8 @@ export default function DashboardPage() {
             {/* EPG Section - 40% Ad + 60% EPG */}
             <div className="flex-1 flex min-h-0 bg-[var(--iptv-surface-dark)] overflow-hidden">
               {/* Ad Section - 40% or 100% if no EPG/content info (LEFT SIDE) */}
-              <div className={`flex items-center justify-center border-r border-white/5 ${activeContent && (activeContent.type === 'live' && currentEpg.length > 0 || activeContent.type !== 'live') ? 'w-[40%]' : 'flex-1'}`}>
-                <div className="w-full h-full min-h-[150px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10 m-6">
+              <div className={`flex items-center justify-center border-r border-white/5 py-4 ${activeContent && (activeContent.type === 'live' && currentEpg.length > 0 || activeContent.type !== 'live') ? 'w-[40%]' : 'flex-1'}`}>
+                <div className="w-full h-full min-h-[150px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10 mx-6">
                   <span className="text-white/30 text-xs">REKLAM ALANI</span>
                 </div>
               </div>

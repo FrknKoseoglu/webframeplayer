@@ -57,9 +57,14 @@ export function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-white/5 pt-6 mt-6 text-center">
+        <div className="border-t border-white/5 pt-6 mt-6 text-center space-y-2">
           <p className="text-sm text-white/40">
             &copy; 2025 FRAME. {language === 'tr' ? 'Tüm hakları saklıdır' : 'All rights reserved'}.
+          </p>
+          <p className="text-xs text-white/30 max-w-lg mx-auto">
+            {language === 'tr'
+              ? 'Bu uygulama yalnızca istemci taraflı bir medya oynatıcısıdır. Hiçbir yayın sunucularımız üzerinden aktarılmaz.'
+              : 'This application is a strictly client-side media player. No streams are proxied through our servers.'}
           </p>
         </div>
       </div>

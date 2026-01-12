@@ -82,10 +82,6 @@ interface PlayerState {
   // Audio preferences
   preferredAudio1: string;
   preferredAudio2: string;
-  
-  // Proxy settings
-  customProxyUrl: string;
-  enableCustomProxy: boolean;
 }
 
 // Store actions interface
@@ -133,8 +129,6 @@ interface PlayerActions {
   setVolume: (volume: number) => void;
   setSubtitlePreferences: (subtitle1: string, subtitle2: string, enabled: boolean) => void;
   setAudioPreferences: (audio1: string, audio2: string) => void;
-  setCustomProxyUrl: (url: string) => void;
-  toggleCustomProxy: () => void;
   
   // History actions
   addToHistory: (content: ContentItem) => void;
@@ -177,8 +171,6 @@ const initialState: PlayerState = {
   subtitlesEnabled: true,
   preferredAudio1: 'en',
   preferredAudio2: 'tr',
-  customProxyUrl: '',
-  enableCustomProxy: false,
 };
 
 export const usePlayerStore = create<PlayerStore>()(
@@ -410,15 +402,6 @@ export const usePlayerStore = create<PlayerStore>()(
         });
       },
       
-      // Proxy settings
-      setCustomProxyUrl: (url) => {
-        set({ customProxyUrl: url });
-      },
-      
-      toggleCustomProxy: () => {
-        set((state) => ({ enableCustomProxy: !state.enableCustomProxy }));
-      },
-      
       // History actions
       addToHistory: (content) => {
         const profileId = get().activeProfile?.id;
@@ -475,8 +458,6 @@ export const usePlayerStore = create<PlayerStore>()(
         preferredAudio1: state.preferredAudio1,
         preferredAudio2: state.preferredAudio2,
         historyByProfile: state.historyByProfile,
-        customProxyUrl: state.customProxyUrl,
-        enableCustomProxy: state.enableCustomProxy,
       }),
     }
   )

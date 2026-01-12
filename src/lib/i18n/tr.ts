@@ -26,9 +26,12 @@ export const tr = {
       ctaDashboard: 'Frame\'i Aç',
       ctaNewService: 'Yeni Servis Ekle',
       ctaDemo: 'Demo İzle',
+      ctaDownload: 'Masaüstü Uygulamasını İndir',
+      ctaWebBeta: 'Web Player\'ı Aç',
       statHls: 'HLS Streaming',
       statXtream: 'Codes Desteği',
       statBrowser: 'Tarayıcı Tabanlı',
+      statDesktop: 'Masaüstü Uyumlu',
     },
     features: {
       title: 'Güçlü Özellikler',
@@ -71,6 +74,10 @@ export const tr = {
       a5: 'Kurulum gerekmiyor! Player tamamen tarayıcınızda çalışır.',
       q6: 'Verilerim güvende mi?',
       a6: 'Bilgileriniz tarayıcınızda yerel olarak saklanır ve asla sunucularımıza gönderilmez.',
+      q7: 'Web\'de neden bazı yayınlar açılmıyor?',
+      a7: 'Tarayıcı güvenlik politikaları (CORS) nedeniyle bazı yayınlar engellenebilir. Masaüstü uygulamasını indirerek bu sorunu çözebilirsiniz.',
+      q8: 'Proxy sunucusu var mı?',
+      a8: 'Hayır, bağlantı tamamen cihazınız ve yayıncı arasındadır. Hiçbir akış sunucularımız üzerinden geçmez.',
     },
     footer: {
       login: 'Giriş',

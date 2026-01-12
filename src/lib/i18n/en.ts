@@ -28,9 +28,12 @@ export const en: Translations = {
       ctaDashboard: 'Open Frame',
       ctaNewService: 'Add New Service',
       ctaDemo: 'View Demo',
+      ctaDownload: 'Download Desktop App',
+      ctaWebBeta: 'Open Web Player',
       statHls: 'HLS Streaming',
       statXtream: 'Codes Support',
       statBrowser: 'Browser Based',
+      statDesktop: 'Desktop Compatible',
     },
     features: {
       title: 'Powerful Features',
@@ -73,6 +76,10 @@ export const en: Translations = {
       a5: 'No installation required! The player runs entirely in your web browser.',
       q6: 'Is my data secure?',
       a6: 'Your credentials are stored locally in your browser and never sent to our servers.',
+      q7: 'Why don\'t some streams work on the web?',
+      a7: 'Browser security policies (CORS) may block some streams. Download the desktop app to solve this issue.',
+      q8: 'Is there a proxy server?',
+      a8: 'No, the connection is directly between your device and the broadcaster. No streams pass through our servers.',
     },
     footer: {
       login: 'Login',

@@ -16,10 +16,6 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
   const activeContent = usePlayerStore((state) => state.activeContent);
   const isPlaying = usePlayerStore((state) => state.isPlaying);
   
-  // Subscribe to proxy settings so component re-renders when they change
-  const enableCustomProxy = usePlayerStore((state) => state.enableCustomProxy);
-  const customProxyUrl = usePlayerStore((state) => state.customProxyUrl);
-  
   // State for resolved stream URL
   const [resolvedUrl, setResolvedUrl] = useState<string | null>(null);
   const [isResolving, setIsResolving] = useState(false);
@@ -52,12 +48,8 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
           console.log('[MasterPlayer] Stream resolved:', result.originalUrl, '->', result.url);
         }
         
-        // Step 2: Apply CORS proxy to the resolved URL (if enabled)
+        // Step 2: Apply URL helper (direct URL, no proxy)
         const finalUrl = getStreamUrl(result.url);
-        
-        if (enableCustomProxy && customProxyUrl) {
-          console.log('[MasterPlayer] Proxy applied:', finalUrl);
-        }
         
         setResolvedUrl(finalUrl);
       } catch (error: any) {
@@ -80,7 +72,7 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
     return () => {
       cancelled = true;
     };
-  }, [activeContent?.url, activeContent?.id, enableCustomProxy, customProxyUrl]);
+  }, [activeContent?.url, activeContent?.id]);
 
   // No content selected
   if (!activeContent) {

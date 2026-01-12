@@ -50,6 +50,8 @@ export function FAQ() {
     { question: f.q4, answer: f.a4 },
     { question: f.q5, answer: f.a5 },
     { question: f.q6, answer: f.a6 },
+    { question: f.q7, answer: f.a7 },
+    { question: f.q8, answer: f.a8 },
   ];
 
   return (

@@ -12,6 +12,8 @@ import { useTranslation } from '@/lib/i18n';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { CorsErrorModal } from './CorsErrorModal';
+import { UnsupportedCodecModal } from './UnsupportedCodecModal';
+import { isLikelyCodecError, isCodecError, mightBeUnsupportedFormat } from '@/lib/codec-utils';
 
 interface VideoPlayerProps {
   src: PlayerSrc | null;
@@ -21,12 +23,12 @@ interface VideoPlayerProps {
 
 export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
   const playerRef = useRef<MediaPlayerInstance>(null);
-  const { volume, setVolume, enableCustomProxy, language } = usePlayerStore();
+  const { volume, setVolume, language } = usePlayerStore();
   const { t } = useTranslation();
-  const proxy = t.settings.proxy;
   const router = useRouter();
   const [hasError, setHasError] = useState(false);
   const [showCorsError, setShowCorsError] = useState(false);
+  const [showCodecError, setShowCodecError] = useState(false);
   const [copied, setCopied] = useState(false);
 
   // Copy stream URL to clipboard
@@ -54,6 +56,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
   useEffect(() => {
     setHasError(false);
     setShowCorsError(false);
+    setShowCodecError(false);
   }, [src]);
 
   // DEBUG: Press Ctrl+Shift+C to simulate CORS error
@@ -75,7 +78,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
 
   // Monitor player state and detect stuck loading
   useEffect(() => {
-    if (!src || enableCustomProxy) return;
+    if (!src) return;
 
     const player = playerRef.current;
     if (!player) return;
@@ -122,7 +125,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
       player.removeEventListener('playing', handlePlaying);
       player.removeEventListener('waiting', handleWaiting);
     };
-  }, [src, enableCustomProxy]);
+  }, [src]);
 
   const handleVolumeChange = (detail: { volume: number }) => {
     setVolume(detail.volume);
@@ -134,6 +137,19 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
     // Detect CORS errors from multiple sources
     const errorMessage = e.message?.toLowerCase() || e.detail?.message?.toLowerCase() || '';
     const errorCode = e.code || e.detail?.code;
+    
+    // Check for codec errors first
+    const srcUrl = typeof src === 'string' ? src : (src as any)?.src || '';
+    const isCodecIssue = isCodecError(errorMessage) || 
+                         (errorCode === 3 && mightBeUnsupportedFormat(srcUrl)) || // MEDIA_ERR_DECODE
+                         (errorCode === 4 && mightBeUnsupportedFormat(srcUrl));   // MEDIA_ERR_SRC_NOT_SUPPORTED
+    
+    if (isCodecIssue) {
+      console.log('Codec error detected - showing codec modal');
+      setHasError(true);
+      setShowCodecError(true);
+      return;
+    }
     
     const isCorsError = 
       errorMessage.includes('cors') || 
@@ -147,12 +163,12 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
     console.log('Error analysis:', {
       message: errorMessage,
       code: errorCode,
-      isCorsError,
-      proxyEnabled: enableCustomProxy
+      isCodecIssue,
+      isCorsError
     });
 
-    // Show error only if proxy is NOT enabled
-    if (isCorsError && !enableCustomProxy) {
+    // Show CORS error if detected
+    if (isCorsError) {
       setHasError(true);
       setShowCorsError(true);
     }
@@ -160,7 +176,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
 
   // Also listen for provider errors
   const handleProviderSetup = (provider: any) => {
-    if (!provider || enableCustomProxy) return;
+    if (!provider) return;
 
     // Listen for HLS errors if using HLS
     const video = provider.video;
@@ -170,7 +186,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
         if (error) {
           console.warn('Video element error:', error);
           // Network error (code 2) often indicates CORS
-          if (error.code === 2 && !enableCustomProxy) {
+          if (error.code === 2) {
             setHasError(true);
             setShowCorsError(true);
           }
@@ -187,13 +203,25 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
   };
 
   // Show error state instead of player - stops loading completely
-  if (hasError && !enableCustomProxy) {
+  if (hasError) {
+    const srcUrl = typeof src === 'string' ? src : (src as any)?.src || '';
+    
     return (
       <div className="aspect-video w-full bg-gradient-to-br from-zinc-900 via-zinc-950 to-black flex items-center justify-center">
         <CorsErrorModal 
           isOpen={showCorsError} 
           onClose={() => setShowCorsError(false)} 
           domainName={typeof window !== 'undefined' ? window.location.host : 'Web Player'} 
+        />
+        <UnsupportedCodecModal
+          isOpen={showCodecError}
+          onClose={() => setShowCodecError(false)}
+          streamUrl={srcUrl}
+          title={title}
+          onTryAnyway={() => {
+            setShowCodecError(false);
+            setHasError(false);
+          }}
         />
         
         <div className="relative max-w-2xl px-6">
@@ -206,10 +234,12 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
             </div>
             <div className="text-center space-y-3">
               <h2 className="text-2xl font-semibold text-white">
-                {proxy.corsError}
+                {language === 'tr' ? 'CORS Hatası' : 'CORS Error'}
               </h2>
               <p className="text-zinc-300 max-w-md text-base leading-relaxed">
-                {proxy.corsErrorMessage}
+                {language === 'tr' 
+                  ? 'Tarayıcı güvenlik politikaları (CORS) nedeniyle bu yayın web\'de açılamıyor. Masaüstü uygulamasını kullanmanızı öneriyoruz.'
+                  : 'This stream cannot be played in the browser due to CORS security policies. We recommend using the desktop app.'}
               </p>
               <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
                 <Button
