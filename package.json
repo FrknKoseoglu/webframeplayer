@@ -10,13 +10,12 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "electron-dev": "concurrently -k \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron-build": "set ELECTRON_BUILD=true && npm run build && electron-builder",
+    "electron-build": "npx -y cross-env ELECTRON_BUILD=true npm run build && electron-builder",
     "electron-pack": "electron-builder"
   },
   "build": {
     "appId": "com.frame.iptv-player",
     "productName": "FRAME IPTV Player",
-    "afterPack": "./electron-builder-hooks.js",
     "directories": {
       "output": "dist"
     },

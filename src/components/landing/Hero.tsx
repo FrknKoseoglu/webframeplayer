@@ -22,10 +22,15 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
   const [showWebWarning, setShowWebWarning] = useState(false);
   const [isElectron, setIsElectron] = useState(false);
 
-  // Detect if running in Electron
+  // Detect if running in Electron via URL param or localStorage
   useEffect(() => {
-    const userAgent = navigator.userAgent.toLowerCase();
-    setIsElectron(userAgent.includes('electron'));
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('electron') === '1') {
+      localStorage.setItem('isElectronApp', 'true');
+      setIsElectron(true);
+    } else if (localStorage.getItem('isElectronApp') === 'true') {
+      setIsElectron(true);
+    }
   }, []);
 
   const handleDownloadClick = () => {

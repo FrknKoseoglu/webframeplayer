@@ -1,5 +1,27 @@
 const { app, BrowserWindow, Menu, session, dialog } = require('electron'); // 🚨 session ve dialog eklendi
 const path = require('path');
+const fs = require('fs');
+
+// ============================================================================
+// FILE LOGGING (debug için)
+// ============================================================================
+const logFile = path.join(app.getPath('userData'), 'electron-debug.log');
+function log(msg) {
+  const line = `[${new Date().toISOString()}] ${msg}\n`;
+  try { fs.appendFileSync(logFile, line); } catch(e) {}
+  console.log(msg);
+}
+
+process.on('uncaughtException', (error) => {
+  log(`UNCAUGHT EXCEPTION: ${error.stack || error.message}`);
+});
+process.on('unhandledRejection', (reason) => {
+  log(`UNHANDLED REJECTION: ${reason}`);
+});
+
+log(`App starting... Log file: ${logFile}`);
+log(`__dirname: ${__dirname}`);
+log(`app.isPackaged: ${app.isPackaged}`);
 
 // ============================================================================
 // SSL/CERTIFICATE BYPASS (Mixed Content için gerekli)
@@ -7,6 +29,10 @@ const path = require('path');
 app.commandLine.appendSwitch('ignore-certificate-errors');
 app.commandLine.appendSwitch('allow-insecure-localhost', 'true');
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
+app.commandLine.appendSwitch('disable-gpu-sandbox');
+app.commandLine.appendSwitch('no-sandbox');
+
+log('Command line switches set');
 
 // ============================================================================
 // CONFIGURATION
@@ -106,7 +132,7 @@ function createWindow() {
   });
 
   // 🚨 YENİ EKLENEN 1: User-Agent Hilesi (Bot engelini aşar)
-  const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Electron';
+  const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
   win.webContents.setUserAgent(userAgent);
 
   // 🚨 YENİ EKLENEN 2: CSP (Güvenlik) Başlıklarını Temizle
@@ -137,24 +163,56 @@ function createWindow() {
     showWindowOnce('FAILSAFE TIMEOUT (3s)');
   }, 3000);
 
-  const loadUrl = app.isPackaged ? PRODUCTION_URL : DEV_URL;
+  // URL yükleme - retry mekanizması ile
+  const isPackaged = app.isPackaged;
+  const loadUrl = (isPackaged ? PRODUCTION_URL : DEV_URL) + '?electron=1';
   
-  console.log(`[Electron] Mode: ${app.isPackaged ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+  console.log(`[Electron] Mode: ${isPackaged ? 'PRODUCTION' : 'DEVELOPMENT'}`);
   console.log(`[Electron] Loading URL: ${loadUrl}`);
-  
-  win.loadURL(loadUrl).catch((error) => {
-    console.error(`[Electron] CRITICAL LOAD ERROR: ${error.message}`);
-    // Hata olsa bile pencereyi göster ki kullanıcı hatayı görsün
-    showWindowOnce('loadURL catch');
-    
-    // Basit bir hata dialogu göster (opsiyonel)
-    if(app.isPackaged) {
-        dialog.showErrorBox('Bağlantı Hatası', `Sunucuya bağlanılamadı.\nURL: ${loadUrl}\nHata: ${error.message}`);
-    }
-  });
 
-  console.log(`[Electron] Opening DevTools...`);
-  win.webContents.openDevTools();
+  let retryCount = 0;
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 2000;
+
+  const showRetryPage = (errorMsg) => {
+    const retryHTML = `
+      <html>
+      <head><meta charset="utf-8"></head>
+      <body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0a0a0a;color:#fff;font-family:system-ui,sans-serif;">
+        <div style="text-align:center;max-width:400px;">
+          <h2 style="color:#ff6b6b;margin-bottom:8px;">Bağlantı Hatası</h2>
+          <p style="color:#888;font-size:14px;margin-bottom:24px;">${errorMsg}</p>
+          <button onclick="location.href='${loadUrl}'" style="padding:12px 32px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:8px;color:#fff;font-size:16px;cursor:pointer;">
+            Tekrar Dene
+          </button>
+        </div>
+      </body>
+      </html>`;
+    win.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(retryHTML));
+  };
+
+  const tryLoad = () => {
+    win.loadURL(loadUrl).catch((error) => {
+      retryCount++;
+      console.error(`[Electron] Load attempt ${retryCount}/${MAX_RETRIES} failed: ${error.message}`);
+      
+      if (retryCount < MAX_RETRIES) {
+        console.log(`[Electron] Retrying in ${RETRY_DELAY}ms...`);
+        setTimeout(tryLoad, RETRY_DELAY);
+      } else {
+        console.error(`[Electron] All retries exhausted.`);
+        showWindowOnce('all retries failed');
+        showRetryPage(error.message);
+      }
+    });
+  };
+
+  tryLoad();
+
+  if (!isPackaged) {
+    console.log(`[Electron] Opening DevTools...`);
+    win.webContents.openDevTools();
+  }
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     require('electron').shell.openExternal(url);
@@ -178,9 +236,22 @@ function createWindow() {
   });
 }
 
+log('Waiting for app.whenReady()...');
 app.whenReady().then(() => {
+  log('App is ready! Creating window...');
   createApplicationMenu();
   createWindow();
+  log('Window created successfully');
+}).catch((err) => {
+  log(`app.whenReady() FAILED: ${err.message}`);
+});
+
+app.on('render-process-gone', (event, webContents, details) => {
+  log(`RENDER PROCESS GONE: ${JSON.stringify(details)}`);
+});
+
+app.on('child-process-gone', (event, details) => {
+  log(`CHILD PROCESS GONE: ${JSON.stringify(details)}`);
 });
 
 app.on('window-all-closed', () => {

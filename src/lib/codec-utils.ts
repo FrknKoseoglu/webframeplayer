@@ -4,10 +4,10 @@
  * Detects unsupported codecs and provides helpful user options
  */
 
-// Check if running in Electron
+// Check if running in Electron (via localStorage flag set from URL param)
 export const isElectron = (): boolean => {
   return typeof window !== 'undefined' && 
-         window.navigator.userAgent.toLowerCase().includes('electron');
+         localStorage.getItem('isElectronApp') === 'true';
 };
 
 // Common unsupported codec patterns in error messages
