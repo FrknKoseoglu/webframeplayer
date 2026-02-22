@@ -205,7 +205,65 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
   // Show error state instead of player - stops loading completely
   if (hasError) {
     const srcUrl = typeof src === 'string' ? src : (src as any)?.src || '';
+    const electronApp = typeof window !== 'undefined' && localStorage.getItem('isElectronApp') === 'true';
     
+    // Electron: basit inline "Yayın açılamadı" mesajı (popup yok)
+    if (electronApp) {
+      return (
+        <div className="aspect-video w-full bg-gradient-to-br from-zinc-900 via-zinc-950 to-black flex items-center justify-center">
+          <UnsupportedCodecModal
+            isOpen={showCodecError}
+            onClose={() => setShowCodecError(false)}
+            streamUrl={srcUrl}
+            title={title}
+            onTryAnyway={() => {
+              setShowCodecError(false);
+              setHasError(false);
+            }}
+          />
+          
+          <div className="relative max-w-md px-6">
+            <div className="absolute inset-0 blur-3xl bg-gradient-to-r from-orange-600/15 via-red-600/10 to-orange-600/15 rounded-full scale-150" />
+            
+            <div className="relative z-10 flex flex-col items-center gap-4 p-8 bg-zinc-900/60 rounded-2xl border border-white/5">
+              <div className="p-4 rounded-full bg-orange-500/10 border border-orange-500/20">
+                <AlertCircle className="w-10 h-10 text-orange-400" />
+              </div>
+              <div className="text-center space-y-2">
+                <h2 className="text-xl font-semibold text-white">
+                  {language === 'tr' ? 'Yayın Açılamadı' : 'Stream Unavailable'}
+                </h2>
+                <p className="text-zinc-400 text-sm leading-relaxed">
+                  {language === 'tr' 
+                    ? 'Bu yayın şu anda açılamıyor. Lütfen daha sonra tekrar deneyin.'
+                    : 'This stream is currently unavailable. Please try again later.'}
+                </p>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button
+                  onClick={handleCopyLink}
+                  variant="outline"
+                  className="border-white/10 text-zinc-300 hover:bg-white/5"
+                  size="sm"
+                >
+                  {copied ? <Check className="w-4 h-4 mr-1.5" /> : <Copy className="w-4 h-4 mr-1.5" />}
+                  {copied ? (language === 'tr' ? 'Kopyalandı' : 'Copied') : (language === 'tr' ? 'Link Kopyala' : 'Copy Link')}
+                </Button>
+                <Button
+                  onClick={() => setHasError(false)}
+                  className="bg-orange-500/80 hover:bg-orange-500 text-white"
+                  size="sm"
+                >
+                  {language === 'tr' ? 'Tekrar Dene' : 'Retry'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    // Web: mevcut CORS hata UI'ı
     return (
       <div className="aspect-video w-full bg-gradient-to-br from-zinc-900 via-zinc-950 to-black flex items-center justify-center">
         <CorsErrorModal 
