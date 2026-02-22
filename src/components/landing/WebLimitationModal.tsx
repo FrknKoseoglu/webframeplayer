@@ -12,7 +12,7 @@ interface WebLimitationModalProps {
 }
 
 // Placeholder URL - update with your actual GitHub releases URL
-const GITHUB_RELEASES_URL = 'https://github.com/YOUR_USERNAME/iptv-web-player/releases';
+const GITHUB_RELEASES_URL = 'https://github.com/webframeplayer/webframeplayer/releases/tag/preview';
 
 export function WebLimitationModal({ isOpen, onClose }: WebLimitationModalProps) {
   const router = useRouter();
