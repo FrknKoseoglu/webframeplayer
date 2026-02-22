@@ -105,11 +105,11 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
                 )}
               </>
             ) : isElectron ? (
-              // Electron user - show simple "Başla" button
+              // Electron user - show "Hizmet Ekle" button
               <Link href="/login">
                 <Button size="lg" className="bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-red-500/25 min-h-[56px]">
-                  <Play className="w-5 h-5 mr-2" />
-                  {h.ctaStart}
+                  <ArrowRight className="w-5 h-5 mr-2" />
+                  {h.ctaNewService || 'Hizmet Ekle'}
                 </Button>
               </Link>
             ) : (

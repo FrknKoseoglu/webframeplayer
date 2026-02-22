@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-import { AlertTriangle, Copy, Check, X } from 'lucide-react';
+import { useEffect } from 'react';
+import { AlertTriangle, X, Download, Monitor, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 interface CorsErrorModalProps {
   isOpen: boolean;
@@ -10,8 +9,6 @@ interface CorsErrorModalProps {
 }
 
 export function CorsErrorModal({ isOpen, onClose, domainName }: CorsErrorModalProps) {
-  const [copied, setCopied] = useState(false);
-
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -25,22 +22,9 @@ export function CorsErrorModal({ isOpen, onClose, domainName }: CorsErrorModalPr
 
   if (!isOpen) return null;
 
-  const messageTemplate = `Merhaba, satın aldığım yayını Web Player üzerinden izlemek istiyorum ancak sunucunuzun güvenlik ayarları (CORS) nedeniyle yayın tarayıcıda engelleniyor.
-
-Lütfen yayın sunucunuzda aşağıdaki domain için CORS iznini aktif eder misiniz?
-
-İzin Verilecek Domain: ${domainName}
-
-Teknik Bilgi: Response Header'a "Access-Control-Allow-Origin: ${domainName}" eklenmelidir.`;
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(messageTemplate);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy logic', err);
-    }
+  const handleDownload = () => {
+    // Navigate to the landing page or download section
+    window.open('/', '_blank');
   };
 
   return (
@@ -52,17 +36,17 @@ Teknik Bilgi: Response Header'a "Access-Control-Allow-Origin: ${domainName}" ekl
       />
 
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-2xl bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative z-10 w-full max-w-lg bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10 bg-zinc-900/50">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full bg-red-500/10 border border-red-500/20">
-              <AlertTriangle className="w-6 h-6 text-red-500" />
+            <div className="p-3 rounded-full bg-amber-500/10 border border-amber-500/20">
+              <AlertTriangle className="w-6 h-6 text-amber-500" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Yayın Açılamadı (CORS Hatası)</h2>
-              <p className="text-white/50 text-sm">Yayın sağlayıcı kaynaklı engelleme</p>
+              <h2 className="text-xl font-bold text-white">Yayın Açılamadı</h2>
+              <p className="text-white/50 text-sm">Tarayıcı kısıtlaması (CORS)</p>
             </div>
           </div>
           <button 
@@ -74,18 +58,34 @@ Teknik Bilgi: Response Header'a "Access-Control-Allow-Origin: ${domainName}" ekl
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
-          <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-4">
-            <p className="text-red-200/80 text-sm leading-relaxed">
-              Bu hata bizden değil, <span className="font-semibold text-red-200">yayın sağlayıcınızın web izni vermemesinden</span> kaynaklanıyor. 
-              Sorunu çözmek için yayın aldığınız kişiye aşağıdaki mesajı gönderebilirsiniz.
+        <div className="p-6 space-y-5">
+          <div className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-4">
+            <p className="text-amber-200/80 text-sm leading-relaxed">
+              Bu yayın tarayıcı güvenlik politikaları (CORS) nedeniyle web&apos;de açılamıyor. 
+              <span className="font-semibold text-amber-200"> Masaüstü uygulamasını indirerek bu sorunu çözebilirsiniz.</span>
             </p>
           </div>
 
-          <div className="relative">
-            <pre className="w-full h-[240px] p-5 rounded-xl bg-black/50 border border-white/10 text-white/70 font-mono text-sm resize-none focus:outline-none overflow-auto whitespace-pre-wrap leading-relaxed">
-              {messageTemplate}
-            </pre>
+          {/* Benefits */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-white/70 text-sm">
+              <div className="p-2 rounded-lg bg-green-500/10">
+                <Monitor className="w-4 h-4 text-green-400" />
+              </div>
+              <span>Tüm yayınlar sorunsuz açılır</span>
+            </div>
+            <div className="flex items-center gap-3 text-white/70 text-sm">
+              <div className="p-2 rounded-lg bg-blue-500/10">
+                <Download className="w-4 h-4 text-blue-400" />
+              </div>
+              <span>Ücretsiz, hızlı kurulum</span>
+            </div>
+            <div className="flex items-center gap-3 text-white/70 text-sm">
+              <div className="p-2 rounded-lg bg-purple-500/10">
+                <ExternalLink className="w-4 h-4 text-purple-400" />
+              </div>
+              <span>Windows, macOS ve Linux desteği</span>
+            </div>
           </div>
         </div>
 
@@ -96,13 +96,14 @@ Teknik Bilgi: Response Header'a "Access-Control-Allow-Origin: ${domainName}" ekl
             onClick={onClose}
             className="text-white/50 hover:text-white hover:bg-white/5"
           >
-            Kapat
+            Daha Sonra
           </Button>
           <Button
-            onClick={handleCopy}
-            className="bg-white text-black hover:bg-white/90"
+            onClick={handleDownload}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white gap-2"
           >
-            {copied ? 'Kopyalandı' : 'Mesajı Kopyala'}
+            <Download className="w-4 h-4" />
+            Uygulamayı İndir
           </Button>
         </div>
       </div>

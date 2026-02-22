@@ -173,7 +173,7 @@ export const en: Translations = {
       testFailed: 'Proxy not working, please check the URL.',
       invalidUrl: 'Invalid format. Example: https://proxy.com or 192.168.1.1:8080',
       corsError: 'CORS Error',
-      corsErrorMessage: 'You can use a proxy as a workaround, but the permanent solution is for the broadcaster to whitelist this site. Click "Error Details" for more info.',
+      corsErrorMessage: 'This stream cannot be played due to browser restrictions. Download the desktop app to watch all streams without issues.',
     },
   },
 };

@@ -48,7 +48,7 @@ export function Footer() {
               <Github className="w-5 h-5 text-white/60" />
             </a>
             <a
-              href="mailto:contact@example.com"
+              href="mailto:webframeplayer@gmail.com"
               className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"
             >
               <Mail className="w-5 h-5 text-white/60" />

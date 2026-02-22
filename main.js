@@ -2,6 +2,13 @@ const { app, BrowserWindow, Menu, session, dialog } = require('electron'); // �
 const path = require('path');
 
 // ============================================================================
+// SSL/CERTIFICATE BYPASS (Mixed Content için gerekli)
+// ============================================================================
+app.commandLine.appendSwitch('ignore-certificate-errors');
+app.commandLine.appendSwitch('allow-insecure-localhost', 'true');
+app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
+
+// ============================================================================
 // CONFIGURATION
 // ============================================================================
 
@@ -99,7 +106,7 @@ function createWindow() {
   });
 
   // 🚨 YENİ EKLENEN 1: User-Agent Hilesi (Bot engelini aşar)
-  const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+  const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Electron';
   win.webContents.setUserAgent(userAgent);
 
   // 🚨 YENİ EKLENEN 2: CSP (Güvenlik) Başlıklarını Temizle
@@ -161,6 +168,13 @@ function createWindow() {
 
   win.webContents.on('did-finish-load', () => {
     console.log(`[Electron] Page loaded successfully!`);
+  });
+
+  // 🚨 Sertifika hatalarını bypass et (HTTP IPTV streamleri için)
+  win.webContents.on('certificate-error', (event, url, error, certificate, callback) => {
+    console.log(`[Electron] Certificate error bypassed for: ${url}`);
+    event.preventDefault();
+    callback(true); // Sertifika hatasını yoksay
   });
 }
 
