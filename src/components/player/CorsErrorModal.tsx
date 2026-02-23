@@ -23,7 +23,7 @@ export function CorsErrorModal({ isOpen, onClose, domainName }: CorsErrorModalPr
   if (!isOpen) return null;
 
   const handleDownload = () => {
-    window.open('https://github.com/webframeplayer/webframeplayer/releases/tag/preview', '_blank', 'noopener,noreferrer');
+    window.open('https://github.com/webframeplayer/webframeplayer/releases', '_blank', 'noopener,noreferrer');
   };
 
   return (
