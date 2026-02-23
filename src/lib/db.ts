@@ -20,9 +20,23 @@ if (!connectionString) {
 const pool = connectionString ? new Pool({ connectionString }) : null;
 const adapter = pool ? new PrismaPg(pool) : null;
 
+const createDummyPrisma = () => {
+  return new Proxy({}, {
+    get: (target, prop) => {
+      if (prop === '$connect' || prop === '$disconnect') return async () => {};
+      if (prop === '$transaction') return async (cb: any) => cb(createDummyPrisma());
+      return new Proxy({}, {
+        get: () => async () => {
+          throw new Error('Database connection string is missing. Please set DATABASE_URL.');
+        }
+      });
+    }
+  }) as unknown as PrismaClient;
+};
+
 export const db = globalForPrisma.prisma ?? (adapter 
   ? new PrismaClient({ adapter, log: ['error'] })
-  : new PrismaClient({ log: ['error'] }) // Fallback without connection for build
+  : createDummyPrisma()
 );
 
 
