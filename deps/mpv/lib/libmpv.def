@@ -1,0 +1,12 @@
+LIBRARY libmpv-2.dll
+EXPORTS
+    mpv_create
+    mpv_initialize
+    mpv_terminate_destroy
+    mpv_command
+    mpv_set_option_string
+    mpv_render_context_create
+    mpv_render_context_render
+    mpv_render_context_free
+    mpv_render_context_set_update_callback
+    mpv_set_property_string

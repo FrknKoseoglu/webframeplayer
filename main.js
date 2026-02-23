@@ -1,6 +1,10 @@
 const { app, BrowserWindow, Menu, session, dialog } = require('electron'); // 🚨 session ve dialog eklendi
 const path = require('path');
 const fs = require('fs');
+const { ipcMain } = require('electron');
+
+// Native MPV module is now initialized exclusively in the Renderer Process (via preload.js)
+// for zero-copy Canvas rendering and high performance.
 
 // ============================================================================
 // FILE LOGGING (debug için)
@@ -122,8 +126,10 @@ function createWindow() {
     webPreferences: {
       webSecurity: false, // CORS kapalı
       allowRunningInsecureContent: true, // HTTP izinli
-      nodeIntegration: false,
-      contextIsolation: true,
+      nodeIntegration: true, // Required for SharedArrayBuffer zero-copy when COOP/COEP is unavailable
+      contextIsolation: false, // Required to stop Electron from proxying and stripping SharedArrayBuffer
+      sandbox: false, // GEREKLİ: preload.js'in native modül ve Node.js API'lerine (fs, path) erişebilmesi için sandbox KAPALI olmalı
+      preload: path.join(__dirname, 'preload.js'),
     },
     show: false,
     backgroundColor: '#0a0a0a',
@@ -142,10 +148,17 @@ function createWindow() {
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': ['default-src * \'unsafe-inline\' \'unsafe-eval\' data: blob:'], // Her şeye izin ver
-        'X-Frame-Options': ['ALLOWALL'] // Frame engelini kaldır
+        'X-Frame-Options': ['ALLOWALL'], // Frame engelini kaldır
+        'Cross-Origin-Opener-Policy': ['same-origin'],
+        'Cross-Origin-Embedder-Policy': ['credentialless']
       },
     });
   });
+
+  // ============================================================================
+  // MPV IPC HANDLERS - DEPRECATED
+  // Rendering logic has been moved entirely to the Renderer process via preload.js
+  // ============================================================================
 
   const showWindowOnce = (source) => {
     if (!windowShown) {

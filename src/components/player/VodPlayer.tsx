@@ -104,7 +104,8 @@ export function VodPlayer({ src, poster, title }: VodPlayerProps) {
       airplay: true,
       theme: '#E50914',
       moreVideoAttr: {
-        crossOrigin: 'anonymous',
+        // crossOrigin removed: IPTV servers don't return CORS headers,
+        // and Electron has webSecurity:false so it's not needed
       },
       settings: [],
       customType: {

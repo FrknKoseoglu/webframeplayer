@@ -30,6 +30,8 @@ interface PlayerState {
   // Profile management
   profiles: Profile[];
   activeProfile: Profile | null;
+  defaultProfileId: string | null;
+  hasBooted: boolean;
   
   // Content data
   categories: Category[];
@@ -90,6 +92,7 @@ interface PlayerActions {
   addProfile: (profile: Profile) => void;
   removeProfile: (id: string) => void;
   switchProfile: (id: string) => void;
+  setDefaultProfileId: (id: string | null) => void;
   updateProfile: (id: string, updates: Partial<Profile>) => void;
   
   // Content actions
@@ -105,6 +108,7 @@ interface PlayerActions {
   setContentType: (type: ContentType) => void;
   setSearchQuery: (query: string) => void;
   toggleSidebar: () => void;
+  setHasBooted: (status: boolean) => void;
   
   // Loading actions
   setLoading: (isLoading: boolean, step?: LoadingStep, progress?: number) => void;
@@ -143,6 +147,8 @@ type PlayerStore = PlayerState & PlayerActions;
 const initialState: PlayerState = {
   profiles: [],
   activeProfile: null,
+  defaultProfileId: null,
+  hasBooted: false,
   categories: [],
   content: [],
   searchIndex: [],
@@ -189,6 +195,7 @@ export const usePlayerStore = create<PlayerStore>()(
         set((state) => ({
           profiles: state.profiles.filter((p) => p.id !== id),
           activeProfile: state.activeProfile?.id === id ? null : state.activeProfile,
+          defaultProfileId: state.defaultProfileId === id ? null : state.defaultProfileId,
         }));
       },
 
@@ -208,6 +215,8 @@ export const usePlayerStore = create<PlayerStore>()(
           }));
         }
       },
+
+      setDefaultProfileId: (id) => set({ defaultProfileId: id }),
 
       updateProfile: (id, updates) => {
         set((state) => ({
@@ -280,6 +289,8 @@ export const usePlayerStore = create<PlayerStore>()(
       setSearchQuery: (query) => set({ searchQuery: query }),
       
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+
+      setHasBooted: (status) => set({ hasBooted: status }),
 
       // Loading actions
       setLoading: (isLoading, step, progress) => {
@@ -444,6 +455,7 @@ export const usePlayerStore = create<PlayerStore>()(
         profiles: state.profiles,
         favorites: state.favorites,
         activeProfile: state.activeProfile,
+        defaultProfileId: state.defaultProfileId,
         // Now we persist content and categories too
         content: state.content,
         categories: state.categories,

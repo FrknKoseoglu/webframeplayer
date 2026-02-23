@@ -11,7 +11,8 @@
     "postinstall": "prisma generate",
     "electron-dev": "concurrently -k \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
     "electron-build": "npx -y cross-env ELECTRON_BUILD=true npm run build && electron-builder",
-    "electron-pack": "electron-builder"
+    "electron-pack": "electron-builder",
+    "rebuild": "electron-rebuild -f"
   },
   "build": {
     "appId": "com.frame.iptv-player",
@@ -65,6 +66,7 @@
     "nanoid": "^5.1.6",
     "next": "16.1.1",
     "next-auth": "^5.0.0-beta.30",
+    "node-addon-api": "^8.5.0",
     "pg": "^8.16.3",
     "plyr": "^3.8.3",
     "react": "^18.3.1",
@@ -75,6 +77,7 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@electron/rebuild": "^4.0.3",
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",

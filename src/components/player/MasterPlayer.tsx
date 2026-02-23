@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { VideoPlayer } from './VideoPlayer';
 import { VodPlayer } from './VodPlayer';
+import { MpvPlayer } from './MpvPlayer';
 import { Tv, Loader2 } from 'lucide-react';
 import { getStreamUrl } from '@/lib/url-helper';
 import { resolveStreamUrl } from '@/app/actions/stream-resolver';
@@ -21,12 +22,20 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
   const [isResolving, setIsResolving] = useState(false);
   const [resolveError, setResolveError] = useState<string | null>(null);
 
+  // Determine if we should use MPV (only in Electron, resets on new video)
+  const isElectron = typeof window !== 'undefined' && typeof window.mpv !== 'undefined';
+  const [useMpv, setUseMpv] = useState(isElectron);
+
   // Resolve stream URL when content changes
   useEffect(() => {
     if (!activeContent?.url) {
       setResolvedUrl(null);
       setResolveError(null);
       return;
+    }
+
+    if (isElectron) {
+      setUseMpv(true);
     }
 
     // Capture URL in local const to avoid null issues in async callback
@@ -107,7 +116,27 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
     );
   }
 
-  // Live TV → Vidstack
+  // Wait for user to press Play for VOD previews
+  if ((activeContent.type === 'movie' || activeContent.type === 'series') && !isPlaying) {
+    return null; // Will be replaced by PlayerPreview from parent
+  }
+
+  // 1. Try MPV First (if in Electron and hasn't failed)
+  if (useMpv) {
+    return (
+      <MpvPlayer 
+        src={resolvedUrl} 
+        poster={activeContent.logo}
+        isLive={activeContent.type === 'live'}
+        onError={(err) => {
+          console.warn('[MasterPlayer] MPV failed, falling back to Web Players:', err);
+          setUseMpv(false);
+        }} 
+      />
+    );
+  }
+
+  // 2. Fallback: Live TV → Vidstack
   if (activeContent.type === 'live') {
     return (
       <VideoPlayer
@@ -118,12 +147,7 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
     );
   }
 
-  // VOD (Movie/Series) → Artplayer
-  // Only show player if isPlaying is true
-  if (!isPlaying) {
-    return null; // Will be replaced by PlayerPreview from parent
-  }
-
+  // 3. Fallback: VOD (Movie/Series) → Artplayer
   return (
     <VodPlayer
       src={resolvedUrl}

@@ -1,0 +1,27 @@
+gyp info it worked if it ends with ok
+gyp info using node-gyp@11.5.0
+gyp info using node@24.11.1 | win32 | x64
+gyp info spawn C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe
+gyp info spawn args [
+gyp info spawn args 'build/binding.sln',
+gyp info spawn args '/clp:Verbosity=minimal',
+gyp info spawn args '/nologo',
+gyp info spawn args '/nodeReuse:false',
+gyp info spawn args '/p:Configuration=Release;Platform=x64'
+gyp info spawn args ]
+
+     Creating library D:\dev\webframeplayer\build\Release\mpv_renderer.lib and object D:\dev\webframeplayer\build\Release\mpv_renderer.exp
+mpv_renderer.obj : error LNK2001: unresolved external symbol mpv_free [D:\dev\webframeplayer\build\mpv_renderer.vcxproj]
+mpv_renderer.obj : error LNK2001: unresolved external symbol mpv_get_property_string [D:\dev\webframeplayer\build\mpv_renderer.vcxproj]
+D:\dev\webframeplayer\build\Release\mpv_renderer.node : fatal error LNK1120: 2 unresolved externals [D:\dev\webframeplayer\build\mpv_renderer.vcxproj]
+gyp ERR! build error 
+gyp ERR! stack Error: `C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe` failed with exit code: 1
+gyp ERR! stack at ChildProcess.<anonymous> (D:\dev\webframeplayer\node_modules\node-gyp\lib\build.js:219:23)
+gyp ERR! stack at ChildProcess.emit (node:events:508:28)
+gyp ERR! stack at ChildProcess._handle.onexit (node:internal/child_process:294:12)
+gyp ERR! System Windows_NT 10.0.26200
+gyp ERR! command "C:\\Program Files\\nodejs\\node.exe" "D:\\dev\\webframeplayer\\node_modules\\node-gyp\\bin\\node-gyp.js" "build"
+gyp ERR! cwd D:\dev\webframeplayer
+gyp ERR! node -v v24.11.1
+gyp ERR! node-gyp -v v11.5.0
+gyp ERR! not ok 

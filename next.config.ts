@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   trailingSlash: true,
+  // Removed strict COOP/COEP headers as they block external images (IPTV logos)
+  // Electron handles SharedArrayBuffer natively without these headers when configured correctly.
 };
 
 export default nextConfig;

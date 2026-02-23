@@ -45,15 +45,15 @@ export async function resolveStreamUrl(url: string): Promise<ResolveResult> {
 
     console.log('[StreamResolver] Resolving:', url);
 
-    // Fetch with manual redirect handling and VLC User-Agent
+    // Use HEAD to avoid downloading large VOD files (movies can be several GB)
+    // HEAD returns headers (status, Content-Type, Location) without body
     const response = await fetch(url, {
-      method: 'GET',
+      method: 'HEAD',
       headers: {
         'User-Agent': 'VLC/3.0.18 LibVLC/3.0.18',
         'Accept': '*/*',
       },
       redirect: 'manual', // Don't auto-follow redirects
-      // Short timeout for initial request
       signal: AbortSignal.timeout(10000),
     });
 
@@ -90,51 +90,9 @@ export async function resolveStreamUrl(url: string): Promise<ResolveResult> {
       }
     }
 
-    // 200 OK - URL is likely the direct stream or returns data
+    // 200 OK - URL is likely the direct stream
     if (response.status === 200) {
-      // Check Content-Type to determine if it's a stream or API response
-      const contentType = response.headers.get('Content-Type') || '';
-      
-      // If it's a video/stream type or playlist, return as-is
-      if (
-        contentType.includes('video') ||
-        contentType.includes('mpegurl') ||
-        contentType.includes('x-mpegURL') ||
-        contentType.includes('octet-stream') ||
-        contentType.includes('application/vnd')
-      ) {
-        console.log('[StreamResolver] Direct stream URL (200):', url);
-        return {
-          success: true,
-          url: originalUrl,
-          originalUrl,
-          wasRedirected: false,
-        };
-      }
-      
-      // If it's JSON, try to parse and extract stream URL
-      if (contentType.includes('application/json')) {
-        try {
-          const text = await response.text();
-          const data = JSON.parse(text);
-          
-          // Common patterns for stream URL in JSON responses
-          const streamUrl = data.url || data.stream_url || data.source || data.src;
-          if (streamUrl && typeof streamUrl === 'string') {
-            console.log('[StreamResolver] Extracted from JSON:', streamUrl);
-            return {
-              success: true,
-              url: streamUrl,
-              originalUrl,
-              wasRedirected: true,
-            };
-          }
-        } catch {
-          // Not valid JSON, treat as direct URL
-        }
-      }
-      
-      // Default: return original URL
+      console.log('[StreamResolver] Direct stream URL (200):', url);
       return {
         success: true,
         url: originalUrl,

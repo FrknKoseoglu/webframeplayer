@@ -44,3 +44,8 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# native libraries exceeding 100mb
+deps/mpv/lib/libmpv-2.dll
+libmpv-2.dll
+*.dll

@@ -42,8 +42,8 @@ export function SettingsPanel() {
   const { t } = useTranslation();
   
   const { 
-    language, bufferMode, cacheExpiry, profiles, activeProfile,
-    setLanguage, setBufferMode, setCacheExpiry, removeProfile, switchProfile, updateProfile,
+    language, bufferMode, cacheExpiry, profiles, activeProfile, defaultProfileId,
+    setLanguage, setBufferMode, setCacheExpiry, removeProfile, switchProfile, updateProfile, setDefaultProfileId,
     setCategories, setContent, setLoading
   } = usePlayerStore();
   
@@ -381,7 +381,7 @@ export function SettingsPanel() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => router.push('/login')}
+              onClick={() => router.push('/login?add=true')}
               className="border-white/10 text-white/60 hover:text-white"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -389,6 +389,30 @@ export function SettingsPanel() {
             </Button>
           </div>
           
+          {/* Default Service Selection */}
+          {profiles.length > 0 && (
+            <div className="mb-4 p-4 bg-white/5 rounded-lg border border-white/10 flex items-center justify-between">
+              <div>
+                <p className="text-white font-medium text-sm">{language === 'tr' ? 'Varsayılan Hizmet' : 'Default Service'}</p>
+                <p className="text-white/50 text-xs mt-0.5">
+                  {language === 'tr' 
+                    ? 'Uygulama açılışında otomatik başlatılacak hizmet' 
+                    : 'Service to start automatically on app launch'}
+                </p>
+              </div>
+              <select
+                value={defaultProfileId || ''}
+                onChange={(e) => setDefaultProfileId(e.target.value || null)}
+                className="w-48 px-3 py-2 rounded-lg bg-black/20 border border-white/10 text-white text-sm focus:outline-none focus:border-[var(--iptv-primary)]"
+              >
+                <option value="" className="bg-zinc-900">{language === 'tr' ? 'Seçilmedi (İlk Hizmet)' : 'Not Selected (First Service)'}</option>
+                {profiles.map(p => (
+                  <option key={p.id} value={p.id} className="bg-zinc-900">{p.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="space-y-2">
             {profiles.length === 0 ? (
               <div className="text-center py-8">

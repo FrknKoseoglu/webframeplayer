@@ -16,7 +16,7 @@ function LoginPageContent() {
   const [autoSelected, setAutoSelected] = useState(false);
   const [editProfileId, setEditProfileId] = useState<string | null>(null);
 
-  // Check for edit query param
+  // Check for edit or add query params
   useEffect(() => {
     const editId = searchParams.get('edit');
     if (editId) {
@@ -25,16 +25,43 @@ function LoginPageContent() {
         setEditProfileId(editId);
       }
     }
+    
+    if (searchParams.get('add') === 'true') {
+      setShowAddNew(true);
+    }
   }, [searchParams, profiles]);
 
-  // Auto-select single profile
+  // Auto-select single or default profile on app boot
   useEffect(() => {
-    if (profiles.length === 1 && !activeProfile && !autoSelected && !editProfileId) {
+    const forceSelect = searchParams.get('select') === 'true';
+    const forceAdd = searchParams.get('add') === 'true';
+    const { hasBooted, defaultProfileId, setHasBooted } = usePlayerStore.getState();
+
+    // If we've already booted in this session, don't auto-redirect unless forceSelect
+    // If not booted, we redirect to default or first profile
+    if (!hasBooted && profiles.length > 0 && !editProfileId && !forceSelect && !forceAdd) {
+      setHasBooted(true);
+      
+      // Mark as auto-selected so UI knows
       setAutoSelected(true);
-      switchProfile(profiles[0].id);
+      
+      const targetProfile = defaultProfileId 
+        ? profiles.find(p => p.id === defaultProfileId) || profiles[0] 
+        : profiles[0];
+        
+      if (!activeProfile || activeProfile.id !== targetProfile.id) {
+        switchProfile(targetProfile.id);
+      }
+      
       router.push('/dashboard');
+      return;
     }
-  }, [profiles, activeProfile, autoSelected, switchProfile, router, editProfileId]);
+    // Organic login page hit from dashboard (or multiple profiles without default)
+    const organicHit = profiles.length > 0 && activeProfile && !forceSelect && !forceAdd && !editProfileId && hasBooted;
+    if (organicHit) {
+      // Intentionally do nothing to let them select a service
+    }
+  }, [profiles, activeProfile, autoSelected, switchProfile, router, editProfileId, searchParams]);
 
   // Edit mode - show form with profile data
   if (editProfileId) {

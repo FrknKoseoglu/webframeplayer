@@ -292,7 +292,7 @@ export default function DashboardPage() {
         {/* Service Selector */}
         {profiles.length > 1 && (
           <button 
-            onClick={() => router.push('/login')}
+            onClick={() => router.push('/login?select=true')}
             className="w-full flex items-center justify-between px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors min-h-[44px]"
           >
             <span className="text-sm text-white/80 truncate">{activeProfile?.name}</span>
@@ -413,7 +413,7 @@ export default function DashboardPage() {
           {/* Service Selector */}
           {sidebarOpen && profiles.length > 1 && (
             <button 
-              onClick={() => router.push('/login')}
+              onClick={() => router.push('/login?select=true')}
               className="w-full flex items-center justify-between px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors"
             >
               <span className="text-sm text-white/80 truncate">{activeProfile?.name}</span>
