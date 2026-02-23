@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
+    "install": "node -e \"if(process.platform === 'win32') require('child_process').execSync('node-gyp rebuild', {stdio: 'inherit'})\"",
     "electron-dev": "concurrently -k \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
     "electron-build": "npx -y cross-env ELECTRON_BUILD=true npm run build && electron-builder",
     "electron-pack": "electron-builder",
@@ -22,6 +23,7 @@
     },
     "files": [
       "main.js",
+      "preload.js",
       "out/**/*"
     ],
     "extraResources": [
@@ -31,6 +33,16 @@
         "filter": [
           "**/*"
         ]
+      },
+      {
+        "from": "build/Release/mpv_renderer.node",
+        "to": "mpv_renderer.node"
+      }
+    ],
+    "extraFiles": [
+      {
+        "from": "libmpv-2.dll",
+        "to": "."
       }
     ],
     "win": {
