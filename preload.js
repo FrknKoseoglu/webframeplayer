@@ -12,8 +12,10 @@ try {
   const possiblePaths = [
     path.join(__dirname, 'build', 'Release', 'mpv_renderer.node'),
     path.join(process.cwd(), 'build', 'Release', 'mpv_renderer.node'),
-    path.resolve('build/Release/mpv_renderer.node')
-  ];
+    path.resolve('build/Release/mpv_renderer.node'),
+    // For packaged app:
+    process.resourcesPath ? path.join(process.resourcesPath, 'mpv_renderer.node') : null
+  ].filter(Boolean);
 
   let nativePath = null;
   for (const p of possiblePaths) {
@@ -35,10 +37,12 @@ try {
   } else {
     initError = `Native module NOT FOUND in any of: ${possiblePaths.join(', ')}`;
     console.error(`[Preload] ${initError}`);
+    alert(`[MPV Error] ${initError}`);
   }
 } catch (e) {
   initError = e.message || String(e);
   console.error('[Preload] Failed to load native mpv module:', e);
+  alert(`[MPV Exception] ${initError}`);
 }
 
 window.mpv = {

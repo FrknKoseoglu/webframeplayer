@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 // POST - Add credits to a provider (Admin only)
 export async function POST(request: NextRequest) {
   const session = await auth();

@@ -17,13 +17,13 @@ if (!connectionString) {
   }
 }
 
-const pool = new Pool({ connectionString: connectionString || '' });
-const adapter = new PrismaPg(pool);
+const pool = connectionString ? new Pool({ connectionString }) : null;
+const adapter = pool ? new PrismaPg(pool) : null;
 
-export const db = globalForPrisma.prisma ?? new PrismaClient({
-  adapter,
-  log: ['error'],
-});
+export const db = globalForPrisma.prisma ?? (adapter 
+  ? new PrismaClient({ adapter, log: ['error'] })
+  : new PrismaClient({ log: ['error'] }) // Fallback without connection for build
+);
 
 
 

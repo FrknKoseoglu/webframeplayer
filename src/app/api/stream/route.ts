@@ -64,3 +64,4 @@ export async function OPTIONS() {
   headers.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
   return new NextResponse(null, { headers });
 }
+

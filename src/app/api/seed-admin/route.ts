@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hashPassword } from '@/lib/password';
@@ -34,3 +35,4 @@ export async function POST() {
     return NextResponse.json({ error: 'Failed to create admin' }, { status: 500 });
   }
 }
+
