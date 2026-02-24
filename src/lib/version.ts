@@ -1,5 +1,5 @@
 // Defines the minimum required Electron version for the web app to function optimally, or to inform users of new updates.
-export const LATEST_ELECTRON_VERSION = '0.1.0';
+export const LATEST_ELECTRON_VERSION = '0.3.0';
 
 /**
  * Compare two semantic version strings.
