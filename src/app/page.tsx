@@ -2,16 +2,18 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { Hero, Features, HowItWorks, FAQ, FAQSchema, Footer, MagicLink } from '@/components/landing';
 import { ImportHandler } from '@/components/import/ImportHandler';
 
 function HomeContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [hasProfiles, setHasProfiles] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [isElectronBoot, setIsElectronBoot] = useState(false);
 
   // Check for import params
   const hasImportParams = searchParams.has('importUrl') || searchParams.has('importXtream') || searchParams.has('d');
@@ -30,10 +32,16 @@ function HomeContent() {
       // Auto-start for desktop app (skip landing page)
       const isElectron = new URLSearchParams(window.location.search).get('electron') === '1' || localStorage.getItem('isElectronApp') === 'true';
       if (isElectron && !state.hasBooted) {
-         window.location.href = '/login';
+        setIsElectronBoot(true);
+        router.replace('/login');
       }
     }
-  }, [hasImportParams]);
+  }, [hasImportParams, router]);
+
+  // Electron auto-boot: show nothing (blank dark screen) while redirecting
+  if (isElectronBoot) {
+    return <div className="min-h-screen bg-[var(--iptv-background)]" />;
+  }
 
   // Show import handler
   if (showImport && hasImportParams) {

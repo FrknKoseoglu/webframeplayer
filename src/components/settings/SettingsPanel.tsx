@@ -6,6 +6,7 @@ import { Globe, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, Ext
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { usePlayerStore } from '@/store/usePlayerStore';
+import { useProfileLoader, ProfileLoaderScreen } from '@/components/auth/ProfileLoader';
 import { 
   authenticateXtream, 
   getLiveCategories, 
@@ -47,6 +48,9 @@ export function SettingsPanel() {
   const [copiedMagicLinkMap, setCopiedMagicLinkMap] = useState<Record<string, boolean>>({});
   const [supportUrlDialog, setSupportUrlDialog] = useState<{ url: string; name: string } | null>(null);
 
+  // Shared profile loading (switch profile with step-by-step animation)
+  const profileLoader = useProfileLoader();
+
   const handleDeleteClick = (id: string) => {
     setDeleteConfirmId(id);
   };
@@ -68,7 +72,10 @@ export function SettingsPanel() {
 
   const handleProfileClick = (id: string) => {
     if (activeProfile?.id !== id) {
-      switchProfile(id);
+      const profile = profiles.find(p => p.id === id);
+      if (profile) {
+        profileLoader.loadProfileData(profile);
+      }
     }
   };
 
@@ -173,6 +180,11 @@ export function SettingsPanel() {
     if (hours > 0) return language === 'tr' ? `${hours} saat önce` : `${hours} hours ago`;
     return language === 'tr' ? 'Az önce' : 'Just now';
   };
+
+  // Show loading screen when switching profiles
+  if (profileLoader.isLoading) {
+    return <ProfileLoaderScreen profileName={profileLoader.profileName} bootStep={profileLoader.bootStep} completedSteps={profileLoader.completedSteps} />;
+  }
 
   return (
     <div className="h-full overflow-y-auto bg-[var(--iptv-surface-dark)] p-6">
