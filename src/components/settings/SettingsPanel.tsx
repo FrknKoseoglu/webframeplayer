@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, ExternalLink, Infinity, Copy, Check, Type } from 'lucide-react';
+import { Globe, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, ExternalLink, Infinity, Copy, Check, Type, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { usePlayerStore } from '@/store/usePlayerStore';
@@ -24,6 +24,7 @@ import { processM3UPlaylist } from '@/lib/m3u-parser';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n';
 import { generateMagicLink } from '@/lib/url-helper';
+import { LATEST_ELECTRON_VERSION, compareVersions } from '@/lib/version';
 
 
 const CACHE_OPTIONS = [
@@ -632,6 +633,60 @@ export function SettingsPanel() {
             )}
           </div>
         </div>
+        {/* Version Info Section */}
+        <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-gray-500/20 flex items-center justify-center">
+              <Info className="w-5 h-5 text-gray-400" />
+            </div>
+            <div>
+              <h2 className="text-white font-semibold">{language === 'tr' ? 'Versiyon Bilgisi' : 'Version Info'}</h2>
+              <p className="text-white/50 text-sm">{language === 'tr' ? 'Uygulama sürüm bilgileri' : 'Application version information'}</p>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="flex items-center justify-between px-4 py-2.5 rounded-lg bg-white/5">
+              <span className="text-white/60 text-sm">{language === 'tr' ? 'Web Versiyonu' : 'Web Version'}</span>
+              <span className="text-white font-medium text-sm">{LATEST_ELECTRON_VERSION}</span>
+            </div>
+            
+            {typeof window !== 'undefined' && localStorage.getItem('isElectronApp') === 'true' && (
+              <>
+                <div className="flex items-center justify-between px-4 py-2.5 rounded-lg bg-white/5">
+                  <span className="text-white/60 text-sm">{language === 'tr' ? 'Electron Versiyonu' : 'Electron Version'}</span>
+                  <span className="text-white font-medium text-sm">{localStorage.getItem('electronAppVersion') || '?'}</span>
+                </div>
+                
+                {(() => {
+                  const electronVer = localStorage.getItem('electronAppVersion');
+                  const isOutdated = electronVer && compareVersions(electronVer, LATEST_ELECTRON_VERSION) < 0;
+                  return isOutdated ? (
+                    <div className="flex items-center justify-between px-4 py-2.5 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                      <span className="text-orange-400 text-sm">
+                        {language === 'tr' ? 'Güncelleme mevcut!' : 'Update available!'}
+                      </span>
+                      <Button
+                        onClick={() => window.open('https://webframeplayer.com', '_blank')}
+                        className="bg-orange-500 hover:bg-orange-600 text-white"
+                        size="sm"
+                      >
+                        {language === 'tr' ? 'Güncelle' : 'Update'}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="px-4 py-2.5 rounded-lg bg-green-500/10 border border-green-500/20">
+                      <span className="text-green-400 text-sm">
+                        {language === 'tr' ? '✓ Güncel sürüm kullanılıyor' : '✓ Up to date'}
+                      </span>
+                    </div>
+                  );
+                })()}
+              </>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );

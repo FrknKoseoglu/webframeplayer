@@ -6,7 +6,7 @@ import '@vidstack/react/player/styles/default/layouts/video.css';
 import { useEffect, useRef, useState } from 'react';
 import { MediaPlayer, MediaProvider, type PlayerSrc, type MediaPlayerInstance } from '@vidstack/react';
 import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
-import { Tv, AlertCircle, Settings, Copy, Check } from 'lucide-react';
+import { Tv, AlertCircle, Settings, Copy, Check, Download } from 'lucide-react';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { useTranslation } from '@/lib/i18n';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { CorsErrorModal } from './CorsErrorModal';
 import { UnsupportedCodecModal } from './UnsupportedCodecModal';
 import { isLikelyCodecError, isCodecError, mightBeUnsupportedFormat } from '@/lib/codec-utils';
+import { generateMagicLink } from '@/lib/url-helper';
 
 interface VideoPlayerProps {
   src: PlayerSrc | null;
@@ -30,6 +31,8 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
   const [showCorsError, setShowCorsError] = useState(false);
   const [showCodecError, setShowCodecError] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [magicCopied, setMagicCopied] = useState(false);
+  const activeProfile = usePlayerStore((s) => s.activeProfile);
 
   // Copy stream URL to clipboard
   const handleCopyLink = async () => {
@@ -238,24 +241,47 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
                     ? 'Bu yayın şu anda açılamıyor. Lütfen daha sonra tekrar deneyin.'
                     : 'This stream is currently unavailable. Please try again later.'}
                 </p>
+                <p className="text-zinc-500 text-xs leading-relaxed mt-2">
+                  {language === 'tr'
+                    ? 'Magic Link\'i kopyalayıp uygulamaya eklediğinizde mevcut bilgileriniz uygulamaya aktarılacaktır.'
+                    : 'Copy the Magic Link and paste it in the app to transfer your current settings.'}
+                </p>
               </div>
-              <div className="flex gap-3 pt-2">
-                <Button
-                  onClick={handleCopyLink}
-                  variant="outline"
-                  className="border-white/10 text-zinc-300 hover:bg-white/5"
-                  size="sm"
-                >
-                  {copied ? <Check className="w-4 h-4 mr-1.5" /> : <Copy className="w-4 h-4 mr-1.5" />}
-                  {copied ? (language === 'tr' ? 'Kopyalandı' : 'Copied') : (language === 'tr' ? 'Link Kopyala' : 'Copy Link')}
-                </Button>
-                <Button
-                  onClick={() => setHasError(false)}
-                  className="bg-orange-500/80 hover:bg-orange-500 text-white"
-                  size="sm"
-                >
-                  {language === 'tr' ? 'Tekrar Dene' : 'Retry'}
-                </Button>
+              <div className="flex flex-col gap-2 pt-2 w-full">
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleCopyLink}
+                    variant="outline"
+                    className="flex-1 border-white/10 text-zinc-300 hover:bg-white/5"
+                    size="sm"
+                  >
+                    {copied ? <Check className="w-4 h-4 mr-1.5" /> : <Copy className="w-4 h-4 mr-1.5" />}
+                    {copied ? (language === 'tr' ? 'Kopyalandı' : 'Copied') : (language === 'tr' ? 'Link Kopyala' : 'Copy Link')}
+                  </Button>
+                  <Button
+                    onClick={() => setHasError(false)}
+                    className="flex-1 bg-orange-500/80 hover:bg-orange-500 text-white"
+                    size="sm"
+                  >
+                    {language === 'tr' ? 'Tekrar Dene' : 'Retry'}
+                  </Button>
+                </div>
+                {activeProfile && (
+                  <Button
+                    onClick={async () => {
+                      const link = generateMagicLink(activeProfile);
+                      await navigator.clipboard.writeText(link);
+                      setMagicCopied(true);
+                      setTimeout(() => setMagicCopied(false), 2000);
+                    }}
+                    variant="outline"
+                    className="w-full border-blue-500/20 text-blue-400 hover:bg-blue-500/10"
+                    size="sm"
+                  >
+                    {magicCopied ? <Check className="w-4 h-4 mr-1.5" /> : <Copy className="w-4 h-4 mr-1.5" />}
+                    {magicCopied ? 'Magic Link Kopyalandı!' : 'Magic Link Kopyala'}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -282,60 +308,63 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
           }}
         />
         
-        <div className="relative max-w-2xl px-6">
+        <div className="relative max-w-xl px-6">
           {/* Error glow effect */}
           <div className="absolute inset-0 blur-3xl bg-gradient-to-r from-red-600/20 via-orange-600/20 to-red-600/20 rounded-full scale-150" />
           
-          <div className="relative z-10 flex flex-col items-center gap-6 p-12 bg-zinc-900/50 rounded-2xl border border-red-500/20">
-            <div className="p-6 rounded-full bg-red-500/20 border border-red-500/30">
-              <AlertCircle className="w-16 h-16 text-red-400" />
+          <div className="relative z-10 flex flex-col items-center gap-6 p-10 bg-zinc-900/50 rounded-2xl border border-red-500/20 text-center">
+            <div className="p-5 rounded-full bg-red-500/20 border border-red-500/30">
+              <AlertCircle className="w-12 h-12 text-red-400" />
             </div>
-            <div className="text-center space-y-3">
+            <div className="space-y-3">
               <h2 className="text-2xl font-semibold text-white">
                 {language === 'tr' ? 'CORS Hatası' : 'CORS Error'}
               </h2>
-              <p className="text-zinc-300 max-w-md text-base leading-relaxed">
+              <p className="text-zinc-300 text-sm leading-relaxed max-w-md mx-auto">
                 {language === 'tr' 
-                  ? 'Tarayıcı güvenlik politikaları (CORS) nedeniyle bu yayın web\'de açılamıyor. Masaüstü uygulamasını kullanmanızı öneriyoruz.'
-                  : 'This stream cannot be played in the browser due to CORS security policies. We recommend using the desktop app.'}
+                  ? 'Tarayıcı güvenlik politikaları (CORS) nedeniyle bu yayın web\'de açılamıyor. Masaüstü uygulamasını indirerek tüm içerikleri sorunsuz izleyebilirsiniz.'
+                  : 'This stream cannot be played in the browser due to CORS security policies. Download the desktop app to watch all content seamlessly.'}
               </p>
-              <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
-                <Button
-                  onClick={() => setShowCorsError(true)}
-                  variant="outline"
-                  className="border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300"
-                  size="lg"
-                >
-                  <AlertCircle className="w-5 h-5 mr-2" />
-                  Hata Detayı
-                </Button>
-                <Button
-                  onClick={() => router.push('/settings')}
-                  className="bg-[var(--iptv-primary)] hover:opacity-90 text-white px-6"
-                  size="lg"
-                >
-                  <Settings className="w-5 h-5 mr-2" />
-                  {t.dashboard.nav.settings}
-                </Button>
-                <Button
-                  onClick={handleCopyLink}
-                  variant="outline"
-                  className="border-blue-500/20 text-blue-400 hover:bg-blue-500/10"
-                  size="lg"
-                >
-                  {copied ? <Check className="w-5 h-5 mr-2" /> : <Copy className="w-5 h-5 mr-2" />}
-                  {copied ? 'Kopyalandı!' : 'Bağlantıyı Kopyala'}
-                </Button>
-                <Button
-                  onClick={() => setHasError(false)}
-                  variant="outline"
-                  className="border-white/20 text-white hover:bg-white/10"
-                  size="lg"
-                >
-                  {language === 'tr' ? 'Tekrar Dene' : 'Retry'}
-                </Button>
-              </div>
+              <p className="text-zinc-500 text-xs leading-relaxed max-w-md mx-auto">
+                {language === 'tr'
+                  ? 'Magic Link\'i kopyalayıp masaüstü uygulamasına yapıştırarak mevcut bilgilerinizi kolayca aktarabilirsiniz.'
+                  : 'Copy the Magic Link and paste it in the desktop app to easily transfer your settings.'}
+              </p>
             </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-2 w-full max-w-sm">
+              <Button
+                onClick={() => window.open('/', '_blank')}
+                className="flex-1 bg-[var(--iptv-primary)] hover:opacity-90 text-white px-6"
+                size="lg"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                {language === 'tr' ? 'Uygulamayı İndir' : 'Download App'}
+              </Button>
+              {activeProfile && (
+                <Button
+                  onClick={async () => {
+                    const link = generateMagicLink(activeProfile);
+                    await navigator.clipboard.writeText(link);
+                    setMagicCopied(true);
+                    setTimeout(() => setMagicCopied(false), 2000);
+                  }}
+                  variant="outline"
+                  className="flex-1 border-blue-500/20 text-blue-400 hover:bg-blue-500/10"
+                  size="lg"
+                >
+                  {magicCopied ? <Check className="w-5 h-5 mr-2" /> : <Copy className="w-5 h-5 mr-2" />}
+                  {magicCopied ? 'Kopyalandı!' : 'Magic Link Kopyala'}
+                </Button>
+              )}
+            </div>
+            <Button
+              onClick={() => setHasError(false)}
+              variant="outline"
+              className="border-white/10 text-white/60 hover:bg-white/5"
+              size="sm"
+            >
+              {language === 'tr' ? 'Tekrar Dene' : 'Retry'}
+            </Button>
           </div>
         </div>
       </div>

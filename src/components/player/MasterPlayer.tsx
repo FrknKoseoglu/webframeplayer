@@ -6,6 +6,8 @@ import { VideoPlayer } from './VideoPlayer';
 import { VodPlayer } from './VodPlayer';
 import { MpvPlayer } from './MpvPlayer';
 import { Tv, Loader2 } from 'lucide-react';
+import { ChannelIcon } from '@/components/ui/ChannelIcon';
+import { StreamLoading } from './StreamLoading';
 import { getStreamUrl } from '@/lib/url-helper';
 import { resolveStreamUrl } from '@/app/actions/stream-resolver';
 
@@ -99,27 +101,23 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
   // Resolving state
   if (isResolving) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-black text-center p-8">
-        {activeContent?.logo && (
-          <img src={activeContent.logo} alt="" className="w-16 h-16 object-contain rounded-lg mb-4 bg-white/10 p-1" />
-        )}
-        <p className="text-white font-semibold mb-2">{activeContent?.name || ''}</p>
-        <Loader2 className="w-8 h-8 text-[var(--iptv-primary)] animate-spin mb-2" />
-        <p className="text-white/50 text-xs">Stream çözümleniyor...</p>
-      </div>
+      <StreamLoading
+        name={activeContent?.name}
+        logo={activeContent?.logo}
+        isLive={activeContent?.type === 'live'}
+        message="Stream çözümleniyor..."
+      />
     );
   }
 
   // No resolved URL yet
   if (!resolvedUrl) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-black text-center p-8">
-        {activeContent?.logo && (
-          <img src={activeContent.logo} alt="" className="w-16 h-16 object-contain rounded-lg mb-4 bg-white/10 p-1" />
-        )}
-        <p className="text-white font-semibold mb-2">{activeContent?.name || ''}</p>
-        <Loader2 className="w-8 h-8 text-white/40 animate-spin" />
-      </div>
+      <StreamLoading
+        name={activeContent?.name}
+        logo={activeContent?.logo}
+        isLive={activeContent?.type === 'live'}
+      />
     );
   }
 
@@ -135,6 +133,8 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
         src={resolvedUrl} 
         poster={activeContent.logo}
         isLive={activeContent.type === 'live'}
+        channelName={activeContent.name}
+        channelLogo={activeContent.logo}
         onError={(err) => {
           console.warn('[MasterPlayer] MPV failed, falling back to Web Players:', err);
           setUseMpv(false);

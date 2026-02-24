@@ -323,6 +323,7 @@ export const usePlayerStore = create<PlayerStore>()(
             ...series,
             id: `${series.id}_ep_${episode.id}`,
             name: `${series.name} - S${episode.seasonNum}E${episode.episodeNum} - ${episode.title}`,
+            logo: episode.image || series.logo,
             url: episode.url,
             seasonNumber: episode.seasonNum,
             episodeNumber: episode.episodeNum,

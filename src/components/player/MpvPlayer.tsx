@@ -1,13 +1,17 @@
 'use client';
 
 import { useEffect, useRef, useState, useId } from 'react';
-import { Play, Pause, Volume2, Maximize, Loader2, RotateCcw, FastForward, Settings, Activity, RefreshCw } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Maximize, Loader2, RotateCcw, FastForward, Settings, Activity, RefreshCw } from 'lucide-react';
 import { usePlayerStore } from '@/store/usePlayerStore';
+import { ChannelIcon } from '@/components/ui/ChannelIcon';
+import { StreamLoading } from './StreamLoading';
 
 interface MpvPlayerProps {
   src: string;
   poster?: string;
   isLive?: boolean;
+  channelName?: string;
+  channelLogo?: string;
   onError?: (err?: any) => void;
 }
 
@@ -20,7 +24,7 @@ const formatTime = (s: number) => {
   return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 };
 
-export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
+export function MpvPlayer({ src, onError, isLive = false, channelName, channelLogo }: MpvPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const uniqueId = useId().replace(/:/g, '');
@@ -43,7 +47,12 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
   
   const [isRewingText, setIsRewindingText] = useState(false);
   const [isFfText, setIsFfText] = useState(false);
+  const [volumeOsd, setVolumeOsd] = useState<number | null>(null);
+  const volumeOsdTimer = useRef<NodeJS.Timeout | null>(null);
   const rewindInterval = useRef<NodeJS.Timeout | null>(null);
+  const [isIdle, setIsIdle] = useState(false);
+  const idleTimer = useRef<NodeJS.Timeout | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     if (!src || typeof window === 'undefined' || !window.mpv) {
@@ -134,7 +143,12 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
     const interval = setInterval(() => {
       const pos = window.mpv.getProperty('time-pos');
       const dur = window.mpv.getProperty('duration');
-      if (pos) setCurrentTime(Number(pos));
+      if (pos) {
+        const p = Number(pos);
+        setCurrentTime(p);
+        // Safety: if playback position > 0, content is playing — force loading off
+        if (p > 0) setIsLoading(false);
+      }
       if (dur) setDuration(Number(dur));
       
       // Fetch tracks only once when duration is known
@@ -166,8 +180,8 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
       const vol = window.mpv.getProperty('volume');
       if (vol) setVolume(Number(vol));
       
-      // Poll bitrate and resolution for live streams (or when explicitly isLive is true)
-      if (isLive || d === 0) {
+      // Poll bitrate and resolution
+      {
         try {
           const vBitrateStr = window.mpv.getProperty('video-bitrate');
           const aBitrateStr = window.mpv.getProperty('audio-bitrate');
@@ -203,9 +217,6 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
             else if (h >= 720) setResolution('HD');
             else if (h >= 480) setResolution('SD');
             else setResolution(`${h}p`);
-          } else {
-            // Debug readout
-            setResolution(`? (h1:${h1}, h2:${h2}, h3:${h3})`);
           }
           
           // Poll FPS - use container-fps first (raw stream FPS), fallback to estimated-vf-fps
@@ -262,11 +273,42 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
   };
 
   const isVod = !isLive && duration > 0;
+
+  // Scroll to adjust volume
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -5 : 5;
+    const newVol = Math.max(0, Math.min(100, volume + delta));
+    setVolume(newVol);
+    window.mpv?.setProperty('volume', newVol.toString());
+    setVolumeOsd(newVol);
+    if (volumeOsdTimer.current) clearTimeout(volumeOsdTimer.current);
+    volumeOsdTimer.current = setTimeout(() => setVolumeOsd(null), 1200);
+  };
+
+  // Track fullscreen changes
+  useEffect(() => {
+    const handleFsChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  // Auto-hide controls + cursor after 3s idle in fullscreen VOD
+  const resetIdle = () => {
+    setIsIdle(false);
+    if (idleTimer.current) clearTimeout(idleTimer.current);
+    if (isFullscreen && isVod) {
+      idleTimer.current = setTimeout(() => setIsIdle(true), 3000);
+    }
+  };
+
+  const handleMouseMove = () => resetIdle();
+
   const audioTracks = tracks.filter(t => t.type === 'audio');
   const subTracks = tracks.filter(t => t.type === 'sub');
 
   return (
-    <div ref={containerRef} className="relative group w-full h-full bg-black overflow-hidden flex items-center justify-center rounded-lg border border-white/5" onDoubleClick={toggleFullscreen}>
+    <div ref={containerRef} className={`relative group w-full h-full bg-black overflow-hidden flex items-center justify-center rounded-lg border border-white/5 ${isIdle ? 'cursor-none' : ''}`} onDoubleClick={toggleFullscreen} onWheel={handleWheel} onMouseMove={handleMouseMove}>
       {error ? (
          <div className="text-red-500 p-8 text-center bg-zinc-950/50 rounded-xl border border-red-500/20 max-w-md z-50">
           <p className="font-bold text-lg mb-2">MPV Oynatıcı Hatası</p>
@@ -283,8 +325,19 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
           <canvas id={canvasId} ref={canvasRef} width={1920} height={1080} className="w-full h-full object-contain" />
           
           {isLoading && !error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-40">
-               <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+            <div className="absolute inset-0 z-40">
+              <StreamLoading name={channelName} logo={channelLogo} isLive={isLive} />
+            </div>
+          )}
+
+          {/* Volume OSD */}
+          {volumeOsd !== null && (
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-sm rounded-lg px-5 py-3 flex items-center gap-3 z-50 border border-white/10 transition-opacity">
+              {volumeOsd === 0 ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
+              <div className="w-32 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                <div className="h-full bg-white rounded-full transition-all" style={{ width: `${volumeOsd}%` }} />
+              </div>
+              <span className="text-white text-sm font-medium w-8 text-right">{volumeOsd}%</span>
             </div>
           )}
 
@@ -311,7 +364,7 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
           )}
           
           {/* Controls Overlay */}
-          <div className="absolute inset-x-0 bottom-0 px-6 pb-6 pt-16 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
+          <div className={`absolute inset-x-0 bottom-0 px-6 pb-6 pt-16 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-300 z-50 ${isIdle ? 'opacity-0 pointer-events-none' : 'opacity-0 group-hover:opacity-100'}`}>
             
             {/* Timeline for VOD */}
             {isVod && (
@@ -351,29 +404,39 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
                 {/* Stats for Live and VOD can be different, but putting here pushes icons right */}
               </div>
               
-              {/* Live Info (Bitrate & Res) vs Settings vs Fullscreen */}
+              {/* Info (Bitrate, Res, FPS) */}
               <div className="flex items-center gap-3">
-                {!isVod && (
-                  <div className="flex items-center gap-2">
-                    {resolution && (
-                      <div className="px-2 py-1 bg-black/40 rounded-md border border-white/10 text-[10px] font-bold text-white/90 tracking-wider">
-                        {resolution}
-                      </div>
-                    )}
-                    {fps && (
-                      <div className="px-2 py-1 bg-black/40 rounded-md border border-white/10 text-[10px] font-bold text-white/90 tracking-wider">
-                        {fps}
-                      </div>
-                    )}
-                    {bitrate && (
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/40 rounded-full border border-white/10 text-xs font-medium text-green-400">
-                         <Activity className="w-3.5 h-3.5" />
-                         {bitrate}
-                      </div>
-                    )}
-                  </div>
-                )}
+                <div className="flex items-center gap-2">
+                  {resolution && (
+                    <div className="px-2 py-1 bg-black/40 rounded-md border border-white/10 text-[10px] font-bold text-white/90 tracking-wider">
+                      {resolution}
+                    </div>
+                  )}
+                  {fps && (
+                    <div className="px-2 py-1 bg-black/40 rounded-md border border-white/10 text-[10px] font-bold text-white/90 tracking-wider">
+                      {fps}
+                    </div>
+                  )}
+                  {bitrate && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/40 rounded-full border border-white/10 text-xs font-medium text-green-400">
+                       <Activity className="w-3.5 h-3.5" />
+                       {bitrate}
+                    </div>
+                  )}
+                </div>
                 
+                {/* Volume icon (left of settings) */}
+                <button 
+                  onClick={() => {
+                    const newVol = volume > 0 ? 0 : 100;
+                    setVolume(newVol);
+                    window.mpv?.setProperty('volume', newVol.toString());
+                  }}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                >
+                  {volume === 0 ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
+                </button>
+
                 {/* Settings Menu */}
                 <div className="relative">
                 <button onClick={() => setShowSettings(!showSettings)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
