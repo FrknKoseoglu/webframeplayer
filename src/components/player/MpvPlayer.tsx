@@ -256,7 +256,7 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
     setIsRewindingText(true);
     rewindInterval.current = setInterval(() => {
         window.mpv?.command(['seek', '-1', 'relative']);
-    }, 400); // 2.5x speed rewind
+    }, 500);
   };
   const stopRewind = () => {
     setIsRewindingText(false);
