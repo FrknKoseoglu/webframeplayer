@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from 'sonner';
+import { Suspense } from 'react';
 import { ConfirmProvider } from '@/components/ui/confirm-dialog';
+import { UpdateChecker } from '@/components/player/UpdateChecker';
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -99,6 +101,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
         <ConfirmProvider>
+          <Suspense fallback={null}>
+            <UpdateChecker />
+          </Suspense>
           {children}
         </ConfirmProvider>
       </body>

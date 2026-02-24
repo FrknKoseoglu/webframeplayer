@@ -1,14 +1,17 @@
 import { useEffect } from 'react';
-import { AlertTriangle, X, Download, Monitor, ExternalLink } from 'lucide-react';
+import { AlertTriangle, X, Download, Monitor, ExternalLink, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 interface CorsErrorModalProps {
   isOpen: boolean;
   onClose: () => void;
   domainName: string;
+  magicLink?: string;
 }
 
-export function CorsErrorModal({ isOpen, onClose, domainName }: CorsErrorModalProps) {
+export function CorsErrorModal({ isOpen, onClose, domainName, magicLink }: CorsErrorModalProps) {
+  const [copied, setCopied] = useState(false);
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -97,6 +100,20 @@ export function CorsErrorModal({ isOpen, onClose, domainName }: CorsErrorModalPr
           >
             Daha Sonra
           </Button>
+          {magicLink && (
+            <Button
+              onClick={async () => {
+                await navigator.clipboard.writeText(magicLink);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              variant="outline"
+              className="border-purple-500/20 text-purple-400 hover:bg-purple-500/10"
+            >
+              {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+              {copied ? 'Kopyalandı!' : 'Sihirli Bağlantı Kopyala'}
+            </Button>
+          )}
           <Button
             onClick={handleDownload}
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white gap-2"

@@ -23,7 +23,7 @@ import { processM3UPlaylist } from '@/lib/m3u-parser';
 import type { Profile, LoadingStep } from '@/types/iptv';
 import { LOADING_MESSAGES } from '@/types/iptv';
 
-type LoginTab = 'xtream' | 'm3u';
+type LoginTab = 'xtream' | 'm3u' | 'magic';
 
 interface LoginScreenProps {
   onBack?: () => void;
@@ -50,6 +50,59 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
   // M3U form state
   const [m3uUrl, setM3uUrl] = useState('');
   const [m3uName, setM3uName] = useState('');
+
+  // Magic link form state
+  const [magicUrl, setMagicUrl] = useState('');
+
+  const handleMagicLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!magicUrl) return;
+
+    try {
+      let dParam: string | null = null;
+      try {
+        const url = new URL(magicUrl);
+        dParam = url.searchParams.get('d');
+      } catch {
+        setError('Geçersiz bir URL girdiniz.');
+        return;
+      }
+
+      if (!dParam) {
+        setError('Bu URL sihirli bir bağlantı (' + magicUrl + ') değil.');
+        return;
+      }
+
+      const decoded = JSON.parse(atob(dParam));
+      
+      if (decoded.importUrl) {
+         setM3uUrl(decoded.importUrl);
+         setM3uName(decodeURIComponent(decoded.serviceName || ''));
+         setActiveTab('m3u');
+         // Use setTimeout to ensure state updates before triggering login
+         setTimeout(() => {
+           const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+           handleM3ULogin(fakeEvent);
+         }, 0);
+      } else if (decoded.importXtream) {
+         setXtreamUrl(decoded.host || '');
+         setXtreamUsername(decoded.user || '');
+         setXtreamPassword(decoded.password || '');
+         setServiceName(decodeURIComponent(decoded.serviceName || ''));
+         setActiveTab('xtream');
+         // Use setTimeout to ensure state updates before triggering login
+         setTimeout(() => {
+           const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+           handleXtreamLogin(fakeEvent);
+         }, 0);
+      } else {
+         setError('Sihirli bağlantı bilgileri okunamadı.');
+      }
+    } catch (err) {
+      setError('Bağlantı ayrıştırılamadı. Geçerli bir Sihirli Bağlantı (Magic Link) olduğundan emin olun.');
+    }
+  };
 
   // Pre-fill form when editing
   useEffect(() => {
@@ -275,13 +328,23 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
               </button>
               <button
                 onClick={() => setActiveTab('m3u')}
-                className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
+                className={`flex-1 py-2.5 px-2 sm:px-4 rounded-lg text-sm font-semibold transition-all ${
                   activeTab === 'm3u'
                     ? 'bg-[var(--iptv-primary)] text-white shadow-lg'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
                 M3U Playlist
+              </button>
+              <button
+                onClick={() => setActiveTab('magic')}
+                className={`flex-1 py-2.5 px-2 sm:px-4 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1 ${
+                  activeTab === 'magic'
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Magic Link
               </button>
             </div>
 
@@ -447,6 +510,44 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
                   ) : (
                     <>
                       <span>{isEditMode ? 'Güncelle' : 'Listeyi Yükle'}</span>
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </form>
+            )}
+
+            {/* Magic Link Form */}
+            {activeTab === 'magic' && (
+              <form onSubmit={handleMagicLogin} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-gray-300 ml-1">
+                    Sihirli Bağlantı (Magic Link)
+                  </label>
+                  <Input
+                    type="url"
+                    placeholder="https://.../?d=..."
+                    value={magicUrl}
+                    onChange={(e) => setMagicUrl(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="bg-[var(--iptv-input-bg)] border-[var(--iptv-border)] text-white placeholder:text-gray-600 focus:border-[var(--iptv-primary)] focus-visible:ring-[var(--iptv-primary)]"
+                  />
+                  <p className="text-xs text-gray-400 ml-1">
+                    Kopyaladığınız sihirli bağlantıyı buraya yapıştırıp bilgileri otomatik doldurabilirsiniz.
+                  </p>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold text-lg py-6 rounded-xl shadow-lg shadow-purple-600/20 mt-2"
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <span>Bilgileri Aktar</span>
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </>
                   )}

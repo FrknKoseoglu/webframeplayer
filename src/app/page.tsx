@@ -26,29 +26,11 @@ function HomeContent() {
     // Show import handler if import params present
     if (hasImportParams) {
       setShowImport(true);
-    } else if (profilesExist) {
+    } else {
       // Auto-start for desktop app (skip landing page)
       const isElectron = new URLSearchParams(window.location.search).get('electron') === '1' || localStorage.getItem('isElectronApp') === 'true';
-      if (isElectron) {
-        const { defaultProfileId, switchProfile, activeProfile, setHasBooted, hasBooted } = usePlayerStore.getState();
-        
-        // Only run auto-boot logic IF we haven't booted yet.
-        if (!hasBooted) {
-          // If we have an active profile or want to auto-select, go straight to dashboard
-          if (state.profiles.length > 0) {
-             setHasBooted(true);
-             const targetProfile = defaultProfileId 
-               ? state.profiles.find(p => p.id === defaultProfileId) || state.profiles[0] 
-               : state.profiles[0];
-               
-             if (!activeProfile || activeProfile.id !== targetProfile.id) {
-               switchProfile(targetProfile.id);
-             }
-             window.location.href = '/dashboard';
-          } else {
-             window.location.href = '/login';
-          }
-        }
+      if (isElectron && !state.hasBooted) {
+         window.location.href = '/login';
       }
     }
   }, [hasImportParams]);

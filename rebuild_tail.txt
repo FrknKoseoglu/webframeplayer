@@ -1,1 +1,0 @@
-derer.cpp(114,22): error C2039: 'IsUint8Array

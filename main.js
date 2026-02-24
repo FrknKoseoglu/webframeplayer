@@ -178,7 +178,7 @@ function createWindow() {
 
   // URL yükleme - retry mekanizması ile
   const isPackaged = app.isPackaged;
-  const loadUrl = (isPackaged ? PRODUCTION_URL : DEV_URL) + '?electron=1';
+  const loadUrl = (isPackaged ? PRODUCTION_URL : DEV_URL) + `?electron=1&v=${app.getVersion()}`;
   
   console.log(`[Electron] Mode: ${isPackaged ? 'PRODUCTION' : 'DEVELOPMENT'}`);
   console.log(`[Electron] Loading URL: ${loadUrl}`);

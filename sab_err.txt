@@ -1,1 +1,0 @@
-Error invoking remote method 'get-sab': Error: An object could not be cloned.

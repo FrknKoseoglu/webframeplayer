@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe, Gauge, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, Subtitles, ExternalLink, Infinity } from 'lucide-react';
+import { Globe, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, ExternalLink, Infinity, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { usePlayerStore } from '@/store/usePlayerStore';
@@ -22,13 +22,8 @@ import {
 import { processM3UPlaylist } from '@/lib/m3u-parser';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n';
+import { generateMagicLink } from '@/lib/url-helper';
 
-const BUFFER_OPTIONS = [
-  { id: 'instant', label: { tr: 'Anlık', en: 'Instant' }, desc: { tr: '~0.5s gecikme', en: '~0.5s delay' } },
-  { id: 'low', label: { tr: 'Düşük Gecikme', en: 'Low Latency' }, desc: { tr: '~2s gecikme', en: '~2s delay' } },
-  { id: 'medium', label: { tr: 'Orta Gecikme', en: 'Medium Latency' }, desc: { tr: '~5s gecikme', en: '~5s delay' } },
-  { id: 'high', label: { tr: 'Yüksek Gecikme', en: 'High Latency' }, desc: { tr: '~10s gecikme, stabil', en: '~10s delay, stable' } },
-] as const;
 
 const CACHE_OPTIONS = [
   { id: 4 as const, label: { tr: '4 Saat', en: '4 Hours' } },
@@ -42,13 +37,14 @@ export function SettingsPanel() {
   const { t } = useTranslation();
   
   const { 
-    language, bufferMode, cacheExpiry, profiles, activeProfile, defaultProfileId,
-    setLanguage, setBufferMode, setCacheExpiry, removeProfile, switchProfile, updateProfile, setDefaultProfileId,
+    language, cacheExpiry, profiles, activeProfile, defaultProfileId,
+    setLanguage, setCacheExpiry, removeProfile, switchProfile, updateProfile, setDefaultProfileId,
     setCategories, setContent, setLoading
   } = usePlayerStore();
   
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [refreshingId, setRefreshingId] = useState<string | null>(null);
+  const [copiedMagicLinkMap, setCopiedMagicLinkMap] = useState<Record<string, boolean>>({});
   const [supportUrlDialog, setSupportUrlDialog] = useState<{ url: string; name: string } | null>(null);
 
   const handleDeleteClick = (id: string) => {
@@ -138,6 +134,21 @@ export function SettingsPanel() {
     } finally {
       setRefreshingId(null);
       setLoading(false);
+    }
+  };
+
+  const handleCopyMagicLink = async (profile: typeof profiles[0]) => {
+    try {
+      const magicUrl = generateMagicLink(profile);
+      if (!magicUrl) return;
+      await navigator.clipboard.writeText(magicUrl);
+      
+      setCopiedMagicLinkMap(prev => ({ ...prev, [profile.id]: true }));
+      setTimeout(() => {
+        setCopiedMagicLinkMap(prev => ({ ...prev, [profile.id]: false }));
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy magic link:', err);
     }
   };
 
@@ -302,36 +313,6 @@ export function SettingsPanel() {
           </div>
         </div>
 
-        {/* Buffer Section */}
-        <div className="bg-white/5 rounded-xl border border-white/10 p-5">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-              <Gauge className="w-5 h-5 text-green-400" />
-            </div>
-            <div>
-              <h2 className="text-white font-semibold">{language === 'tr' ? 'Canlı Yayın Buffer' : 'Live Stream Buffer'}</h2>
-              <p className="text-white/50 text-sm">{language === 'tr' ? 'Gecikme ve stabilite dengesini ayarlayın' : 'Adjust latency and stability balance'}</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-2">
-            {BUFFER_OPTIONS.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => setBufferMode(option.id)}
-                className={cn(
-                  'p-3 rounded-lg border text-left transition-all',
-                  bufferMode === option.id
-                    ? 'bg-[var(--iptv-primary)]/20 border-[var(--iptv-primary)]/50 text-white'
-                    : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
-                )}
-              >
-                <p className="font-medium text-sm">{option.label[language]}</p>
-                <p className="text-xs opacity-60 mt-0.5">{option.desc[language]}</p>
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Cache Expiry Section */}
         <div className="bg-white/5 rounded-xl border border-white/10 p-5">
@@ -363,8 +344,7 @@ export function SettingsPanel() {
           </div>
         </div>
 
-        {/* Audio & Subtitles Section */}
-        <AudioSubtitlesSection language={language} />
+
 
         {/* Services Section */}
         <div className="bg-white/5 rounded-xl border border-white/10 p-5">
@@ -555,6 +535,24 @@ export function SettingsPanel() {
                       <Edit className="w-4 h-4 mr-2" />
                       {language === 'tr' ? 'Düzenle' : 'Edit'}
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopyMagicLink(profile);
+                      }}
+                      className="text-white/60 hover:text-purple-400"
+                    >
+                      {copiedMagicLinkMap[profile.id] ? (
+                        <Check className="w-4 h-4 mr-2" />
+                      ) : (
+                        <Copy className="w-4 h-4 mr-2" />
+                      )}
+                      {copiedMagicLinkMap[profile.id] 
+                        ? (language === 'tr' ? 'Kopyalandı' : 'Copied')
+                        : (language === 'tr' ? 'Sihirli Bağlantı Kopyala' : 'Copy Magic Link')}
+                    </Button>
                     {profile.supportUrl && (
                       <Button
                         variant="ghost"
@@ -592,124 +590,3 @@ export function SettingsPanel() {
   );
 }
 
-// Language options for audio/subtitles
-const TRACK_LANGUAGE_OPTIONS = [
-  { id: 'tr', label: 'Türkçe' },
-  { id: 'en', label: 'English' },
-  { id: 'de', label: 'Deutsch' },
-  { id: 'fr', label: 'Français' },
-  { id: 'es', label: 'Español' },
-  { id: 'ar', label: 'العربية' },
-  { id: 'ru', label: 'Русский' },
-  { id: 'original', label: 'Orijinal / Original' },
-];
-
-function AudioSubtitlesSection({ language }: { language: 'tr' | 'en' }) {
-  const { 
-    preferredSubtitle1, preferredSubtitle2, subtitlesEnabled,
-    preferredAudio1, preferredAudio2,
-    setSubtitlePreferences, setAudioPreferences 
-  } = usePlayerStore();
-
-  return (
-    <div className="bg-white/5 rounded-xl border border-white/10 p-5">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-          <Subtitles className="w-5 h-5 text-cyan-400" />
-        </div>
-        <div>
-          <h2 className="text-white font-semibold">{language === 'tr' ? 'Ses ve Altyazı' : 'Audio & Subtitles'}</h2>
-          <p className="text-white/50 text-sm">{language === 'tr' ? 'Tercih edilen dilleri ayarlayın' : 'Set preferred languages'}</p>
-        </div>
-      </div>
-      
-      {/* Subtitles Toggle */}
-      <div className="mb-4">
-        <button
-          onClick={() => setSubtitlePreferences(preferredSubtitle1, preferredSubtitle2, !subtitlesEnabled)}
-          className={cn(
-            'w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all',
-            subtitlesEnabled
-              ? 'bg-green-500/10 border-green-500/30'
-              : 'bg-white/5 border-white/10'
-          )}
-        >
-          <span className={cn('font-medium', subtitlesEnabled ? 'text-green-400' : 'text-white/60')}>
-            {language === 'tr' ? 'Altyazıları Göster' : 'Show Subtitles'}
-          </span>
-          <div className={cn(
-            'w-12 h-6 rounded-full transition-all relative',
-            subtitlesEnabled ? 'bg-green-500' : 'bg-white/20'
-          )}>
-            <div className={cn(
-              'absolute top-1 w-4 h-4 rounded-full bg-white transition-all',
-              subtitlesEnabled ? 'right-1' : 'left-1'
-            )} />
-          </div>
-        </button>
-      </div>
-
-      {/* Subtitle Preferences */}
-      <div className="space-y-3 mb-6">
-        <p className="text-sm text-white/70 font-medium">{language === 'tr' ? 'Altyazı Tercihleri' : 'Subtitle Preferences'}</p>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs text-white/50 mb-1 block">{language === 'tr' ? '1. Tercih' : '1st Choice'}</label>
-            <select
-              value={preferredSubtitle1}
-              onChange={(e) => setSubtitlePreferences(e.target.value, preferredSubtitle2, subtitlesEnabled)}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[var(--iptv-primary)]"
-            >
-              {TRACK_LANGUAGE_OPTIONS.map((opt) => (
-                <option key={opt.id} value={opt.id} className="bg-zinc-900">{opt.label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs text-white/50 mb-1 block">{language === 'tr' ? '2. Tercih' : '2nd Choice'}</label>
-            <select
-              value={preferredSubtitle2}
-              onChange={(e) => setSubtitlePreferences(preferredSubtitle1, e.target.value, subtitlesEnabled)}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[var(--iptv-primary)]"
-            >
-              {TRACK_LANGUAGE_OPTIONS.map((opt) => (
-                <option key={opt.id} value={opt.id} className="bg-zinc-900">{opt.label}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Audio Preferences */}
-      <div className="space-y-3">
-        <p className="text-sm text-white/70 font-medium">{language === 'tr' ? 'Ses Tercihleri' : 'Audio Preferences'}</p>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs text-white/50 mb-1 block">{language === 'tr' ? '1. Tercih' : '1st Choice'}</label>
-            <select
-              value={preferredAudio1}
-              onChange={(e) => setAudioPreferences(e.target.value, preferredAudio2)}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[var(--iptv-primary)]"
-            >
-              {TRACK_LANGUAGE_OPTIONS.map((opt) => (
-                <option key={opt.id} value={opt.id} className="bg-zinc-900">{opt.label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs text-white/50 mb-1 block">{language === 'tr' ? '2. Tercih' : '2nd Choice'}</label>
-            <select
-              value={preferredAudio2}
-              onChange={(e) => setAudioPreferences(preferredAudio1, e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[var(--iptv-primary)]"
-            >
-              {TRACK_LANGUAGE_OPTIONS.map((opt) => (
-                <option key={opt.id} value={opt.id} className="bg-zinc-900">{opt.label}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}

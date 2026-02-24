@@ -49,3 +49,6 @@ next-env.d.ts
 deps/mpv/lib/libmpv-2.dll
 libmpv-2.dll
 *.dll
+
+# Logs
+.logs
