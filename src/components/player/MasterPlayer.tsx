@@ -100,8 +100,12 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
   if (isResolving) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center bg-black text-center p-8">
-        <Loader2 className="w-12 h-12 text-[var(--iptv-primary)] animate-spin mb-4" />
-        <p className="text-white/60 text-sm">Stream çözümleniyor...</p>
+        {activeContent?.logo && (
+          <img src={activeContent.logo} alt="" className="w-16 h-16 object-contain rounded-lg mb-4 bg-white/10 p-1" />
+        )}
+        <p className="text-white font-semibold mb-2">{activeContent?.name || ''}</p>
+        <Loader2 className="w-8 h-8 text-[var(--iptv-primary)] animate-spin mb-2" />
+        <p className="text-white/50 text-xs">Stream çözümleniyor...</p>
       </div>
     );
   }
@@ -110,8 +114,11 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
   if (!resolvedUrl) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center bg-black text-center p-8">
-        <Tv className="w-20 h-20 text-white/20 mb-6" />
-        <h3 className="text-white/60 text-xl font-medium mb-2">Yükleniyor...</h3>
+        {activeContent?.logo && (
+          <img src={activeContent.logo} alt="" className="w-16 h-16 object-contain rounded-lg mb-4 bg-white/10 p-1" />
+        )}
+        <p className="text-white font-semibold mb-2">{activeContent?.name || ''}</p>
+        <Loader2 className="w-8 h-8 text-white/40 animate-spin" />
       </div>
     );
   }

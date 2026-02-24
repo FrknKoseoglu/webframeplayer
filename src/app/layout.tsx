@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { Suspense } from 'react';
 import { ConfirmProvider } from '@/components/ui/confirm-dialog';
 import { UpdateChecker } from '@/components/player/UpdateChecker';
+import { FontSizeSync } from '@/components/ui/FontSizeSync';
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -103,6 +104,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <ConfirmProvider>
           <Suspense fallback={null}>
             <UpdateChecker />
+            <FontSizeSync />
           </Suspense>
           {children}
         </ConfirmProvider>

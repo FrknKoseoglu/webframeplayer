@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { ChannelIcon } from '@/components/ui/ChannelIcon';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { usePlayerStore, useFilteredContent } from '@/store/usePlayerStore';
 import { MasterPlayer } from '@/components/player/MasterPlayer';
@@ -753,9 +754,7 @@ export default function DashboardPage() {
                               : 'hover:bg-white/5 border border-transparent'
                           }`}
                         >
-                          <div className="w-10 h-10 rounded bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
-                            {item.logo ? <img src={item.logo} alt="" className="w-8 h-8 object-contain" /> : <Radio className="w-5 h-5 text-white/50" />}
-                          </div>
+                          <ChannelIcon name={item.name} logo={item.logo} className="w-10 h-10 text-sm" />
                           <div className="flex-1 min-w-0">
                             <p className="text-white text-sm font-medium truncate">{item.name}</p>
                             <p className="text-white/40 text-xs truncate">{item.group}</p>
@@ -822,9 +821,7 @@ export default function DashboardPage() {
                           : 'hover:bg-white/5 border border-transparent'
                       }`}
                     >
-                      <div className="w-10 h-10 rounded bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
-                        {item.logo ? <img src={item.logo} alt="" className="w-8 h-8 object-contain" /> : <Radio className="w-5 h-5 text-white/50" />}
-                      </div>
+                      <ChannelIcon name={item.name} logo={item.logo} className="w-10 h-10 text-sm" />
                       <div className="flex-1 min-w-0">
                         <p className="text-white text-sm font-medium truncate">{item.name}</p>
                         <p className="text-white/40 text-xs truncate">{item.group}</p>
@@ -869,7 +866,7 @@ export default function DashboardPage() {
             </div>
 
             {/* EPG Section - 40% Ad + 60% EPG */}
-            <div className="flex-1 flex min-h-0 bg-[var(--iptv-surface-dark)] overflow-hidden">
+            <div className="flex-1 flex min-h-0 bg-[var(--iptv-surface-dark)] overflow-hidden border-t border-white/5">
               {/* Ad Section - 40% or 100% if no EPG/content info (LEFT SIDE) */}
               <div className={`flex items-center justify-center border-r border-white/5 py-4 ${activeContent && (activeContent.type === 'live' && currentEpg.length > 0 || activeContent.type !== 'live') ? 'w-[40%]' : 'flex-1'}`}>
                 <div className="w-full h-full min-h-[150px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10 mx-6">

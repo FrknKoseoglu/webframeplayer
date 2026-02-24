@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, ExternalLink, Infinity, Copy, Check } from 'lucide-react';
+import { Globe, Server, Plus, Trash2, Edit, AlertTriangle, RefreshCw, Clock, ExternalLink, Infinity, Copy, Check, Type } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { usePlayerStore } from '@/store/usePlayerStore';
@@ -37,9 +37,9 @@ export function SettingsPanel() {
   const { t } = useTranslation();
   
   const { 
-    language, cacheExpiry, profiles, activeProfile, defaultProfileId,
+    language, cacheExpiry, profiles, activeProfile, defaultProfileId, fontSize,
     setLanguage, setCacheExpiry, removeProfile, switchProfile, updateProfile, setDefaultProfileId,
-    setCategories, setContent, setLoading
+    setCategories, setContent, setLoading, setFontSize
   } = usePlayerStore();
   
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -313,6 +313,41 @@ export function SettingsPanel() {
           </div>
         </div>
 
+        {/* Font Size Section */}
+        <div className="bg-white/5 rounded-xl border border-white/10 p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center">
+              <Type className="w-5 h-5 text-indigo-400" />
+            </div>
+            <div>
+              <h2 className="text-white font-semibold">{language === 'tr' ? 'Yazı Boyutu' : 'Font Size'}</h2>
+              <p className="text-white/50 text-sm">{language === 'tr' ? 'Arayüz yazı boyutunu ayarlayın' : 'Adjust interface font size'}</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-2">
+            {[
+              { id: 14, label: { tr: 'Küçük', en: 'Small' } },
+              { id: 16, label: { tr: 'Normal', en: 'Normal' } },
+              { id: 18, label: { tr: 'Büyük', en: 'Large' } },
+              { id: 20, label: { tr: 'Çok Büyük', en: 'Extra Large' } },
+            ].map((option) => (
+              <button
+                key={option.id}
+                onClick={() => setFontSize(option.id)}
+                className={cn(
+                  'flex-1 p-3 rounded-lg border text-center transition-all',
+                  fontSize === option.id
+                    ? 'bg-[var(--iptv-primary)]/20 border-[var(--iptv-primary)]/50 text-white'
+                    : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
+                )}
+              >
+                <p className="font-medium text-sm">{option.label[language]}</p>
+                <p className="text-xs opacity-60 mt-0.5">{option.id}px</p>
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Cache Expiry Section */}
         <div className="bg-white/5 rounded-xl border border-white/10 p-5">

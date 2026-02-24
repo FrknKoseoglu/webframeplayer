@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, useId } from 'react';
-import { Play, Pause, Volume2, Maximize, Loader2, RotateCcw, FastForward, Settings, Activity } from 'lucide-react';
+import { Play, Pause, Volume2, Maximize, Loader2, RotateCcw, FastForward, Settings, Activity, RefreshCw } from 'lucide-react';
+import { usePlayerStore } from '@/store/usePlayerStore';
 
 interface MpvPlayerProps {
   src: string;
@@ -28,6 +29,7 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
   const [error, setError] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
 
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -37,6 +39,7 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
   const [volume, setVolume] = useState(100);
   const [bitrate, setBitrate] = useState<string | null>(null);
   const [resolution, setResolution] = useState<string | null>(null);
+  const [fps, setFps] = useState<string | null>(null);
   
   const [isRewingText, setIsRewindingText] = useState(false);
   const [isFfText, setIsFfText] = useState(false);
@@ -60,6 +63,7 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
     setBitrate(null);
     setResolution(null);
     setShowSettings(false);
+    setFps(null);
 
     const fallbackTimeout = setTimeout(() => {
        if (isActive && isLoading) {
@@ -87,6 +91,18 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
           try {
             cleanupRender = window.mpv.startRendering(canvasId, () => {
                 if (isActive) setIsLoading(false);
+                // Apply audio/subtitle preferences from store
+                try {
+                  const state = usePlayerStore.getState();
+                  if (state.preferredAudio1) {
+                    window.mpv?.setProperty('alang', `${state.preferredAudio1},${state.preferredAudio2 || 'en'}`);
+                  }
+                  if (state.subtitlesEnabled && state.preferredSubtitle1) {
+                    window.mpv?.setProperty('slang', `${state.preferredSubtitle1},${state.preferredSubtitle2 || 'en'}`);
+                  } else if (!state.subtitlesEnabled) {
+                    window.mpv?.setProperty('sid', 'no');
+                  }
+                } catch(prefErr) { console.warn('Failed to apply preferences:', prefErr); }
             });
           } catch (e: any) {
             console.error('Failed to start rendering:', e);
@@ -108,7 +124,7 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
       if (window.mpv && window.mpv.stop) window.mpv.stop();
       if (rewindInterval.current) clearInterval(rewindInterval.current);
     };
-  }, [src, onError, canvasId]);
+  }, [src, onError, canvasId, retryCount]);
 
   // Property Polling
   useEffect(() => {
@@ -191,6 +207,12 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
             // Debug readout
             setResolution(`? (h1:${h1}, h2:${h2}, h3:${h3})`);
           }
+          
+          // Poll FPS - use container-fps first (raw stream FPS), fallback to estimated-vf-fps
+          const fpsStr = window.mpv.getProperty('container-fps') || window.mpv.getProperty('estimated-vf-fps');
+          if (fpsStr && fpsStr !== '0' && fpsStr !== 'undefined') {
+            setFps(Math.round(Number(fpsStr)) + ' fps');
+          }
         } catch(e) {}
       }
     }, 1000);
@@ -244,12 +266,17 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
   const subTracks = tracks.filter(t => t.type === 'sub');
 
   return (
-    <div ref={containerRef} className="relative group w-full h-full bg-black overflow-hidden flex items-center justify-center rounded-lg border border-white/5">
+    <div ref={containerRef} className="relative group w-full h-full bg-black overflow-hidden flex items-center justify-center rounded-lg border border-white/5" onDoubleClick={toggleFullscreen}>
       {error ? (
          <div className="text-red-500 p-8 text-center bg-zinc-950/50 rounded-xl border border-red-500/20 max-w-md z-50">
           <p className="font-bold text-lg mb-2">MPV Oynatıcı Hatası</p>
           <p className="text-sm opacity-70 mb-4">{error}</p>
-          <button onClick={() => onError?.(new Error("Switch"))} className="px-4 py-2 bg-red-500/20 text-white rounded">Web Oynatıcı ile Dene</button>
+          <div className="flex gap-3 justify-center">
+            <button onClick={() => { setError(null); setRetryCount(c => c + 1); }} className="px-4 py-2 bg-blue-500/20 text-white rounded flex items-center gap-2">
+              <RefreshCw className="w-4 h-4" /> Yeniden Yükle
+            </button>
+            <button onClick={() => onError?.(new Error("Switch"))} className="px-4 py-2 bg-red-500/20 text-white rounded">Web Oynatıcı ile Dene</button>
+          </div>
         </div>
       ) : (
         <>
@@ -333,6 +360,11 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
                         {resolution}
                       </div>
                     )}
+                    {fps && (
+                      <div className="px-2 py-1 bg-black/40 rounded-md border border-white/10 text-[10px] font-bold text-white/90 tracking-wider">
+                        {fps}
+                      </div>
+                    )}
                     {bitrate && (
                       <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/40 rounded-full border border-white/10 text-xs font-medium text-green-400">
                          <Activity className="w-3.5 h-3.5" />
@@ -413,6 +445,9 @@ export function MpvPlayer({ src, onError, isLive = false }: MpvPlayerProps) {
                 )}
               </div>
 
+              <button onClick={() => { setError(null); setRetryCount(c => c + 1); }} className="p-2 hover:bg-white/10 rounded-full transition-colors" title="Yeniden Yükle">
+                <RefreshCw className="w-5 h-5 text-white" />
+              </button>
               <button onClick={toggleFullscreen} className="p-2 hover:bg-white/10 rounded-full transition-colors"><Maximize className="w-5 h-5 text-white" /></button>
             </div>
           </div>

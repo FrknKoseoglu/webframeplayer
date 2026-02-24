@@ -84,6 +84,9 @@ interface PlayerState {
   // Audio preferences
   preferredAudio1: string;
   preferredAudio2: string;
+  
+  // Font size (px)
+  fontSize: number;
 }
 
 // Store actions interface
@@ -133,6 +136,7 @@ interface PlayerActions {
   setVolume: (volume: number) => void;
   setSubtitlePreferences: (subtitle1: string, subtitle2: string, enabled: boolean) => void;
   setAudioPreferences: (audio1: string, audio2: string) => void;
+  setFontSize: (size: number) => void;
   
   // History actions
   addToHistory: (content: ContentItem) => void;
@@ -177,6 +181,7 @@ const initialState: PlayerState = {
   subtitlesEnabled: true,
   preferredAudio1: 'en',
   preferredAudio2: 'tr',
+  fontSize: 16,
 };
 
 export const usePlayerStore = create<PlayerStore>()(
@@ -414,6 +419,14 @@ export const usePlayerStore = create<PlayerStore>()(
       },
       
       // History actions
+      setFontSize: (size) => {
+        set({ fontSize: size });
+        // Apply to document immediately
+        if (typeof document !== 'undefined') {
+          document.documentElement.style.fontSize = `${size}px`;
+        }
+      },
+      
       addToHistory: (content) => {
         const profileId = get().activeProfile?.id;
         if (!profileId) return;
@@ -470,6 +483,7 @@ export const usePlayerStore = create<PlayerStore>()(
         preferredAudio1: state.preferredAudio1,
         preferredAudio2: state.preferredAudio2,
         historyByProfile: state.historyByProfile,
+        fontSize: state.fontSize,
       }),
     }
   )
