@@ -27,6 +27,7 @@ import { SettingsPanel } from '@/components/settings/SettingsPanel';
 import { HistoryView } from '@/components/history/HistoryView';
 import { getShortEPG, convertEpgListings } from '@/lib/xtream-adapter';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { MarqueeText } from '@/components/ui/MarqueeText';
 import type { ContentType, ContentItem, Category, EpgProgram, Season } from '@/types/iptv';
 
 type NavItem = {
@@ -344,7 +345,7 @@ export default function DashboardPage() {
                         onClick={() => handleCategoryClick(cat)}
                         className="flex-1 text-left hover:text-white overflow-hidden"
                       >
-                        <span className="category-text block">{cat.name}</span>
+                        <MarqueeText>{cat.name}</MarqueeText>
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleHiddenGroup(cat.id); }}
@@ -465,7 +466,7 @@ export default function DashboardPage() {
                           onClick={() => handleCategoryClick(cat)}
                           className="flex-1 text-left hover:text-white overflow-hidden"
                         >
-                          <span className="category-text block">{cat.name}</span>
+                          <MarqueeText>{cat.name}</MarqueeText>
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); toggleHiddenGroup(cat.id); }}
@@ -756,8 +757,7 @@ export default function DashboardPage() {
                         >
                           <ChannelIcon name={item.name} logo={item.logo} className="w-10 h-10 text-sm" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-white text-sm font-medium truncate">{item.name}</p>
-                            <p className="text-white/40 text-xs truncate">{item.group}</p>
+                            <MarqueeText className="text-white text-sm font-medium">{item.name}</MarqueeText>
                           </div>
                           <button 
                             onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }} 
@@ -823,8 +823,7 @@ export default function DashboardPage() {
                     >
                       <ChannelIcon name={item.name} logo={item.logo} className="w-10 h-10 text-sm" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-white text-sm font-medium truncate">{item.name}</p>
-                        <p className="text-white/40 text-xs truncate">{item.group}</p>
+                        <MarqueeText className="text-white text-sm font-medium">{item.name}</MarqueeText>
                       </div>
                       <button 
                         onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }} 
@@ -885,7 +884,7 @@ export default function DashboardPage() {
                           {activeContent.logo && <img src={activeContent.logo} alt="" className="w-10 h-10 object-contain rounded-lg bg-white/10 p-0.5" />}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <p className="text-white font-semibold truncate">{activeContent.name}</p>
+                              <MarqueeText className="text-white font-semibold">{activeContent.name}</MarqueeText>
                               <span className="text-[10px] text-white/40 bg-white/5 px-1.5 py-0.5 rounded">EPG</span>
                             </div>
                             <p className="text-white/50 text-xs">{activeContent.group}</p>

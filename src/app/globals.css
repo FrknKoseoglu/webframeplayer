@@ -251,27 +251,14 @@ html, body {
   padding-right: env(safe-area-inset-right);
 }
 
-/* Category text marquee animation on hover */
-@keyframes marquee {
+/* MarqueeText hover scroll animation */
+@keyframes marquee-scroll {
   0% {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(calc(-100% + 140px));
+    transform: translateX(var(--marquee-offset, 0));
   }
-}
-
-.category-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 140px;
-}
-
-.category-item:hover .category-text {
-  overflow: visible;
-  text-overflow: unset;
-  animation: marquee 3s linear infinite alternate;
 }
 
 /* Global cursor pointer for all interactive elements */

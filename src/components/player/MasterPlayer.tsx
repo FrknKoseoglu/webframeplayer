@@ -45,6 +45,7 @@ export function MasterPlayer({ autoPlay = false }: MasterPlayerProps) {
     let cancelled = false;
     
     async function resolve() {
+      setResolvedUrl(null);  // Clear old URL so old player unmounts immediately
       setIsResolving(true);
       setResolveError(null);
       

@@ -44,15 +44,18 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
   const [bitrate, setBitrate] = useState<string | null>(null);
   const [resolution, setResolution] = useState<string | null>(null);
   const [fps, setFps] = useState<string | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
   
   const [isRewingText, setIsRewindingText] = useState(false);
   const [isFfText, setIsFfText] = useState(false);
   const [volumeOsd, setVolumeOsd] = useState<number | null>(null);
   const volumeOsdTimer = useRef<NodeJS.Timeout | null>(null);
+  const prevVolumeRef = useRef<number>(100);
   const rewindInterval = useRef<NodeJS.Timeout | null>(null);
   const [isIdle, setIsIdle] = useState(false);
   const idleTimer = useRef<NodeJS.Timeout | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const loadingSrc = useRef<string>(src);
 
   useEffect(() => {
     if (!src || typeof window === 'undefined' || !window.mpv) {
@@ -73,6 +76,7 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
     setResolution(null);
     setShowSettings(false);
     setFps(null);
+
 
     const fallbackTimeout = setTimeout(() => {
        if (isActive && isLoading) {
@@ -95,23 +99,48 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
         setIsReady(true);
         clearTimeout(fallbackTimeout);
 
+        // Track when rendering actually starts
+        let renderStarted = false;
+        const loadStartTime = Date.now();
+        const MIN_LOADING_MS = 1500; // Minimum loading overlay display time
+
+        const clearLoadingWhenReady = () => {
+          if (!isActive) return;
+          const elapsed = Date.now() - loadStartTime;
+          if (elapsed >= MIN_LOADING_MS) {
+            setIsLoading(false);
+          } else {
+            setTimeout(() => { if (isActive) setIsLoading(false); }, MIN_LOADING_MS - elapsed);
+          }
+        };
+
+        // Ultimate safety: clear loading after 8s if startRendering callback never fires
+        // Canvas is already cleared to black, so user won't see old frame
+        const loadingFallback = setTimeout(() => {
+          if (isActive) setIsLoading(false);
+        }, 8000);
+
         setTimeout(() => {
           if (!isActive) return;
           try {
             cleanupRender = window.mpv.startRendering(canvasId, () => {
-                if (isActive) setIsLoading(false);
-                // Apply audio/subtitle preferences from store
-                try {
-                  const state = usePlayerStore.getState();
-                  if (state.preferredAudio1) {
-                    window.mpv?.setProperty('alang', `${state.preferredAudio1},${state.preferredAudio2 || 'en'}`);
-                  }
-                  if (state.subtitlesEnabled && state.preferredSubtitle1) {
-                    window.mpv?.setProperty('slang', `${state.preferredSubtitle1},${state.preferredSubtitle2 || 'en'}`);
-                  } else if (!state.subtitlesEnabled) {
-                    window.mpv?.setProperty('sid', 'no');
-                  }
-                } catch(prefErr) { console.warn('Failed to apply preferences:', prefErr); }
+                if (!renderStarted) {
+                  renderStarted = true;
+                  clearTimeout(loadingFallback);
+                  clearLoadingWhenReady();
+                  // Apply audio/subtitle preferences from store
+                  try {
+                    const state = usePlayerStore.getState();
+                    if (state.preferredAudio1) {
+                      window.mpv?.setProperty('alang', `${state.preferredAudio1},${state.preferredAudio2 || 'en'}`);
+                    }
+                    if (state.subtitlesEnabled && state.preferredSubtitle1) {
+                      window.mpv?.setProperty('slang', `${state.preferredSubtitle1},${state.preferredSubtitle2 || 'en'}`);
+                    } else if (!state.subtitlesEnabled) {
+                      window.mpv?.setProperty('sid', 'no');
+                    }
+                  } catch(prefErr) { console.warn('Failed to apply preferences:', prefErr); }
+                }
             });
           } catch (e: any) {
             console.error('Failed to start rendering:', e);
@@ -146,8 +175,6 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
       if (pos) {
         const p = Number(pos);
         setCurrentTime(p);
-        // Safety: if playback position > 0, content is playing — force loading off
-        if (p > 0) setIsLoading(false);
       }
       if (dur) setDuration(Number(dur));
       
@@ -179,6 +206,10 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
       // Poll volume
       const vol = window.mpv.getProperty('volume');
       if (vol) setVolume(Number(vol));
+      
+      // Poll pause state
+      const pauseStr = window.mpv.getProperty('pause');
+      setIsPaused(pauseStr === 'yes');
       
       // Poll bitrate and resolution
       {
@@ -325,7 +356,7 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
           <canvas id={canvasId} ref={canvasRef} width={1920} height={1080} className="w-full h-full object-contain" />
           
           {isLoading && !error && (
-            <div className="absolute inset-0 z-40">
+            <div className="absolute inset-0 z-40 bg-black">
               <StreamLoading name={channelName} logo={channelLogo} isLive={isLive} />
             </div>
           )}
@@ -386,8 +417,8 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
             )}
 
             <div className="flex items-center gap-4">
-              <button onClick={() => window.mpv?.play()} className="p-2 hover:bg-white/10 rounded-full transition-colors"><Play className="w-6 h-6 fill-current text-white" /></button>
-              <button onClick={() => window.mpv?.pause()} className="p-2 hover:bg-white/10 rounded-full transition-colors"><Pause className="w-6 h-6 fill-current text-white" /></button>
+              <button onClick={() => window.mpv?.play()} className={`p-2 rounded-full transition-colors ${!isPaused ? 'bg-[var(--iptv-primary)]/20' : 'hover:bg-white/10'}`}><Play className={`w-6 h-6 fill-current ${!isPaused ? 'text-[var(--iptv-primary)]' : 'text-white'}`} /></button>
+              <button onClick={() => window.mpv?.pause()} className={`p-2 rounded-full transition-colors ${isPaused ? 'bg-[var(--iptv-primary)]/20' : 'hover:bg-white/10'}`}><Pause className={`w-6 h-6 fill-current ${isPaused ? 'text-[var(--iptv-primary)]' : 'text-white'}`} /></button>
               
               {isVod && (
                 <>
@@ -428,9 +459,15 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
                 {/* Volume icon (left of settings) */}
                 <button 
                   onClick={() => {
-                    const newVol = volume > 0 ? 0 : 100;
-                    setVolume(newVol);
-                    window.mpv?.setProperty('volume', newVol.toString());
+                    if (volume > 0) {
+                      prevVolumeRef.current = volume;
+                      setVolume(0);
+                      window.mpv?.setProperty('volume', '0');
+                    } else {
+                      const restored = prevVolumeRef.current || 100;
+                      setVolume(restored);
+                      window.mpv?.setProperty('volume', restored.toString());
+                    }
                   }}
                   className="p-2 hover:bg-white/10 rounded-full transition-colors"
                 >

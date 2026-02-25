@@ -9,69 +9,37 @@ export default function TermsPage() {
   const termsContent = {
     tr: {
       title: 'Kullanım Koşulları',
-      subtitle: 'Son güncelleme: 5 Ocak 2025',
+      subtitle: 'Son güncelleme: 25 Şubat 2026',
       sections: [
         {
           title: '1. Hizmet Tanımı',
-          content: 'Frame, kullanıcıların kendi sağladıkları medya URL\'lerini (M3U, Xtream Codes API) web tarayıcısı üzerinden oynatmalarını sağlayan bir "Hizmet Olarak Yazılım" (SaaS) platformudur. Platform, VLC Media Player, MPC-HC veya benzeri masaüstü medya oynatıcılarının web tabanlı bir alternatifidir.'
+          content: "Frame, kullanıcıların kendi sağladıkları ağ medya bağlantılarını (örn. M3U çalma listeleri, Uzaktan Medya API'leri) web tarayıcısı ve masaüstü arayüzü üzerinden oynatmalarını sağlayan, \"İçerik Sağlayıcıdan Bağımsız\" (BYOC - Bring Your Own Content) bir medya oynatıcı aracıdır. Platform; VLC Media Player, MPC-HC veya benzeri yerel masaüstü medya oynatıcılarının web tabanlı bir alternatifinden ibarettir."
         },
         {
-          title: '2. Hizmetin Kapsamı',
-          content: 'Frame:\n• Herhangi bir içerik, kanal listesi veya IPTV aboneliği SATMAZ\n• Kullanıcılara M3U listesi veya Xtream bilgileri SAĞLAMAZ\n• İçerik üretmez, barındırmaz veya dağıtmaz\n• Sadece kullanıcının GİRDİĞİ linkleri oynatmak için teknik bir araçtır'
+          title: '2. Hizmetin Kapsamı (ÖNEMLİ)',
+          content: "Frame bir içerik platformu DEĞİLDİR. Bu kapsamda Frame:\n\n• Herhangi bir medya içeriği, kanal listesi, film, dizi veya yayın aboneliği SATMAZ.\n• Kullanıcıcılara hazır çalma listeleri veya sunucu erişim bilgileri SAĞLAMAZ.\n• Kendi sunucularında hiçbir ses veya video materyali üretmez, barındırmaz veya dağıtmaz.\n• Sadece ve sadece kullanıcının KENDİ İRADESİYLE GİRDİĞİ dış bağlantıları (URL) ekranda oynatmak için geliştirilmiş tarafsız bir yazılım aracıdır."
         },
         {
-          title: '3. Yasaklanan Kullanımlar',
-          content: 'Platformu aşağıdaki amaçlarla kullanmak KATİ OLARAK YASAKTIR:\n• Telif hakları ihlal edilen korsan içerik izlemek\n• Yasal izni olmadığınız canlı yayınları veya filmleri izlemek\n• Başkalarının IPTV hesaplarını izinsiz kullanmak\n• Platformu yasadışı faaliyetler için kullanmak\n\nBu kurallara uymayan kullanıcıların hesapları kapatılabilir ve IP adresleri engellenebilir.'
-        },
-        {
-          title: '4. Kullanıcı Sorumluluğu',
-          content: 'Kullanıcı, platforma girdiği TÜM URL\'lerin, M3U listelerinin ve Xtream bilgilerinin yasal olduğundan ve kullanım hakkına sahip olduğundan emin olmakla TAMAMEN SORUMLUDUR. Platform, kullanıcının izlediği içeriğin yasal durumunu denetlemez.'
-        },
-        {
-          title: '5. Proxy Hizmeti - Teknik Açıklama',
-          content: 'Platform, CORS (Cross-Origin Resource Sharing) ve Mixed Content (HTTP/HTTPS) gibi tarayıcı kısıtlamalarını aşmak için opsiyonel bir proxy hizmeti sunar. Bu hizmet:\n• Sadece teknik bir köprüdür (relay)\n• Hiçbir veriyi önbelleğe ALMAZ (No-Cache)\n• Kullanıcı izni ile aktif edilir\n• Korsan içerik izlemek için DEĞİL, tarayıcı uyumluluğu için vardır'
-        },
-        {
-          title: '6. Sorumluluk Reddi',
-          content: 'Frame "OLDUĞU GİBİ" (AS-IS) sunulmaktadır. Platform üzerinden izlenen içeriklerin doğası, yasal durumu veya kalitesi hakkında HİÇBİR GARANTİ VERİLMEZ. Platform, kullanıcıların izlediği içeriklerden kaynaklanan herhangi bir yasal, mali veya başka sorunlardan sorumlu TUTULAMAZ.'
-        },
-        {
-          title: '7. Yasal Talepler ve İşbirliği',
-          content: 'Telif hakkı sahipleri veya yasal mercilerin talebi halinde, 5651 sayılı "İnternet Ortamında Yapılan Yayınların Düzenlenmesi ve Bu Yayınlar Yoluyla İşlenen Suçlarla Mücadele Edilmesi Hakkında Kanun" ve ilgili mevzuat çerçevesinde gerekli bilgileri paylaşırız.\n\nTelif hakkı bildirimi için: oew585p6r@mozmail.com'
+          title: '3. Kullanıcı Sorumluluğu (Sorumluluk Reddi)',
+          content: 'Kullanıcı, Frame oynatıcısına eklediği TÜM bağlantıların (URL, çalma listeleri, API giriş bilgileri) yasal olduğundan, telif hakkı ihlali içermediğinden ve bu içerikleri kişisel kullanım hakkına sahip olduğundan emin olmakla TAMAMEN VE TEK BAŞINA SORUMLUDUR. Frame yazılımı, kullanıcının dış kaynaklardan çektiği içeriğin yasal durumunu, lisansını veya güvenliğini denetlemez ve bu konuda doğabilecek hiçbir hukuki, cezai veya mali sonuçtan sorumlu tutulamaz. Frame "OLDUĞU GİBİ" (AS-IS) sunulmaktadır.'
         }
       ]
     },
     en: {
       title: 'Terms of Service',
-      subtitle: 'Last updated: January 5, 2025',
+      subtitle: 'Last updated: February 25, 2026',
       sections: [
         {
           title: '1. Service Definition',
-          content: 'Frame is a "Software as a Service" (SaaS) platform that allows users to play their own provided media URLs (M3U, Xtream Codes API) through a web browser. The platform is a web-based alternative to desktop media players like VLC Media Player, MPC-HC, or similar applications.'
+          content: "Frame is a 'Bring Your Own Content' (BYOC) media player tool that allows users to play their own network media links (e.g., M3U playlists, Remote Media APIs) via web browser and desktop interface. The platform is merely a web-based alternative to local desktop media players like VLC Media Player, MPC-HC, or similar."
         },
         {
-          title: '2. Service Scope',
-          content: 'Frame:\n• Does NOT SELL any content, channel lists, or IPTV subscriptions\n• Does NOT PROVIDE users with M3U lists or Xtream credentials\n• Does not produce, host, or distribute content\n• Is only a technical tool to play links ENTERED by the user'
+          title: '2. Scope of Service (IMPORTANT)',
+          content: "Frame is NOT a content platform. In this context, Frame:\n\n• Does NOT SELL any media content, channel lists, movies, series, or broadcast subscriptions.\n• Does NOT PROVIDE users with ready-made playlists or server access information.\n• Does NOT produce, host, or distribute any audio or video material on its own servers.\n• Is ONLY a neutral software tool developed to play external links (URLs) entered by the user of their OWN WILL on the screen."
         },
         {
-          title: '3. Prohibited Uses',
-          content: 'Using the platform for the following purposes is STRICTLY PROHIBITED:\n• Watching pirated content that infringes copyrights\n• Watching live broadcasts or movies without legal permission\n• Using others\' IPTV accounts without authorization\n• Using the platform for illegal activities\n\nAccounts of users who violate these rules may be closed and IP addresses may be blocked.'
-        },
-        {
-          title: '4. User Responsibility',
-          content: 'The user is FULLY RESPONSIBLE for ensuring that ALL URLs, M3U lists, and Xtream credentials entered into the platform are legal and they have the right to use them. The platform does not audit the legal status of the content watched by users.'
-        },
-        {
-          title: '5. Proxy Service - Technical Explanation',
-          content: 'The platform offers an optional proxy service to overcome browser restrictions such as CORS (Cross-Origin Resource Sharing) and Mixed Content (HTTP/HTTPS). This service:\n• Is only a technical bridge (relay)\n• Does NOT cache any data (No-Cache)\n• Is activated with user consent\n• Exists for browser compatibility, NOT for watching pirated content'
-        },
-        {
-          title: '6. Disclaimer',
-          content: 'Frame is provided "AS-IS". NO WARRANTY is given regarding the nature, legal status, or quality of content watched through the platform. The platform CANNOT BE HELD RESPONSIBLE for any legal, financial, or other issues arising from content watched by users.'
-        },
-        {
-          title: '7. Legal Requests and Cooperation',
-          content: 'Upon request from copyright holders or legal authorities, we will share necessary information within the framework of applicable laws (e.g., Turkish Law No. 5651 "Regulation of Publications on the Internet and Combating Crimes Committed through such Publications").\n\nFor copyright notices: oew585p6r@mozmail.com'
+          title: '3. User Responsibility (Disclaimer)',
+          content: "The user is SOLELY AND FULLY RESPONSIBLE for ensuring that ALL links (URLs, playlists, API credentials) added to the Frame player are legal, do not contain copyright infringement, and that they have the right to personal use of these contents. Frame software does not audit the legal status, license, or security of the content pulled from external sources by the user and cannot be held responsible for any legal, criminal, or financial consequences that may arise. Frame is provided 'AS-IS'."
         }
       ]
     }

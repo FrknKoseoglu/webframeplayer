@@ -16,6 +16,7 @@ import {
 import { Search, Menu, Radio, X, History, Tv, Trash2, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n';
+import { MarqueeText } from '@/components/ui/MarqueeText';
 
 type SidebarTab = 'channels' | 'events' | 'history';
 
@@ -367,14 +368,14 @@ function ChannelItem({ channel, isActive, onClick, timestamp }: ChannelItemProps
 
       {/* Channel Info */}
       <div className="flex-1 min-w-0 text-left">
-        <p className={cn('font-medium truncate', isActive ? 'text-white' : 'text-zinc-300')}>
+        <MarqueeText className={cn('font-medium', isActive ? 'text-white' : 'text-zinc-300')}>
           {channel.name}
-        </p>
+        </MarqueeText>
         {timestamp ? (
           <p className="text-xs text-zinc-500 truncate">{formatTime(timestamp)}</p>
         ) : (
           channel.group && (
-            <p className="text-xs text-zinc-500 truncate">{channel.group}</p>
+            <MarqueeText className="text-xs text-zinc-500">{channel.group}</MarqueeText>
           )
         )}
       </div>

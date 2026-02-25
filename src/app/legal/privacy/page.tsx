@@ -9,69 +9,53 @@ export default function PrivacyPage() {
   const privacyContent = {
     tr: {
       title: 'Gizlilik Politikası',
-      subtitle: 'Verilerinizi nasıl işlediğimiz',
+      subtitle: 'Son güncelleme: 25 Şubat 2026',
       sections: [
         {
           title: '1. Veri Minimizasyonu Prensibi',
-          content: 'Frame, "veri minimizasyonu" prensibini benimser. Sadece platformun çalışması için mutlak gerekli olan verileri işleriz. Gereksiz kişisel veri toplamayız.'
+          content: 'Frame, "veri minimizasyonu" prensibini katı bir şekilde uygular. Sadece oynatıcının temel işlevlerini yerine getirmesi için teknik olarak zorunlu olan minimum veriyi işleriz. Kullanıcıların izleme alışkanlıkları veya medya tercihleri profillenmez veya kaydedilmez.'
         },
         {
-          title: '2. Tarayıcı Tabanlı Depolama (LocalStorage)',
-          content: 'Aşağıdaki veriler YALNIZCA tarayıcınızın LocalStorage\'ında saklanır (sunucularımızda DEĞİL):\n• Tema tercihiniz (açık/koyu)\n• Dil tercihiniz (Türkçe/İngilizce)\n• Video oynatıcı ayarları (ses seviyesi, otomatik oynatma vb.)\n• Profil bilgileriniz (sadece tarayıcınızda)\n\nBu veriler hiçbir zaman sunucularımıza aktarılmaz. Tarayıcı önbelleğini temizlediğinizde silinir.'
+          title: '2. Tarayıcı Tabanlı Depolama (Sıfır Sunucu İzi)',
+          content: 'Aşağıdaki veriler YALNIZCA sizin kendi cihazınızın/tarayıcınızın yerel hafızasında (LocalStorage) saklanır ve asla sunucularımıza iletilmez:\n\n• Tema ve dil tercihleri (Açık/Koyu, TR/EN).\n• Oynatıcı yapılandırmaları (Ses seviyesi, ekran oranı, otomatik oynatma).\n• İzleme geçmişi ve cihaza eklenen kişisel bağlantılar.\n\nBu veriler üzerinde tam kontrole sahipsiniz ve tarayıcı önbelleğinizi temizlediğiniz an tümü kalıcı olarak yok olur.'
         },
         {
-          title: '3. IPTV Kimlik Bilgileri',
-          content: 'IPTV kullanıcı adı ve şifreniz ASLA sunucularımızda saklanmaz. Bu bilgiler sadece tarayıcınızın LocalStorage\'ında tutulur.\n\nİSTİSNA: "Kısa Link" (Magic Link) özelliğini kullanırsanız:\n• Bilgileriniz AES-256 şifreleme ile şifrelenir\n• Benzersiz bir ID ile veritabanımızda saklanır\n• Bu özellik tamamen OPSİYONELDİR ve açık onayınız gerekir\n• İstediğiniz zaman Magic Link\'inizi silebilirsiniz'
+          title: '3. Çerezler (Cookies) ve İzleyiciler',
+          content: 'Platformumuz, kullanıcıları internette takip eden, reklam profili çıkartan veya üçüncü parti pazarlama şirketlerine veri satan (Tracking/Marketing Cookies) HİÇBİR çerez kullanmaz. Sadece oynatıcı arayüz tercihlerini hatırlamak için zaruri (Essential) yerel veriler kullanılır.'
         },
         {
-          title: '4. Proxy Sunucusu ve Loglar',
-          content: 'Proxy hizmetini kullandığınızda:\n• Hiçbir içerik verisi önbelleğe ALINMAZ (No-Cache politikası)\n• Veriler sadece tarayıcınıza anlık olarak aktarılır\n• Sunucu erişim logları sadece güvenlik ve 5651 sayılı yasa gereği tutulur\n• Bu loglar üçüncü taraflarla paylaşılmaz (yasal zorunluluk hariç)'
+          title: '4. Üçüncü Taraf Altyapılar',
+          content: 'Platformun kesintisiz ve güvenli çalışması için global altyapı sağlayıcıları kullanılır:\n\n• Cloudflare (Siber güvenlik, DNS ve CDN)\n• Vercel (Uygulama barındırma)\n\nBu servisler, verileri kendi katı güvenlik ve gizlilik politikaları çerçevesinde işler.'
         },
         {
-          title: '5. Çerezler (Cookies)',
-          content: 'Platform minimal çerez kullanır:\n• Oturum çerezi (session cookie) - Giriş durumunuzu korur\n• Tercih çerezi - Dil ve tema tercihlerinizi hatırlar\n\nÜçüncü taraf reklam veya takip çerezi KULLANILMAZ.'
-        },
-        {
-          title: '6. Üçüncü Taraf Hizmetler',
-          content: 'Platform, aşağıdaki üçüncü taraf hizmetleri kullanır:\n• Cloudflare (CDN ve DDoS koruması)\n• Vercel (Hosting)\n\nBu hizmetler kendi gizlilik politikalarına tabidir.'
-        },
-        {
-          title: '7. Haklarınız (KVKK/GDPR)',
-          content: 'Kişisel Verilerin Korunması Kanunu (KVKK) ve GDPR çerçevesinde:\n• Verilerinize erişme hakkınız\n• Verilerin silinmesini isteme hakkınız\n• Verilerin düzeltilmesini isteme hakkınız\n\nBu hakları kullanmak için iletişime geçebilirsiniz.'
+          title: '5. Yasal Haklarınız (KVKK & GDPR)',
+          content: 'Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Genel Veri Koruma Yönetmeliği (GDPR) kapsamında; sistemlerimizde (eğer var ise) tutulan verilerinize erişme, bu verilerin kullanım amacını öğrenme, anonimleştirilmesini veya tamamen silinmesini (Unutulma Hakkı) talep etme hakkına sahipsiniz.\n\nTalepleriniz için iletişim: oew585p6r@mozmail.com'
         }
       ]
     },
     en: {
       title: 'Privacy Policy',
-      subtitle: 'How we handle your data',
+      subtitle: 'Last updated: February 25, 2026',
       sections: [
         {
           title: '1. Data Minimization Principle',
-          content: 'Frame adopts the "data minimization" principle. We only process data that is absolutely necessary for the platform to function. We do not collect unnecessary personal data.'
+          content: "Frame strictly applies the 'data minimization' principle. We only process the minimum data technically necessary for the player to perform its basic functions. Users' viewing habits or media preferences are not profiled or recorded."
         },
         {
-          title: '2. Browser-Based Storage (LocalStorage)',
-          content: 'The following data is stored ONLY in your browser\'s LocalStorage (NOT on our servers):\n• Your theme preference (light/dark)\n• Your language preference (Turkish/English)\n• Video player settings (volume, autoplay, etc.)\n• Your profile information (only in your browser)\n\nThis data is never transferred to our servers. It is deleted when you clear your browser cache.'
+          title: '2. Browser-Based Storage (Zero Server Trace)',
+          content: "The following data is stored ONLY in your own device's/browser's local memory (LocalStorage) and is never transmitted to our servers:\n\n• Theme and language preferences (Light/Dark, TR/EN).\n• Player configurations (Volume level, aspect ratio, autoplay).\n• Viewing history and personal links added to the device.\n\nYou have full control over this data, and the moment you clear your browser cache, it is all permanently destroyed."
         },
         {
-          title: '3. IPTV Credentials',
-          content: 'Your IPTV username and password are NEVER stored on our servers. This information is only kept in your browser\'s LocalStorage.\n\nEXCEPTION: If you use the "Short Link" (Magic Link) feature:\n• Your credentials are encrypted with AES-256 encryption\n• Stored in our database with a unique ID\n• This feature is completely OPTIONAL and requires explicit consent\n• You can delete your Magic Link at any time'
+          title: '3. Cookies and Trackers',
+          content: 'Our platform does NOT use any cookies that track users on the internet, create advertising profiles, or sell data to third-party marketing companies (Tracking/Marketing Cookies). Only essential local data is used to remember player interface preferences.'
         },
         {
-          title: '4. Proxy Server and Logs',
-          content: 'When you use the proxy service:\n• No content data is CACHED (No-Cache policy)\n• Data is only instantly transmitted to your browser\n• Server access logs are kept only for security and legal compliance (e.g., Law No. 5651)\n• These logs are not shared with third parties (except legal obligation)'
+          title: '4. Third-Party Infrastructures',
+          content: 'Global infrastructure providers are used for the continuous and secure operation of the platform:\n\n• Cloudflare (Cybersecurity, DNS, and CDN)\n• Vercel (App hosting)\n\nThese services process data within the framework of their own strict security and privacy policies.'
         },
         {
-          title: '5. Cookies',
-          content: 'The platform uses minimal cookies:\n• Session cookie - Maintains your login status\n• Preference cookie - Remembers your language and theme preferences\n\nThird-party advertising or tracking cookies are NOT USED.'
-        },
-        {
-          title: '6. Third-Party Services',
-          content: 'The platform uses the following third-party services:\n• Cloudflare (CDN and DDoS protection)\n• Vercel (Hosting)\n\nThese services are subject to their own privacy policies.'
-        },
-        {
-          title: '7. Your Rights (KVKK/GDPR)',
-          content: 'Under the Personal Data Protection Law (KVKK) and GDPR:\n• Right to access your data\n• Right to request deletion of data\n• Right to request correction of data\n\nYou can contact us to exercise these rights.'
+          title: '5. Your Legal Rights (KVKK & GDPR)',
+          content: 'Within the scope of the Personal Data Protection Law (KVKK) and the European General Data Protection Regulation (GDPR); you have the right to access your data held in our systems (if any), learn the purpose of use of this data, request its anonymization or complete deletion (Right to be Forgotten).\n\nFor your requests contact: oew585p6r@mozmail.com'
         }
       ]
     }
