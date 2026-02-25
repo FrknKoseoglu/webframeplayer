@@ -26,7 +26,7 @@ export function CorsErrorModal({ isOpen, onClose, domainName, magicLink }: CorsE
   if (!isOpen) return null;
 
   const handleDownload = () => {
-    window.open('https://github.com/webframeplayer/webframeplayer/releases', '_blank', 'noopener,noreferrer');
+    window.open('https://github.com/webframeplayer/webframeplayer/tags', '_blank', 'noopener,noreferrer');
   };
 
   return (

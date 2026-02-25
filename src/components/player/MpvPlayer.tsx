@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useId } from 'react';
+import { useEffect, useRef, useState, useId, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2, RotateCcw, FastForward, Settings, Activity, RefreshCw } from 'lucide-react';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { ChannelIcon } from '@/components/ui/ChannelIcon';
@@ -56,6 +56,8 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
   const idleTimer = useRef<NodeJS.Timeout | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const loadingSrc = useRef<string>(src);
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
 
   useEffect(() => {
     if (!src || typeof window === 'undefined' || !window.mpv) {
@@ -81,7 +83,7 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
     const fallbackTimeout = setTimeout(() => {
        if (isActive && isLoading) {
            setError("Yayın MPV ile zamanında yüklenemedi.");
-           onError?.(new Error("MPV timeout"));
+           onErrorRef.current?.(new Error("MPV timeout"));
        }
     }, 15000);
 
@@ -162,7 +164,7 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
       if (window.mpv && window.mpv.stop) window.mpv.stop();
       if (rewindInterval.current) clearInterval(rewindInterval.current);
     };
-  }, [src, onError, canvasId, retryCount]);
+  }, [src, canvasId, retryCount]);
 
   // Property Polling
   useEffect(() => {

@@ -29,7 +29,7 @@ export function UpdateModal({ isOpen, onClose, currentVersion, latestVersion }: 
   if (!isOpen) return null;
 
   const handleDownload = () => {
-    window.open('https://github.com/webframeplayer/webframeplayer/releases/latest', '_blank', 'noopener,noreferrer');
+    window.open('https://github.com/webframeplayer/webframeplayer/tags/latest', '_blank', 'noopener,noreferrer');
   };
 
   return (

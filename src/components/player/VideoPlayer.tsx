@@ -11,7 +11,7 @@ import { usePlayerStore } from '@/store/usePlayerStore';
 import { useTranslation } from '@/lib/i18n';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { CorsErrorModal } from './CorsErrorModal';
+
 import { UnsupportedCodecModal } from './UnsupportedCodecModal';
 import { isLikelyCodecError, isCodecError, mightBeUnsupportedFormat } from '@/lib/codec-utils';
 import { generateMagicLink } from '@/lib/url-helper';
@@ -28,7 +28,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const [hasError, setHasError] = useState(false);
-  const [showCorsError, setShowCorsError] = useState(false);
+
   const [showCodecError, setShowCodecError] = useState(false);
   const [copied, setCopied] = useState(false);
   const [magicCopied, setMagicCopied] = useState(false);
@@ -58,26 +58,10 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
   // Reset error when source changes
   useEffect(() => {
     setHasError(false);
-    setShowCorsError(false);
     setShowCodecError(false);
   }, [src]);
 
-  // DEBUG: Press Ctrl+Shift+C to simulate CORS error
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+Shift+C to simulate CORS error
-      if (e.ctrlKey && e.shiftKey && (e.key === 'c' || e.key === 'C')) {
-        e.preventDefault();
-        console.log('[DEBUG] Simulating CORS error - triggered!');
-        setHasError(true);
-        setShowCorsError(true);
-      }
-    };
-    
-    console.log('[DEBUG] CORS debug listener attached');
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+
 
   // Monitor player state and detect stuck loading
   useEffect(() => {
@@ -173,7 +157,6 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
     // Show CORS error if detected
     if (isCorsError) {
       setHasError(true);
-      setShowCorsError(true);
     }
   };
 
@@ -191,7 +174,6 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
           // Network error (code 2) often indicates CORS
           if (error.code === 2) {
             setHasError(true);
-            setShowCorsError(true);
           }
         }
       };
@@ -292,11 +274,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
     // Web: mevcut CORS hata UI'ı
     return (
       <div className="aspect-video w-full bg-gradient-to-br from-zinc-900 via-zinc-950 to-black flex items-center justify-center">
-        <CorsErrorModal 
-          isOpen={showCorsError} 
-          onClose={() => setShowCorsError(false)} 
-          domainName={typeof window !== 'undefined' ? window.location.host : 'Web Player'} 
-        />
+
         <UnsupportedCodecModal
           isOpen={showCodecError}
           onClose={() => setShowCodecError(false)}
@@ -333,7 +311,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 pt-2 w-full max-w-sm">
               <Button
-                onClick={() => window.open('/', '_blank')}
+                onClick={() => window.open('https://github.com/webframeplayer/webframeplayer/tags', '_blank', 'noopener,noreferrer')}
                 className="flex-1 bg-[var(--iptv-primary)] hover:opacity-90 text-white px-6"
                 size="lg"
               >

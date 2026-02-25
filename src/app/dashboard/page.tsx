@@ -103,9 +103,6 @@ export default function DashboardPage() {
   }, [categories, contentType]);
 
   const handleNavClick = (item: NavItem) => {
-    // Stop any running player when navigating
-    stopContent();
-    
     setActiveNav(item.id);
     if (item.special === 'home') {
       // Stay on home, don't change content type
@@ -150,9 +147,7 @@ export default function DashboardPage() {
     }
   };
   
-  // Mobile bottom nav handler
   const handleMobileNavClick = (navId: string, contentType?: ContentType) => {
-    stopContent();
     setActiveNav(navId);
     
     if (navId === 'favorites') {

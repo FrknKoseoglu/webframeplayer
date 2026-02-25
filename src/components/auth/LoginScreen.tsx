@@ -289,7 +289,7 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
 
       {/* Main Content */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
-        <div className="w-full max-w-[440px] flex flex-col gap-8 animate-fade-in-up">
+        <div className="w-full max-w-[880px] flex flex-col gap-8 animate-fade-in-up">
           {/* Logo / Header */}
           <div className="flex flex-col items-center justify-center text-center space-y-4">
             <div className="w-16 h-16 bg-[var(--iptv-primary)] rounded-2xl flex items-center justify-center shadow-glow mb-2">
@@ -558,7 +558,11 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
 
           {/* Version */}
           <div className="text-center mt-auto">
-            <p className="text-xs text-gray-600 font-mono">v1.0.0</p>
+            <p className="text-xs text-gray-600 font-mono">
+              {typeof window !== 'undefined' && localStorage.getItem('isElectronApp') === 'true'
+                ? 'Electron v0.3.0'
+                : 'Web v0.3.0'}
+            </p>
           </div>
         </div>
       </main>

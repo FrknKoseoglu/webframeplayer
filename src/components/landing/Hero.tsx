@@ -9,7 +9,7 @@ import { WebLimitationModal } from './WebLimitationModal';
 import { useTranslation } from '@/lib/i18n';
 
 // Placeholder URL - update with your actual GitHub releases URL
-const GITHUB_RELEASES_URL = 'https://github.com/webframeplayer/webframeplayer/releases';
+const GITHUB_RELEASES_URL = 'https://github.com/webframeplayer/webframeplayer/tags';
 
 interface HeroProps {
   hasProfiles?: boolean;
