@@ -8,8 +8,7 @@ import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { WebLimitationModal } from './WebLimitationModal';
 import { useTranslation } from '@/lib/i18n';
 
-// Placeholder URL - update with your actual GitHub releases URL
-const GITHUB_RELEASES_URL = 'https://github.com/webframeplayer/webframeplayer/tags';
+
 
 interface HeroProps {
   hasProfiles?: boolean;
@@ -34,7 +33,7 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
   }, []);
 
   const handleDownloadClick = () => {
-    window.open(GITHUB_RELEASES_URL, '_blank', 'noopener,noreferrer');
+    window.open(`${window.location.origin}/l/indir`, '_blank', 'noopener,noreferrer');
   };
 
   const handleWebPlayerClick = () => {

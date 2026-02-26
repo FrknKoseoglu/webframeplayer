@@ -11,8 +11,7 @@ interface WebLimitationModalProps {
   onClose: () => void;
 }
 
-// Placeholder URL - update with your actual GitHub releases URL
-const GITHUB_RELEASES_URL = 'https://github.com/webframeplayer/webframeplayer/tags';
+
 
 export function WebLimitationModal({ isOpen, onClose }: WebLimitationModalProps) {
   const router = useRouter();
@@ -26,7 +25,7 @@ export function WebLimitationModal({ isOpen, onClose }: WebLimitationModalProps)
   };
 
   const handleDownload = () => {
-    window.open(GITHUB_RELEASES_URL, '_blank', 'noopener,noreferrer');
+    window.open(`${window.location.origin}/l/indir`, '_blank', 'noopener,noreferrer');
   };
 
   return (

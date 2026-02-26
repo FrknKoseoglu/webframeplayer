@@ -178,4 +178,13 @@ model CreditLog {
   @@index([createdAt])
 }
 
+model AdminShortLink {
+  id          String   @id @default(cuid())
+  originalUrl String
+  shortCode   String   @unique
+  clicks      Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+}
+
 

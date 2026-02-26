@@ -113,6 +113,22 @@ export default async function AdminDashboard() {
             <h3 className="text-xl font-bold mb-2 group-hover:text-blue-400 transition-colors">Tüm Müşteriler</h3>
             <p className="text-white/40 text-sm">Sistemdeki tüm müşterileri görüntüle ve filtrele.</p>
           </Link>
+
+          <Link
+            href="/admin/short-links"
+            className="group relative bg-[var(--iptv-surface)] border border-white/5 rounded-2xl p-6 hover:border-purple-500/50 transition-all duration-300"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 bg-purple-500/10 rounded-xl group-hover:bg-purple-500/20 transition-colors">
+                <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              </div>
+              <div className="bg-white/5 px-2 py-1 rounded text-xs text-white/40 group-hover:bg-white/10 transition-colors">Yönet</div>
+            </div>
+            <h3 className="text-xl font-bold mb-2 group-hover:text-purple-400 transition-colors">Link Kısaltıcı</h3>
+            <p className="text-white/40 text-sm">Sistem genelindeki yönlendirmeleri ve tıklanma istatistiklerini yönet.</p>
+          </Link>
         </div>
       </div>
     </div>

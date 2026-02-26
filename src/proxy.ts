@@ -44,7 +44,6 @@ export default auth((req) => {
 });
 
 // Force Node.js runtime (required for crypto/bcrypt compatibility)
-export const runtime = 'nodejs';
 
 export const config = {
   matcher: [

@@ -311,7 +311,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 pt-2 w-full max-w-sm">
               <Button
-                onClick={() => window.open('https://github.com/webframeplayer/webframeplayer/tags', '_blank', 'noopener,noreferrer')}
+                onClick={() => window.open(`${window.location.origin}/l/indir`, '_blank', 'noopener,noreferrer')}
                 className="flex-1 bg-[var(--iptv-primary)] hover:opacity-90 text-white px-6"
                 size="lg"
               >
