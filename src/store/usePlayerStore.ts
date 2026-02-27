@@ -311,6 +311,18 @@ export const usePlayerStore = create<PlayerStore>()(
         // Add to history
         get().addToHistory(content);
         
+        // Track GA4 Event
+        if (typeof window !== 'undefined' && 'gtag' in window && autoPlay) {
+          const profileName = get().activeProfile?.name || 'Unknown';
+          (window as any).gtag('event', 'content_played', {
+            service_name: profileName,
+            stream_type: content.type,
+            category_name: content.group || 'Unknown',
+            content_name: content.name,
+            app_version: process.env.NEXT_PUBLIC_APP_VERSION || '0.4.0'
+          });
+        }
+        
         set({ 
           activeContent: content,
           isPlaying: autoPlay,
@@ -318,11 +330,25 @@ export const usePlayerStore = create<PlayerStore>()(
       },
 
       playEpisode: (series, episode) => {
+        const episodeName = `${series.name} - S${episode.seasonNum}E${episode.episodeNum} - ${episode.title}`;
+
+        // Track GA4 Event
+        if (typeof window !== 'undefined' && 'gtag' in window) {
+          const profileName = get().activeProfile?.name || 'Unknown';
+          (window as any).gtag('event', 'content_played', {
+            service_name: profileName,
+            stream_type: 'episode', // Or 'series'
+            category_name: series.group || 'Unknown',
+            content_name: episodeName,
+            app_version: process.env.NEXT_PUBLIC_APP_VERSION || '0.4.0'
+          });
+        }
+
         set({
           activeContent: {
             ...series,
             id: `${series.id}_ep_${episode.id}`,
-            name: `${series.name} - S${episode.seasonNum}E${episode.episodeNum} - ${episode.title}`,
+            name: episodeName,
             logo: episode.image || series.logo,
             url: episode.url,
             seasonNumber: episode.seasonNum,

@@ -61,7 +61,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
         {/* End Google Tag Manager */}
-        
         {/* Google Analytics */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-0G4ZT7FEY4"></script>
         <script
@@ -70,7 +69,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-0G4ZT7FEY4');
+
+              // Detect if running inside Electron
+              var isElectron = typeof window !== 'undefined' && window.navigator && window.navigator.userAgent.toLowerCase().indexOf(' electron/') > -1;
+              var platform = isElectron ? 'electron' : 'web';
+              
+              // App version (set at build time or generic if unavailable)
+              var appVersion = process.env.NEXT_PUBLIC_APP_VERSION || '0.4.0';
+
+              gtag('config', 'G-0G4ZT7FEY4', {
+                'app_platform': platform,
+                'app_version': appVersion
+              });
             `,
           }}
         />
