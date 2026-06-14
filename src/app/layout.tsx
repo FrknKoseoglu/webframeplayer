@@ -49,54 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr" className="dark">
-      <head>
-        {/* Google Tag Manager */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-5KWH3FZ4');`,
-          }}
-        />
-        {/* End Google Tag Manager */}
-        {/* Google Analytics */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-0G4ZT7FEY4"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-
-              // Detect if running inside Electron
-              var isElectron = typeof window !== 'undefined' && window.navigator && window.navigator.userAgent.toLowerCase().indexOf(' electron/') > -1;
-              var platform = isElectron ? 'electron' : 'web';
-              
-              // App version (set at build time or generic if unavailable)
-              var appVersion = process.env.NEXT_PUBLIC_APP_VERSION || '0.4.0';
-
-              gtag('config', 'G-0G4ZT7FEY4', {
-                'app_platform': platform,
-                'app_version': appVersion
-              });
-            `,
-          }}
-        />
-      </head>
       <body className={`${plusJakartaSans.variable} font-sans antialiased`}>
-        {/* Google Tag Manager (noscript) */}
-        <noscript>
-          <iframe 
-            src="https://www.googletagmanager.com/ns.html?id=GTM-5KWH3FZ4"
-            height="0" 
-            width="0" 
-            style={{ display: 'none', visibility: 'hidden' }}
-          />
-        </noscript>
-        {/* End Google Tag Manager (noscript) */}
-        
         <Toaster 
           position="top-center"
           richColors

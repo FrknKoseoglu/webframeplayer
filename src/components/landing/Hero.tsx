@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Download, Tv, ArrowRight, Globe, Play } from 'lucide-react';
+import { Download, Tv, ArrowRight, Globe, Play, Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { WebLimitationModal } from './WebLimitationModal';
@@ -33,7 +33,7 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
   }, []);
 
   const handleDownloadClick = () => {
-    window.open(`${window.location.origin}/l/indir`, '_blank', 'noopener,noreferrer');
+    window.open('https://github.com/FrknKoseoglu/webframeplayer/releases', '_blank', 'noopener,noreferrer');
   };
 
   const handleWebPlayerClick = () => {
@@ -97,15 +97,32 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
                   </Button>
                 </Link>
                 {!isElectron && (
-                  <Button 
-                    variant="outline" 
-                    size="lg" 
-                    onClick={handleDownloadClick}
-                    className="border-white/20 text-white hover:bg-white/5 px-8 py-6 text-lg rounded-xl min-h-[56px]"
-                  >
-                    <Download className="w-5 h-5 mr-2" />
-                    {t.landing.hero.ctaDownload || 'Uygulamayı İndir'}
-                  </Button>
+                  <>
+                    <Button 
+                      variant="outline" 
+                      size="lg" 
+                      onClick={handleDownloadClick}
+                      className="border-white/20 text-white hover:bg-white/5 px-8 py-6 text-lg rounded-xl min-h-[56px]"
+                    >
+                      <Download className="w-5 h-5 mr-2" />
+                      {t.landing.hero.ctaDownload || 'Uygulamayı İndir'}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="lg" 
+                      className="border-white/20 text-white hover:bg-white/5 px-8 py-6 text-lg rounded-xl min-h-[56px]"
+                      asChild
+                    >
+                      <a 
+                        href="https://github.com/FrknKoseoglu/webframeplayer"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Github className="w-5 h-5 mr-2" />
+                        GitHub
+                      </a>
+                    </Button>
+                  </>
                 )}
               </>
             ) : isElectron ? (
@@ -127,6 +144,23 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
                 >
                   <Download className="w-5 h-5 mr-2" />
                   {t.landing.hero.ctaDownload || 'Masaüstü Uygulamasını İndir'}
+                </Button>
+
+                {/* Github Link */}
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="border-white/20 text-white hover:bg-white/5 px-8 py-6 text-lg rounded-xl min-h-[56px]"
+                  asChild
+                >
+                  <a 
+                    href="https://github.com/FrknKoseoglu/webframeplayer"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Github className="w-5 h-5 mr-2" />
+                    GitHub
+                  </a>
                 </Button>
                 
                 {/* Secondary CTA: Web Player (Beta) with warning */}
