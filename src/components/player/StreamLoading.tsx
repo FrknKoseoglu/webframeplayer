@@ -28,7 +28,7 @@ export function StreamLoading({ name, logo, isLive = false, message = 'Yükleniy
           {name && <p className="text-white font-semibold mb-2">{name}</p>}
         </>
       )}
-      <Loader2 className="w-10 h-10 text-[var(--iptv-primary)] animate-spin mb-2" />
+      <Loader2 className="w-10 h-10 text-[var(--frame-primary)] animate-spin mb-2" />
       <p className="text-white/50 text-sm">{message}</p>
     </div>
   );

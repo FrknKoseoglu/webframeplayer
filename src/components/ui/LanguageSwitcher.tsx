@@ -17,7 +17,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         className={cn(
           'px-3 py-1 h-8 text-sm font-medium rounded-md transition-all',
           language === 'tr'
-            ? 'bg-[var(--iptv-primary)] text-white'
+            ? 'bg-[var(--frame-primary)] text-white'
             : 'text-white/60 hover:text-white hover:bg-white/10'
         )}
       >
@@ -30,7 +30,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         className={cn(
           'px-3 py-1 h-8 text-sm font-medium rounded-md transition-all',
           language === 'en'
-            ? 'bg-[var(--iptv-primary)] text-white'
+            ? 'bg-[var(--frame-primary)] text-white'
             : 'text-white/60 hover:text-white hover:bg-white/10'
         )}
       >

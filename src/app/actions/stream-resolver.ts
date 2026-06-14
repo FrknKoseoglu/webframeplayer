@@ -3,7 +3,7 @@
 /**
  * Stream Resolver - Server Action
  * 
- * Handles IPTV stream URL resolution:
+ * Handles Yayın stream URL resolution:
  * 1. Follows 301/302 redirects to get the real stream URL
  * 2. Uses VLC User-Agent to bypass provider restrictions
  * 3. Resolves load balancer endpoints to direct stream URLs
@@ -18,7 +18,7 @@ export interface ResolveResult {
 }
 
 /**
- * Resolves an IPTV stream URL by following redirects server-side
+ * Resolves an Yayın stream URL by following redirects server-side
  * 
  * @param url - The original stream URL (may be a redirect/API endpoint)
  * @returns ResolveResult with the final resolved URL

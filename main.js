@@ -134,7 +134,7 @@ function createWindow() {
     show: false,
     backgroundColor: '#0a0a0a',
     autoHideMenuBar: true,
-    title: 'FRAME IPTV Player',
+    title: 'FRAME FRAME Player',
   });
 
   // 🚨 YENİ EKLENEN 1: User-Agent Hilesi (Bot engelini aşar)
@@ -241,7 +241,7 @@ function createWindow() {
     console.log(`[Electron] Page loaded successfully!`);
   });
 
-  // 🚨 Sertifika hatalarını bypass et (HTTP IPTV streamleri için)
+  // 🚨 Sertifika hatalarını bypass et (HTTP Yayın streamleri için)
   win.webContents.on('certificate-error', (event, url, error, certificate, callback) => {
     console.log(`[Electron] Certificate error bypassed for: ${url}`);
     event.preventDefault();

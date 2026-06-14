@@ -23,9 +23,9 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--iptv-background)]">
+    <div className="min-h-screen bg-[var(--frame-background)]">
       {/* Header */}
-      <div className="sticky top-0 z-50 flex items-center gap-3 px-4 py-3 bg-[var(--iptv-surface-dark)] border-b border-white/10">
+      <div className="sticky top-0 z-50 flex items-center gap-3 px-4 py-3 bg-[var(--frame-surface-dark)] border-b border-white/10">
         <button
           onClick={() => router.push('/dashboard')}
           className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"

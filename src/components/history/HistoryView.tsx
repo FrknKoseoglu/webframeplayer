@@ -48,7 +48,7 @@ export function HistoryView({ onPlayContent }: HistoryViewProps) {
   };
 
   return (
-    <div className="flex-1 overflow-auto bg-[var(--iptv-background)]">
+    <div className="flex-1 overflow-auto bg-[var(--frame-background)]">
       <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -119,7 +119,7 @@ export function HistoryView({ onPlayContent }: HistoryViewProps) {
                 {/* Play Button */}
                 <Button
                   size="icon"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)]"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--frame-primary)] hover:bg-[var(--frame-primary-dark)]"
                 >
                   <Play className="w-5 h-5 text-white" />
                 </Button>

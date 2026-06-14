@@ -156,7 +156,7 @@ export function SettingsPanel() {
         setCopiedMagicLinkMap(prev => ({ ...prev, [profile.id]: false }));
       }, 2000);
     } catch (err) {
-      console.error('Failed to copy magic link:', err);
+      console.error('Failed to copy magic code:', err);
     }
   };
 
@@ -188,11 +188,11 @@ export function SettingsPanel() {
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-[var(--iptv-surface-dark)] p-6">
+    <div className="h-full overflow-y-auto bg-[var(--frame-surface-dark)] p-6">
       {/* Delete Confirmation Modal */}
       {deleteConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-          <div className="bg-[var(--iptv-surface-dark)] border border-white/10 rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+          <div className="bg-[var(--frame-surface-dark)] border border-white/10 rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
                 <AlertTriangle className="w-6 h-6 text-red-400" />
@@ -233,7 +233,7 @@ export function SettingsPanel() {
       {/* Support URL Confirmation Dialog */}
       {supportUrlDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-          <div className="bg-[var(--iptv-surface-dark)] border border-white/10 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+          <div className="bg-[var(--frame-surface-dark)] border border-white/10 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
                 <ExternalLink className="w-6 h-6 text-blue-400" />
@@ -308,7 +308,7 @@ export function SettingsPanel() {
               onClick={() => setLanguage('tr')}
               className={cn(
                 'flex-1 border-white/10',
-                language === 'tr' ? 'bg-[var(--iptv-primary)] border-[var(--iptv-primary)] text-white' : 'text-white/60 hover:text-white'
+                language === 'tr' ? 'bg-[var(--frame-primary)] border-[var(--frame-primary)] text-white' : 'text-white/60 hover:text-white'
               )}
             >
               🇹🇷 Türkçe
@@ -318,7 +318,7 @@ export function SettingsPanel() {
               onClick={() => setLanguage('en')}
               className={cn(
                 'flex-1 border-white/10',
-                language === 'en' ? 'bg-[var(--iptv-primary)] border-[var(--iptv-primary)] text-white' : 'text-white/60 hover:text-white'
+                language === 'en' ? 'bg-[var(--frame-primary)] border-[var(--frame-primary)] text-white' : 'text-white/60 hover:text-white'
               )}
             >
               🇬🇧 English
@@ -351,7 +351,7 @@ export function SettingsPanel() {
                 className={cn(
                   'flex-1 p-3 rounded-lg border text-center transition-all',
                   fontSize === option.id
-                    ? 'bg-[var(--iptv-primary)]/20 border-[var(--iptv-primary)]/50 text-white'
+                    ? 'bg-[var(--frame-primary)]/20 border-[var(--frame-primary)]/50 text-white'
                     : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
                 )}
               >
@@ -382,7 +382,7 @@ export function SettingsPanel() {
                 className={cn(
                   'p-3 rounded-lg border text-center transition-all',
                   cacheExpiry === option.id
-                    ? 'bg-[var(--iptv-primary)]/20 border-[var(--iptv-primary)]/50 text-white'
+                    ? 'bg-[var(--frame-primary)]/20 border-[var(--frame-primary)]/50 text-white'
                     : 'bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10'
                 )}
               >
@@ -403,7 +403,7 @@ export function SettingsPanel() {
               </div>
               <div>
                 <h2 className="text-white font-semibold">{language === 'tr' ? 'Hizmetler' : 'Services'}</h2>
-                <p className="text-white/50 text-sm">{language === 'tr' ? 'IPTV servislerinizi yönetin' : 'Manage your IPTV services'}</p>
+                <p className="text-white/50 text-sm">{language === 'tr' ? 'Yayın servislerinizi yönetin' : 'Manage your Yayın services'}</p>
               </div>
             </div>
             <Button
@@ -431,7 +431,7 @@ export function SettingsPanel() {
               <select
                 value={defaultProfileId || ''}
                 onChange={(e) => setDefaultProfileId(e.target.value || null)}
-                className="w-48 px-3 py-2 rounded-lg bg-black/20 border border-white/10 text-white text-sm focus:outline-none focus:border-[var(--iptv-primary)]"
+                className="w-48 px-3 py-2 rounded-lg bg-black/20 border border-white/10 text-white text-sm focus:outline-none focus:border-[var(--frame-primary)]"
               >
                 <option value="" className="bg-zinc-900">{language === 'tr' ? 'Seçilmedi (İlk Hizmet)' : 'Not Selected (First Service)'}</option>
                 {profiles.map(p => (
@@ -455,7 +455,7 @@ export function SettingsPanel() {
                   className={cn(
                     'flex flex-col gap-2 p-4 rounded-lg border transition-all cursor-pointer',
                     activeProfile?.id === profile.id
-                      ? 'bg-[var(--iptv-primary)]/10 border-[var(--iptv-primary)]/30'
+                      ? 'bg-[var(--frame-primary)]/10 border-[var(--frame-primary)]/30'
                       : 'bg-white/5 border-white/10 hover:bg-white/10'
                   )}
                 >
@@ -599,7 +599,7 @@ export function SettingsPanel() {
                       )}
                       {copiedMagicLinkMap[profile.id] 
                         ? (language === 'tr' ? 'Kopyalandı' : 'Copied')
-                        : (language === 'tr' ? 'Sihirli Bağlantı Kopyala' : 'Copy Magic Link')}
+                        : (language === 'tr' ? 'Sihirli Kod Kopyala' : 'Copy Magic Code')}
                     </Button>
                     {profile.supportUrl && (
                       <Button

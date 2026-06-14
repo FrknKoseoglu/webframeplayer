@@ -15,7 +15,7 @@ export function getStreamUrl(targetUrl: string): string {
 }
 
 /**
- * Generate a magic link for a given profile to be imported onto the desktop app
+ * Generate a magic code for a given profile to be imported onto the desktop app
  */
 export function generateMagicLink(profile: any): string {
   if (typeof window === 'undefined') return '';
@@ -45,7 +45,7 @@ export function generateMagicLink(profile: any): string {
     const encoded = btoa(jsonString);
     return `${baseUrl}/?d=${encoded}`;
   } catch (err) {
-    console.error('Failed to generate magic link', err);
+    console.error('Failed to generate magic code', err);
     return baseUrl;
   }
 }

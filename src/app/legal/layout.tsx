@@ -7,9 +7,9 @@ export default function LegalLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[var(--iptv-background)] text-white">
+    <div className="min-h-screen bg-[var(--frame-background)] text-white">
       {/* Simple Header */}
-      <header className="border-b border-white/10 bg-[var(--iptv-surface)]">
+      <header className="border-b border-white/10 bg-[var(--frame-surface)]">
         <div className="container mx-auto px-4 py-4">
           <Link 
             href="/"
@@ -27,7 +27,7 @@ export default function LegalLayout({
       </main>
 
       {/* Simple Footer */}
-      <footer className="border-t border-white/10 bg-[var(--iptv-surface)] mt-16">
+      <footer className="border-t border-white/10 bg-[var(--frame-surface)] mt-16">
         <div className="container mx-auto px-4 py-6 text-center">
           <p className="text-white/40 text-sm">
             © 2025 Frame. Tüm hakları saklıdır.

@@ -70,7 +70,7 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
   const messageParam = parsedData?.message || searchParams.get('message');
   const supportUrl = parsedData?.supportUrl || searchParams.get('supportUrl');
   const logoUrl = parsedData?.logoUrl || searchParams.get('logoUrl');
-  const xrkad = parsedData?.xrkad || searchParams.get('xrkad'); // Ad-free flag from provider magic links
+  const xrkad = parsedData?.xrkad || searchParams.get('xrkad'); // Ad-free flag from provider magic codes
 
   // Set display service name
   useEffect(() => {
@@ -170,7 +170,7 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
         m3uUrl: importUrl,
         supportUrl: supportUrl || undefined,
         logoUrl: logoUrl || undefined,
-        adFree: xrkad === '1', // Ad-free if from provider magic link
+        adFree: xrkad === '1', // Ad-free if from provider magic code
         active: true,
         createdAt: Date.now(),
         lastRefresh: Date.now(),
@@ -272,7 +272,7 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
         },
         supportUrl: supportUrl || undefined,
         logoUrl: logoUrl || undefined,
-        adFree: xrkad === '1', // Ad-free if from provider magic link
+        adFree: xrkad === '1', // Ad-free if from provider magic code
         active: true,
         createdAt: Date.now(),
         lastRefresh: Date.now(),
@@ -319,11 +319,11 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--iptv-background)] flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-[var(--iptv-surface)]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
+    <div className="min-h-screen bg-[var(--frame-background)] flex items-center justify-center p-6">
+      <div className="max-w-md w-full bg-[var(--frame-surface)]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 bg-[var(--iptv-primary)] rounded-2xl flex items-center justify-center">
+          <div className="w-16 h-16 bg-[var(--frame-primary)] rounded-2xl flex items-center justify-center">
             {success ? (
               <CheckCircle className="w-8 h-8 text-white" />
             ) : (
@@ -348,7 +348,7 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
 
         {/* Custom Message from Provider */}
         {customMessage && (
-          <div className="bg-[var(--iptv-primary)]/10 border border-[var(--iptv-primary)]/30 rounded-lg p-4 mb-6">
+          <div className="bg-[var(--frame-primary)]/10 border border-[var(--frame-primary)]/30 rounded-lg p-4 mb-6">
             <p className="text-white/80 text-sm text-center italic">
               "{customMessage}"
             </p>
@@ -359,12 +359,12 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
         {!success && !error && (
           <div className="mt-4">
             <div className="flex items-center gap-3 text-sm text-white/70 mb-2">
-              <Loader2 className="w-4 h-4 animate-spin text-[var(--iptv-primary)]" />
+              <Loader2 className="w-4 h-4 animate-spin text-[var(--frame-primary)]" />
               <span>{LOADING_MESSAGES[loadingStep]}</span>
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-[var(--iptv-primary)] transition-all duration-300"
+                className="h-full bg-[var(--frame-primary)] transition-all duration-300"
                 style={{ width: getProgressWidth() }}
               />
             </div>
@@ -393,7 +393,7 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
                   if (importUrl) handleM3UImport();
                   else if (importXtream) handleXtreamImport();
                 }}
-                className="flex-1 bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white"
+                className="flex-1 bg-[var(--frame-primary)] hover:bg-[var(--frame-primary-dark)] text-white"
               >
                 {language === 'tr' ? 'Tekrar Dene' : 'Retry'}
               </Button>
@@ -409,7 +409,7 @@ export function ImportHandler({ onComplete, onCancel }: ImportHandlerProps) {
                 onComplete();
                 router.push('/dashboard');
               }}
-              className="w-full bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white h-12 text-lg font-bold"
+              className="w-full bg-[var(--frame-primary)] hover:bg-[var(--frame-primary-dark)] text-white h-12 text-lg font-bold"
             >
               {language === 'tr' ? 'Devam Et' : 'Continue'}
             </Button>

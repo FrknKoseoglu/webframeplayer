@@ -42,11 +42,11 @@ export function EpgPopup() {
 
   return (
     <Dialog open={!!selectedProgram} onOpenChange={() => setSelectedProgram(null)}>
-      <DialogContent className="bg-[var(--iptv-surface)] border-white/10 text-white max-w-lg">
+      <DialogContent className="bg-[var(--frame-surface)] border-white/10 text-white max-w-lg">
         <DialogHeader>
           <div className="flex items-center gap-2 mb-2">
             {isLive() && (
-              <span className="text-[10px] font-bold text-white bg-[var(--iptv-primary)] px-2 py-0.5 rounded animate-pulse">
+              <span className="text-[10px] font-bold text-white bg-[var(--frame-primary)] px-2 py-0.5 rounded animate-pulse">
                 CANLI
               </span>
             )}
@@ -84,7 +84,7 @@ export function EpgPopup() {
             {isLive() && (
               <div className="h-1.5 bg-black/30 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-[var(--iptv-primary)] rounded-full transition-all"
+                  className="h-full bg-[var(--frame-primary)] rounded-full transition-all"
                   style={{ 
                     width: `${((Date.now() / 1000 - selectedProgram.startTimestamp) / (selectedProgram.endTimestamp - selectedProgram.startTimestamp)) * 100}%` 
                   }}

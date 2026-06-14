@@ -52,14 +52,14 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
         onClose={() => setShowWebWarning(false)} 
       />
       
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[var(--iptv-background)]">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[var(--frame-background)]">
         {/* Language Switcher - Top Right */}
         <div className="absolute top-6 right-6 z-20">
           <LanguageSwitcher />
         </div>
 
         {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--iptv-primary)]/20 via-transparent to-purple-900/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--frame-primary)]/20 via-transparent to-purple-900/20" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/20 via-transparent to-transparent" />
         
         {/* Grid Pattern */}
@@ -75,7 +75,7 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
 
           {/* Headline */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            {h.headline.split('.')[0]}. <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--iptv-primary)] to-orange-500">{h.headline.split('.')[1]?.trim() || 'Framed Perfectly.'}</span>
+            {h.headline.split('.')[0]}. <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--frame-primary)] to-orange-500">{h.headline.split('.')[1]?.trim() || 'Framed Perfectly.'}</span>
           </h1>
 
           {/* Subheadline */}
@@ -91,7 +91,7 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
               // Returning user - show Dashboard button (+ download if not Electron)
               <>
                 <Link href="/dashboard">
-                  <Button size="lg" className="bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-red-500/25 min-h-[56px]">
+                  <Button size="lg" className="bg-[var(--frame-primary)] hover:bg-[var(--frame-primary-dark)] text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-red-500/25 min-h-[56px]">
                     <ArrowRight className="w-5 h-5 mr-2" />
                     {h.ctaDashboard}
                   </Button>
@@ -111,7 +111,7 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
             ) : isElectron ? (
               // Electron user - show "Hizmet Ekle" button
               <Link href="/login">
-                <Button size="lg" className="bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-red-500/25 min-h-[56px]">
+                <Button size="lg" className="bg-[var(--frame-primary)] hover:bg-[var(--frame-primary-dark)] text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-red-500/25 min-h-[56px]">
                   <ArrowRight className="w-5 h-5 mr-2" />
                   {h.ctaNewService || 'Hizmet Ekle'}
                 </Button>
@@ -123,7 +123,7 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
                 <Button 
                   size="lg" 
                   onClick={handleDownloadClick}
-                  className="bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-red-500/25 min-h-[56px]"
+                  className="bg-[var(--frame-primary)] hover:bg-[var(--frame-primary-dark)] text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-red-500/25 min-h-[56px]"
                 >
                   <Download className="w-5 h-5 mr-2" />
                   {t.landing.hero.ctaDownload || 'Masaüstü Uygulamasını İndir'}
@@ -177,7 +177,7 @@ export function Hero({ hasProfiles = false, isHydrated = false }: HeroProps) {
 
         {/* Player Mockup (Decorative) */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl px-6 opacity-50 pointer-events-none hidden lg:block">
-          <div className="aspect-video bg-gradient-to-t from-[var(--iptv-background)] via-zinc-900/90 to-zinc-800/50 rounded-t-2xl border border-white/10 border-b-0 shadow-2xl">
+          <div className="aspect-video bg-gradient-to-t from-[var(--frame-background)] via-zinc-900/90 to-zinc-800/50 rounded-t-2xl border border-white/10 border-b-0 shadow-2xl">
             <div className="absolute inset-4 rounded-lg bg-black/50 flex items-center justify-center">
               <Tv className="w-16 h-16 text-white/20" />
             </div>

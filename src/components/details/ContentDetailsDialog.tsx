@@ -78,7 +78,7 @@ export function ContentDetailsDialog({ content, open, onOpenChange }: ContentDet
                         {formatDuration(content.duration)}
                       </span>
                     )}
-                    <span className="text-[var(--iptv-primary)] font-bold border-l border-white/20 pl-3 uppercase tracking-wider">
+                    <span className="text-[var(--frame-primary)] font-bold border-l border-white/20 pl-3 uppercase tracking-wider">
                       {content.type === 'series' ? 'DİZİ' : 'FİLM'}
                     </span>
                   </div>
@@ -99,7 +99,7 @@ export function ContentDetailsDialog({ content, open, onOpenChange }: ContentDet
               <div className="space-y-4">
                 <div>
                   <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-[var(--iptv-primary)]" />
+                    <Clock className="w-4 h-4 text-[var(--frame-primary)]" />
                     Açıklama
                   </h3>
                   <p className="text-white/80 leading-relaxed">

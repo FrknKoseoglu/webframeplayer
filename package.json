@@ -1,5 +1,5 @@
 {
-  "name": "iptv-web-player",
+  "name": "frame-web-player",
   "version": "0.4.0",
   "private": true,
   "main": "main.js",
@@ -16,8 +16,8 @@
     "rebuild": "electron-rebuild -f"
   },
   "build": {
-    "appId": "com.frame.iptv-player",
-    "productName": "FRAME IPTV Player",
+    "appId": "com.frame.media-player",
+    "productName": "FRAME Player",
     "directories": {
       "output": "dist"
     },

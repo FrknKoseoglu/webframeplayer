@@ -225,8 +225,8 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
                 </p>
                 <p className="text-zinc-500 text-xs leading-relaxed mt-2">
                   {language === 'tr'
-                    ? 'Magic Link\'i kopyalayıp uygulamaya eklediğinizde mevcut bilgileriniz uygulamaya aktarılacaktır.'
-                    : 'Copy the Magic Link and paste it in the app to transfer your current settings.'}
+                    ? 'Magic Code\'i kopyalayıp uygulamaya eklediğinizde mevcut bilgileriniz uygulamaya aktarılacaktır.'
+                    : 'Copy the Magic Code and paste it in the app to transfer your current settings.'}
                 </p>
               </div>
               <div className="flex flex-col gap-2 pt-2 w-full">
@@ -261,7 +261,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
                     size="sm"
                   >
                     {magicCopied ? <Check className="w-4 h-4 mr-1.5" /> : <Copy className="w-4 h-4 mr-1.5" />}
-                    {magicCopied ? 'Magic Link Kopyalandı!' : 'Magic Link Kopyala'}
+                    {magicCopied ? 'Magic Code Kopyalandı!' : 'Magic Code Kopyala'}
                   </Button>
                 )}
               </div>
@@ -305,14 +305,14 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
               </p>
               <p className="text-zinc-500 text-xs leading-relaxed max-w-md mx-auto">
                 {language === 'tr'
-                  ? 'Magic Link\'i kopyalayıp masaüstü uygulamasına yapıştırarak mevcut bilgilerinizi kolayca aktarabilirsiniz.'
-                  : 'Copy the Magic Link and paste it in the desktop app to easily transfer your settings.'}
+                  ? 'Magic Code\'i kopyalayıp masaüstü uygulamasına yapıştırarak mevcut bilgilerinizi kolayca aktarabilirsiniz.'
+                  : 'Copy the Magic Code and paste it in the desktop app to easily transfer your settings.'}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 pt-2 w-full max-w-sm">
               <Button
                 onClick={() => window.open(`${window.location.origin}/l/indir`, '_blank', 'noopener,noreferrer')}
-                className="flex-1 bg-[var(--iptv-primary)] hover:opacity-90 text-white px-6"
+                className="flex-1 bg-[var(--frame-primary)] hover:opacity-90 text-white px-6"
                 size="lg"
               >
                 <Download className="w-5 h-5 mr-2" />
@@ -331,7 +331,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
                   size="lg"
                 >
                   {magicCopied ? <Check className="w-5 h-5 mr-2" /> : <Copy className="w-5 h-5 mr-2" />}
-                  {magicCopied ? 'Kopyalandı!' : 'Magic Link Kopyala'}
+                  {magicCopied ? 'Kopyalandı!' : 'Magic Code Kopyala'}
                 </Button>
               )}
             </div>
@@ -356,7 +356,7 @@ export function VideoPlayer({ src, title, autoPlay = true }: VideoPlayerProps) {
       <div className="aspect-video w-full bg-gradient-to-br from-zinc-900 via-zinc-950 to-black flex items-center justify-center">
         <div className="relative">
           {/* Cinematic glow effect */}
-          <div className="absolute inset-0 blur-3xl bg-gradient-to-r from-[var(--iptv-primary)]/20 via-red-600/20 to-orange-600/20 rounded-full scale-150" />
+          <div className="absolute inset-0 blur-3xl bg-gradient-to-r from-[var(--frame-primary)]/20 via-red-600/20 to-orange-600/20 rounded-full scale-150" />
           
           <div className="relative z-10 flex flex-col items-center gap-6 p-12">
             <div className="p-6 rounded-full bg-zinc-800/50 border border-zinc-700/50">

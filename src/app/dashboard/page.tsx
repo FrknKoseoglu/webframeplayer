@@ -263,11 +263,11 @@ export default function DashboardPage() {
 
   // Sidebar content for reuse in both desktop sidebar and mobile drawer
   const SidebarContent = (closeSidebar?: () => void) => (
-    <div className="flex flex-col h-full bg-[var(--iptv-surface-dark)]">
+    <div className="flex flex-col h-full bg-[var(--frame-surface-dark)]">
       {/* Logo - Only in mobile drawer, desktop has it inline */}
       <div className="p-4 border-b border-white/5 md:block">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-[var(--iptv-primary)] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[var(--frame-primary)] flex items-center justify-center shrink-0">
             <Tv className="w-5 h-5 text-white" />
           </div>
           <span className="text-white font-bold">Frame Player</span>
@@ -308,7 +308,7 @@ export default function DashboardPage() {
               onClick={() => handleNavClick(item)}
               className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all min-h-[44px] ${
                 activeNav === item.id 
-                  ? 'bg-[var(--iptv-primary)] text-white' 
+                  ? 'bg-[var(--frame-primary)] text-white' 
                   : 'text-white/60 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -364,7 +364,7 @@ export default function DashboardPage() {
           onClick={() => { setActiveNav('settings'); closeSidebar?.(); }}
           className={`flex items-center gap-3 px-3 py-3 rounded-lg w-full min-h-[44px] transition-all ${
             activeNav === 'settings'
-              ? 'bg-[var(--iptv-primary)] text-white'
+              ? 'bg-[var(--frame-primary)] text-white'
               : 'text-white/60 hover:text-white hover:bg-white/5'
           }`}
         >
@@ -376,7 +376,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="h-screen w-screen flex flex-col md:flex-row overflow-hidden bg-[var(--iptv-background)]">
+    <div className="h-screen w-screen flex flex-col md:flex-row overflow-hidden bg-[var(--frame-background)]">
       <LoadingBar />
       <EpgPopup />
       
@@ -384,11 +384,11 @@ export default function DashboardPage() {
       <MobileHeader sidebarContent={SidebarContent} />
       
       {/* Desktop Sidebar - Hidden on mobile */}
-      <aside className={`hidden md:flex ${sidebarOpen ? 'w-64' : 'w-16'} flex-shrink-0 flex-col bg-[var(--iptv-surface-dark)] border-r border-white/5 h-full transition-all duration-300`}>
+      <aside className={`hidden md:flex ${sidebarOpen ? 'w-64' : 'w-16'} flex-shrink-0 flex-col bg-[var(--frame-surface-dark)] border-r border-white/5 h-full transition-all duration-300`}>
         {/* Logo */}
         <div className="p-4 border-b border-white/5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-[var(--iptv-primary)] flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[var(--frame-primary)] flex items-center justify-center shrink-0">
               <Tv className="w-5 h-5 text-white" />
             </div>
             {sidebarOpen && <span className="text-white font-bold">Frame Player</span>}
@@ -429,7 +429,7 @@ export default function DashboardPage() {
                 onClick={() => handleNavClick(item)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
                   activeNav === item.id 
-                    ? 'bg-[var(--iptv-primary)] text-white' 
+                    ? 'bg-[var(--frame-primary)] text-white' 
                     : 'text-white/60 hover:text-white hover:bg-white/5'
                 }`}
               >
@@ -485,7 +485,7 @@ export default function DashboardPage() {
             onClick={() => setActiveNav('settings')}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg w-full transition-all ${
               activeNav === 'settings'
-                ? 'bg-[var(--iptv-primary)] text-white'
+                ? 'bg-[var(--frame-primary)] text-white'
                 : 'text-white/60 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -537,7 +537,7 @@ export default function DashboardPage() {
           
           
           {/* Mobile: Categories OR Content List OR Series Episodes */}
-          <div className="md:hidden flex-1 overflow-hidden bg-[var(--iptv-background)]">
+          <div className="md:hidden flex-1 overflow-hidden bg-[var(--frame-background)]">
             {selectedSeries ? (
               /* Series Episode View */
               <div className="h-full flex flex-col">
@@ -557,7 +557,7 @@ export default function DashboardPage() {
                 {loadingSeries ? (
                   <div className="flex-1 flex items-center justify-center">
                     <div className="text-center">
-                      <div className="w-8 h-8 border-2 border-[var(--iptv-primary)] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                      <div className="w-8 h-8 border-2 border-[var(--frame-primary)] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
                       <p className="text-white/50 text-sm">Bölümler yükleniyor...</p>
                     </div>
                   </div>
@@ -572,7 +572,7 @@ export default function DashboardPage() {
                             onClick={() => setSelectedSeasonNum(season.number)}
                             className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
                               selectedSeasonNum === season.number
-                                ? 'bg-[var(--iptv-primary)] text-white'
+                                ? 'bg-[var(--frame-primary)] text-white'
                                 : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
                             }`}
                           >
@@ -594,7 +594,7 @@ export default function DashboardPage() {
                             key={episode.id}
                             onClick={() => playEpisode(selectedSeries, episode)}
                             className={`flex gap-3 p-3 border-b border-white/5 cursor-pointer transition-colors ${
-                              isPlaying ? 'bg-[var(--iptv-primary)]/10' : 'hover:bg-white/5'
+                              isPlaying ? 'bg-[var(--frame-primary)]/10' : 'hover:bg-white/5'
                             }`}
                           >
                             {/* Episode Thumbnail - Compact */}
@@ -613,7 +613,7 @@ export default function DashboardPage() {
                               
                               {/* Playing indicator badge */}
                               {isPlaying && (
-                                <div className="absolute inset-0 bg-[var(--iptv-primary)]/20 border-2 border-[var(--iptv-primary)] flex items-center justify-center">
+                                <div className="absolute inset-0 bg-[var(--frame-primary)]/20 border-2 border-[var(--frame-primary)] flex items-center justify-center">
                                   <Play className="w-6 h-6 text-white" />
                                 </div>
                               )}
@@ -688,7 +688,7 @@ export default function DashboardPage() {
                       onClick={() => handleCategoryClick(null)}
                       className={`w-full px-4 py-3 rounded-lg text-left font-medium transition-all ${
                         !activeCategory 
-                          ? 'bg-[var(--iptv-primary)] text-white' 
+                          ? 'bg-[var(--frame-primary)] text-white' 
                           : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
                       }`}
                     >
@@ -700,7 +700,7 @@ export default function DashboardPage() {
                         onClick={() => handleCategoryClick(cat)}
                         className={`w-full px-4 py-3 rounded-lg text-left font-medium transition-all ${
                           activeCategory === cat.id
-                            ? 'bg-[var(--iptv-primary)] text-white'
+                            ? 'bg-[var(--frame-primary)] text-white'
                             : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
                         }`}
                       >
@@ -746,7 +746,7 @@ export default function DashboardPage() {
                           onClick={() => handleContentClick(item)}
                           className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all min-h-[56px] ${
                             activeContent?.id === item.id 
-                              ? 'bg-[var(--iptv-primary)]/20 border border-[var(--iptv-primary)]/50' 
+                              ? 'bg-[var(--frame-primary)]/20 border border-[var(--frame-primary)]/50' 
                               : 'hover:bg-white/5 border border-transparent'
                           }`}
                         >
@@ -756,7 +756,7 @@ export default function DashboardPage() {
                           </div>
                           <button 
                             onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }} 
-                            className={`min-w-[44px] min-h-[44px] flex items-center justify-center ${favorites.includes(item.id) ? 'text-[var(--iptv-primary)]' : 'text-white/20 hover:text-white/50'}`}
+                            className={`min-w-[44px] min-h-[44px] flex items-center justify-center ${favorites.includes(item.id) ? 'text-[var(--frame-primary)]' : 'text-white/20 hover:text-white/50'}`}
                           >
                             <Heart className={`w-5 h-5 ${favorites.includes(item.id) ? 'fill-current' : ''}`} />
                           </button>
@@ -770,7 +770,7 @@ export default function DashboardPage() {
           </div>
           
           {/* Desktop: Channel List - Fixed 400px */}
-          <div className="hidden md:flex w-[400px] flex-col min-h-0 border-r border-white/5 bg-[var(--iptv-background)] overflow-hidden">
+          <div className="hidden md:flex w-[400px] flex-col min-h-0 border-r border-white/5 bg-[var(--frame-background)] overflow-hidden">
             {/* Search */}
             <div className="flex p-3 border-b border-white/5 items-center gap-2 shrink-0">
               <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-white/60 hover:text-white shrink-0 min-h-[44px] min-w-[44px]">
@@ -782,7 +782,7 @@ export default function DashboardPage() {
                   placeholder="Kanal ara..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-10 bg-[var(--iptv-input-bg)] border-[var(--iptv-border)] text-white text-sm"
+                  className="pl-9 h-10 bg-[var(--frame-input-bg)] border-[var(--frame-border)] text-white text-sm"
                 />
               </div>
             </div>
@@ -812,7 +812,7 @@ export default function DashboardPage() {
                       onClick={() => handleContentClick(item)}
                       className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all min-h-[56px] ${
                         activeContent?.id === item.id 
-                          ? 'bg-[var(--iptv-primary)]/20 border border-[var(--iptv-primary)]/50' 
+                          ? 'bg-[var(--frame-primary)]/20 border border-[var(--frame-primary)]/50' 
                           : 'hover:bg-white/5 border border-transparent'
                       }`}
                     >
@@ -822,7 +822,7 @@ export default function DashboardPage() {
                       </div>
                       <button 
                         onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }} 
-                        className={`min-w-[44px] min-h-[44px] flex items-center justify-center ${favorites.includes(item.id) ? 'text-[var(--iptv-primary)]' : 'text-white/20 hover:text-white/50'}`}
+                        className={`min-w-[44px] min-h-[44px] flex items-center justify-center ${favorites.includes(item.id) ? 'text-[var(--frame-primary)]' : 'text-white/20 hover:text-white/50'}`}
                       >
                         <Heart className={`w-5 h-5 ${favorites.includes(item.id) ? 'fill-current' : ''}`} />
                       </button>
@@ -837,10 +837,10 @@ export default function DashboardPage() {
           {/* Col 3: Player + EPG - Desktop only, conditionally rendered */}
           {isDesktop && (
             <div className="flex-1 flex flex-col">
-            {/* Video Row: Player + Ad */}
+            {/* Video Row: Player */}
             <div className="shrink-0 flex bg-black">
-              {/* Video Player or Preview - 16:9, 75% width */}
-              <div className="w-[75%]">
+              {/* Video Player or Preview - 16:9, full width */}
+              <div className="w-full">
                 <div className="aspect-video bg-black relative">
                   {activeContent ? (
                     activeContent.type === 'live' || isPlaying ? (
@@ -851,25 +851,12 @@ export default function DashboardPage() {
                   ) : null}
                 </div>
               </div>
-              {/* Ad Area - Right of Player */}
-              <div className="w-[25%] bg-zinc-900 flex items-center justify-center border-l border-white/5 py-4">
-                <div className="w-full h-full min-h-[200px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10 mx-4">
-                  <span className="text-white/30 text-xs">REKLAM ALANI</span>
-                </div>
-              </div>
             </div>
 
-            {/* EPG Section - 40% Ad + 60% EPG */}
-            <div className="flex-1 flex min-h-0 bg-[var(--iptv-surface-dark)] overflow-hidden border-t border-white/5">
-              {/* Ad Section - 40% or 100% if no EPG/content info (LEFT SIDE) */}
-              <div className={`flex items-center justify-center border-r border-white/5 py-4 ${activeContent && (activeContent.type === 'live' && currentEpg.length > 0 || activeContent.type !== 'live') ? 'w-[40%]' : 'flex-1'}`}>
-                <div className="w-full h-full min-h-[150px] flex flex-col items-center justify-center bg-white/5 rounded-lg border border-dashed border-white/10 mx-6">
-                  <span className="text-white/30 text-xs">REKLAM ALANI</span>
-                </div>
-              </div>
-              
-              {/* Channel Info + EPG List - 60% or hidden if no active content (RIGHT SIDE) */}
-              <div className={`flex flex-col min-h-0 overflow-hidden ${activeContent && (activeContent.type === 'live' && currentEpg.length > 0 || activeContent.type !== 'live') ? 'w-[60%]' : 'w-0 hidden'}`}>
+            {/* EPG Section */}
+            <div className="flex-1 flex min-h-0 bg-[var(--frame-surface-dark)] overflow-hidden border-t border-white/5">
+              {/* Channel Info + EPG List */}
+              <div className={`flex flex-col min-h-0 overflow-hidden ${activeContent && (activeContent.type === 'live' && currentEpg.length > 0 || activeContent.type !== 'live') ? 'w-full' : 'w-0 hidden'}`}>
                 {activeContent ? (
                   <>
                     {activeContent.type === 'live' ? (
@@ -900,12 +887,12 @@ export default function DashboardPage() {
                                   onClick={() => handleProgramClick(program)}
                                   className={`rounded-lg p-2.5 cursor-pointer transition-colors ${
                                     isCurrentProgram(program)
-                                      ? 'bg-[var(--iptv-primary)]/15 border border-[var(--iptv-primary)]/20'
-                                      : 'bg-[var(--iptv-surface)] hover:bg-white/5'
+                                      ? 'bg-[var(--frame-primary)]/15 border border-[var(--frame-primary)]/20'
+                                      : 'bg-[var(--frame-surface)] hover:bg-white/5'
                                   }`}
                                 >
                                   <div className="flex items-center gap-2">
-                                    <p className={`text-sm ${isCurrentProgram(program) ? 'text-[var(--iptv-primary)] font-bold' : 'text-white/70 font-medium'}`}>{formatTime(program.start)}</p>
+                                    <p className={`text-sm ${isCurrentProgram(program) ? 'text-[var(--frame-primary)] font-bold' : 'text-white/70 font-medium'}`}>{formatTime(program.start)}</p>
                                     <p className="text-white text-sm truncate flex-1">{program.title}</p>
                                     {isCurrentProgram(program) && (
                                       <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-medium animate-pulse">CANLI</span>
@@ -926,7 +913,7 @@ export default function DashboardPage() {
                     ) : activeContent.type === 'series' ? (
                       <SeriesInfoPanel content={activeContent} />
                     ) : (
-                      <div className={`h-full ${isPlaying ? 'bg-[var(--iptv-surface-dark)]' : 'p-4'}`}>
+                      <div className={`h-full ${isPlaying ? 'bg-[var(--frame-surface-dark)]' : 'p-4'}`}>
                         {isPlaying ? (
                           <div className="h-full overflow-y-auto">
                             <ContentDetails content={activeContent} variant="compact" />

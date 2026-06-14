@@ -86,7 +86,7 @@ export function ConfirmProvider({ children }: ConfirmProviderProps) {
     <ConfirmContext.Provider value={{ confirm }}>
       {children}
       <Dialog open={isOpen} onOpenChange={(open) => !open && handleCancel()}>
-        <DialogContent className="bg-[var(--iptv-surface)] border-white/10 text-white max-w-md">
+        <DialogContent className="bg-[var(--frame-surface)] border-white/10 text-white max-w-md">
           <DialogHeader>
             <div className="flex flex-col items-center text-center gap-4 py-4">
               {getIcon(options?.type)}

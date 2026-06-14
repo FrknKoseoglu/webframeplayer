@@ -131,26 +131,26 @@
 
 /* Frame Player Design System */
 :root {
-  --iptv-primary: #ea2a33;
-  --iptv-primary-dark: #c21e26;
-  --iptv-background: #161616;
-  --iptv-surface: #211111;
-  --iptv-surface-dark: #120808;
-  --iptv-input-bg: #2a1819;
-  --iptv-border: #3d2526;
-  --iptv-text-secondary: #c89295;
+  --frame-primary: #ea2a33;
+  --frame-primary-dark: #c21e26;
+  --frame-background: #161616;
+  --frame-surface: #211111;
+  --frame-surface-dark: #120808;
+  --frame-input-bg: #2a1819;
+  --frame-border: #3d2526;
+  --frame-text-secondary: #c89295;
 }
 
 html, body {
-  background-color: var(--iptv-background);
+  background-color: var(--frame-background);
   color: white;
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Vidstack Player Overrides */
 .vds-video-layout {
-  --media-brand: var(--iptv-primary);
-  --media-focus-ring-color: var(--iptv-primary);
+  --media-brand: var(--frame-primary);
+  --media-focus-ring-color: var(--frame-primary);
 }
 
 /* Focus styles for keyboard navigation */
@@ -166,7 +166,7 @@ html, body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--iptv-primary);
+  outline: 2px solid var(--frame-primary);
   outline-offset: 2px;
 }
 
@@ -177,7 +177,7 @@ html, body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--iptv-background);
+  background: var(--frame-background);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -186,7 +186,7 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--iptv-primary);
+  background: var(--frame-primary);
 }
 
 /* Hide scrollbar for clean UI */

@@ -29,7 +29,7 @@ export function ContentDetails({ content, variant = 'default' }: ContentDetailsP
   // Shared Popup Content
   const popupContent = (
     <Dialog open={showFullDetails} onOpenChange={setShowFullDetails}>
-      <DialogContent className="bg-[var(--iptv-surface)] border-white/10 text-white max-w-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="bg-[var(--frame-surface)] border-white/10 text-white max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white mb-2">
             {content.name}
@@ -165,11 +165,11 @@ export function ContentDetails({ content, variant = 'default' }: ContentDetailsP
               className="w-full h-full object-cover opacity-80"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-[var(--iptv-surface)]">
+            <div className="w-full h-full flex items-center justify-center bg-[var(--frame-surface)]">
               <Play className="w-12 h-12 text-white/20" />
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[var(--iptv-surface-dark)] to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--frame-surface-dark)] to-transparent" />
           
           <div className="absolute bottom-3 left-3 right-3">
             <h3 className="text-lg font-bold text-white line-clamp-2 shadow-black drop-shadow-md">
@@ -206,14 +206,14 @@ export function ContentDetails({ content, variant = 'default' }: ContentDetailsP
             {content.plot || "Bu içerik için detaylı açıklama bulunmuyor."}
           </p>
           {content.plot && (
-            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[var(--iptv-surface-dark)] to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[var(--frame-surface-dark)] to-transparent" />
           )}
         </div>
 
         {/* Actions */}
         <div className="mt-4 pt-4 border-t border-white/5">
           <Button 
-            className="w-full bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary)]/90 text-white gap-2"
+            className="w-full bg-[var(--frame-primary)] hover:bg-[var(--frame-primary)]/90 text-white gap-2"
             onClick={() => setShowFullDetails(true)}
           >
             <Info className="w-4 h-4" />

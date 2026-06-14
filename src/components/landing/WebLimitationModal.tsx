@@ -30,7 +30,7 @@ export function WebLimitationModal({ isOpen, onClose }: WebLimitationModalProps)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="relative bg-[var(--iptv-surface-dark)] border border-white/10 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+      <div className="relative bg-[var(--frame-surface-dark)] border border-white/10 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -56,15 +56,15 @@ export function WebLimitationModal({ isOpen, onClose }: WebLimitationModalProps)
         {/* Body */}
         <p className="text-white/70 text-center mb-8 leading-relaxed">
           {language === 'tr'
-            ? 'Tarayıcıların güvenlik politikaları (CORS) nedeniyle bazı IPTV yayınları web sürümünde açılmayabilir. Kesintisiz deneyim için Masaüstü Uygulamasını öneriyoruz.'
-            : 'Due to browser security policies (CORS), some IPTV streams may not work in the web version. We recommend the Desktop App for a seamless experience.'}
+            ? 'Tarayıcıların güvenlik politikaları (CORS) nedeniyle bazı Yayın yayınları web sürümünde açılmayabilir. Kesintisiz deneyim için Masaüstü Uygulamasını öneriyoruz.'
+            : 'Due to browser security policies (CORS), some Yayın streams may not work in the web version. We recommend the Desktop App for a seamless experience.'}
         </p>
 
         {/* Buttons */}
         <div className="space-y-3">
           <Button
             onClick={handleDownload}
-            className="w-full bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white py-6 text-lg rounded-xl shadow-lg shadow-red-500/25"
+            className="w-full bg-[var(--frame-primary)] hover:bg-[var(--frame-primary-dark)] text-white py-6 text-lg rounded-xl shadow-lg shadow-red-500/25"
           >
             <Download className="w-5 h-5 mr-2" />
             {language === 'tr' ? 'Uygulamayı İndir' : 'Download App'}

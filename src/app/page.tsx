@@ -40,7 +40,7 @@ function HomeContent() {
 
   // Electron auto-boot: show nothing (blank dark screen) while redirecting
   if (isElectronBoot) {
-    return <div className="min-h-screen bg-[var(--iptv-background)]" />;
+    return <div className="min-h-screen bg-[var(--frame-background)]" />;
   }
 
   // Show import handler
@@ -77,7 +77,7 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[var(--iptv-background)]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--frame-background)]" />}>
       <HomeContent />
     </Suspense>
   );

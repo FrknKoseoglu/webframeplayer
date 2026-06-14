@@ -79,7 +79,7 @@ export function HomeView({ onNavigate, backgroundImage }: HomeViewProps) {
         {/* Welcome Text */}
         <div className="mb-8 md:mb-12">
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 md:mb-4">
-            Hoş Geldiniz, <span className="text-[var(--iptv-primary)]">{activeProfile?.name}</span>
+            Hoş Geldiniz, <span className="text-[var(--frame-primary)]">{activeProfile?.name}</span>
           </h1>
           <p className="text-lg md:text-xl text-white/60">
             İzlemek istediğiniz kategoriyi seçin

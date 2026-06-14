@@ -14,7 +14,7 @@ export interface Profile {
   credentials?: XtreamCredentials;
   supportUrl?: string; // Optional support URL from service provider
   logoUrl?: string; // Optional logo URL from service provider
-  adFree?: boolean; // If true, ads are disabled for this profile (provider magic links)
+  adFree?: boolean; // If true, ads are disabled for this profile (provider magic codes)
   active: boolean;
   createdAt: number;
   lastRefresh?: number; // Timestamp of last content refresh

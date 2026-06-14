@@ -68,7 +68,7 @@ private:
         mpv_set_option_string(handle, "hwdec", "no");
         mpv_set_option_string(handle, "video-output-levels", "full");
         
-        // Network options for IPTV streams (bypass bot blocks and SSL cert errors)
+        // Network options for network streams (bypass bot blocks and SSL cert errors)
         mpv_set_option_string(handle, "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
         mpv_set_option_string(handle, "tls-verify", "no");
         mpv_set_option_string(handle, "network-timeout", "15");

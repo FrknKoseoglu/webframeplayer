@@ -85,7 +85,7 @@ function LoginPageContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[var(--iptv-background)]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--frame-background)]" />}>
       <LoginPageContent />
     </Suspense>
   );

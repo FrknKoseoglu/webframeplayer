@@ -84,7 +84,7 @@ export function SeriesInfoPanel({ content }: SeriesInfoPanelProps) {
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-[var(--iptv-primary)] animate-spin" />
+        <Loader2 className="w-6 h-6 text-[var(--frame-primary)] animate-spin" />
       </div>
     );
   }
@@ -111,9 +111,9 @@ export function SeriesInfoPanel({ content }: SeriesInfoPanelProps) {
                 onClick={() => setSelectedSeason(season)}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all ${
                   selectedSeason?.number === season.number
-                    ? 'bg-[var(--iptv-primary)] text-white'
+                    ? 'bg-[var(--frame-primary)] text-white'
                     : currentlyPlayingSeason === season.number
-                    ? 'bg-[var(--iptv-primary)]/30 text-[var(--iptv-primary)] border border-[var(--iptv-primary)]/50'
+                    ? 'bg-[var(--frame-primary)]/30 text-[var(--frame-primary)] border border-[var(--frame-primary)]/50'
                     : 'bg-white/5 text-white/60 hover:bg-white/10'
                 }`}
               >
@@ -135,14 +135,14 @@ export function SeriesInfoPanel({ content }: SeriesInfoPanelProps) {
                 onMouseLeave={() => setHoveredEpisode(null)}
                 className={`group relative flex items-center gap-2 p-1.5 rounded-lg cursor-pointer transition-all overflow-hidden ${
                   isEpisodePlaying(episode)
-                    ? 'bg-[var(--iptv-primary)]/20 border border-[var(--iptv-primary)]/30'
+                    ? 'bg-[var(--frame-primary)]/20 border border-[var(--frame-primary)]/30'
                     : 'bg-white/5 hover:bg-white/10'
                 }`}
               >
                 {/* Season + Episode Number */}
                 <div className={`shrink-0 text-[10px] font-bold w-12 text-center ${
                   isEpisodePlaying(episode) 
-                    ? 'text-[var(--iptv-primary)]' 
+                    ? 'text-[var(--frame-primary)]' 
                     : 'text-white/60'
                 }`}>
                   S{episode.seasonNum}E{episode.episodeNum}
@@ -209,7 +209,7 @@ export function SeriesInfoPanel({ content }: SeriesInfoPanelProps) {
                     </>
                   )}
                   {isEpisodePlaying(episode) ? (
-                    <span className="text-[9px] text-[var(--iptv-primary)] font-bold">OYNATILIYOR</span>
+                    <span className="text-[9px] text-[var(--frame-primary)] font-bold">OYNATILIYOR</span>
                   ) : (
                     <ChevronRight className="w-3 h-3 text-white/20 group-hover:text-white/60 transition-colors" />
                   )}

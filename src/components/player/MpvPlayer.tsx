@@ -419,8 +419,8 @@ export function MpvPlayer({ src, onError, isLive = false, channelName, channelLo
             )}
 
             <div className="flex items-center gap-4">
-              <button onClick={() => window.mpv?.play()} className={`p-2 rounded-full transition-colors ${!isPaused ? 'bg-[var(--iptv-primary)]/20' : 'hover:bg-white/10'}`}><Play className={`w-6 h-6 fill-current ${!isPaused ? 'text-[var(--iptv-primary)]' : 'text-white'}`} /></button>
-              <button onClick={() => window.mpv?.pause()} className={`p-2 rounded-full transition-colors ${isPaused ? 'bg-[var(--iptv-primary)]/20' : 'hover:bg-white/10'}`}><Pause className={`w-6 h-6 fill-current ${isPaused ? 'text-[var(--iptv-primary)]' : 'text-white'}`} /></button>
+              <button onClick={() => window.mpv?.play()} className={`p-2 rounded-full transition-colors ${!isPaused ? 'bg-[var(--frame-primary)]/20' : 'hover:bg-white/10'}`}><Play className={`w-6 h-6 fill-current ${!isPaused ? 'text-[var(--frame-primary)]' : 'text-white'}`} /></button>
+              <button onClick={() => window.mpv?.pause()} className={`p-2 rounded-full transition-colors ${isPaused ? 'bg-[var(--frame-primary)]/20' : 'hover:bg-white/10'}`}><Pause className={`w-6 h-6 fill-current ${isPaused ? 'text-[var(--frame-primary)]' : 'text-white'}`} /></button>
               
               {isVod && (
                 <>

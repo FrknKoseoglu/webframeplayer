@@ -42,10 +42,10 @@ export function ServiceSelector({ onAddNew, onSelect }: ServiceSelectorProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--iptv-background)] text-white flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-[var(--frame-background)] text-white flex flex-col items-center justify-center p-6">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-[var(--iptv-primary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-[var(--frame-primary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
           <Tv className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-2xl font-bold text-white mb-2">Hizmet Seçin</h1>
@@ -58,11 +58,11 @@ export function ServiceSelector({ onAddNew, onSelect }: ServiceSelectorProps) {
           <div
             key={profile.id}
             onClick={() => onSelect(profile)}
-            className="group relative bg-[var(--iptv-surface)] border border-white/5 rounded-xl p-5 flex items-center gap-4 cursor-pointer transition-all hover:bg-[var(--iptv-surface)]/80 hover:border-[var(--iptv-primary)]/30"
+            className="group relative bg-[var(--frame-surface)] border border-white/5 rounded-xl p-5 flex items-center gap-4 cursor-pointer transition-all hover:bg-[var(--frame-surface)]/80 hover:border-[var(--frame-primary)]/30"
           >
             {/* Icon */}
-            <div className="w-12 h-12 bg-[var(--iptv-primary)]/20 rounded-xl flex items-center justify-center shrink-0">
-              <Tv className="w-6 h-6 text-[var(--iptv-primary)]" />
+            <div className="w-12 h-12 bg-[var(--frame-primary)]/20 rounded-xl flex items-center justify-center shrink-0">
+              <Tv className="w-6 h-6 text-[var(--frame-primary)]" />
             </div>
 
             {/* Info */}
@@ -83,7 +83,7 @@ export function ServiceSelector({ onAddNew, onSelect }: ServiceSelectorProps) {
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
-              <div className="w-8 h-8 bg-[var(--iptv-primary)] rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-[var(--frame-primary)] rounded-full flex items-center justify-center">
                 <Play className="w-4 h-4 text-white ml-0.5" />
               </div>
             </div>
@@ -93,7 +93,7 @@ export function ServiceSelector({ onAddNew, onSelect }: ServiceSelectorProps) {
         {/* Add New Service Button */}
         <button
           onClick={onAddNew}
-          className="flex items-center justify-center gap-3 p-5 rounded-xl border-2 border-dashed border-white/10 hover:border-[var(--iptv-primary)]/50 hover:bg-[var(--iptv-primary)]/5 transition-all text-white/60 hover:text-white"
+          className="flex items-center justify-center gap-3 p-5 rounded-xl border-2 border-dashed border-white/10 hover:border-[var(--frame-primary)]/50 hover:bg-[var(--frame-primary)]/5 transition-all text-white/60 hover:text-white"
         >
           <Plus className="w-5 h-5" />
           <span className="font-medium">Yeni Hizmet Ekle</span>

@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
-        'User-Agent': 'IPTV-Player/1.0',
+        'User-Agent': 'Yayın-Player/1.0',
       },
     });
 
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       
       const response = await fetch(xmlUrl, {
         method: 'GET',
-        headers: { 'User-Agent': 'IPTV-Player/1.0' },
+        headers: { 'User-Agent': 'Yayın-Player/1.0' },
       });
 
       if (!response.ok) {

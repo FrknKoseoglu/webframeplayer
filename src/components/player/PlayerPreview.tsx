@@ -90,7 +90,7 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
             className="w-full h-full object-cover opacity-40 blur-md scale-110 group-hover:scale-105 transition-transform duration-1000"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[var(--iptv-surface-dark)] to-black" />
+          <div className="w-full h-full bg-gradient-to-br from-[var(--frame-surface-dark)] to-black" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
       </div>
@@ -130,7 +130,7 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
                     {content.duration && (
                       <span className="text-white/80 border-l border-white/20 pl-3">{formatDuration(content.duration)}</span>
                     )}
-                    <span className="text-[var(--iptv-primary)] font-bold border-l border-white/20 pl-3 uppercase tracking-wider">
+                    <span className="text-[var(--frame-primary)] font-bold border-l border-white/20 pl-3 uppercase tracking-wider">
                       DİZİ
                     </span>
                   </div>
@@ -138,10 +138,10 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
                   {/* Title - Clickable */}
                   <h1 
                     onClick={() => setShowDetailsDialog(true)}
-                    className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight drop-shadow-xl cursor-pointer hover:text-[var(--iptv-primary)] transition-colors flex items-center gap-3 group"
+                    className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight drop-shadow-xl cursor-pointer hover:text-[var(--frame-primary)] transition-colors flex items-center gap-3 group"
                   >
                     {content.name}
-                    <Info className="w-6 h-6 text-white/40 group-hover:text-[var(--iptv-primary)] transition-colors" />
+                    <Info className="w-6 h-6 text-white/40 group-hover:text-[var(--frame-primary)] transition-colors" />
                   </h1>
 
                   {/* Plot */}
@@ -183,7 +183,7 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
                 {content.duration && (
                   <span className="text-white/80 border-l border-white/20 pl-3">{formatDuration(content.duration)}</span>
                 )}
-                <span className="text-[var(--iptv-primary)] font-bold border-l border-white/20 pl-3 uppercase tracking-wider">
+                <span className="text-[var(--frame-primary)] font-bold border-l border-white/20 pl-3 uppercase tracking-wider">
                   {content.type === 'series' ? 'DİZİ' : 'FİLM'}
                 </span>
               </div>
@@ -191,10 +191,10 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
               {/* Title - Clickable, Left-aligned */}
               <h1 
                 onClick={() => setShowDetailsDialog(true)}
-                className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight drop-shadow-xl cursor-pointer hover:text-[var(--iptv-primary)] transition-colors flex items-center gap-3 group"
+                className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight drop-shadow-xl cursor-pointer hover:text-[var(--frame-primary)] transition-colors flex items-center gap-3 group"
               >
                 {content.name}
-                <Info className="w-6 h-6 text-white/40 group-hover:text-[var(--iptv-primary)] transition-colors" />
+                <Info className="w-6 h-6 text-white/40 group-hover:text-[var(--frame-primary)] transition-colors" />
               </h1>
 
               {/* Plot - Left-aligned */}
@@ -224,7 +224,7 @@ export function PlayerPreview({ content }: PlayerPreviewProps) {
                       clearPlaybackError();
                       startPlayback();
                     }}
-                    className="h-14 px-8 bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary)]/90 text-white rounded-xl gap-3 text-lg font-semibold shadow-lg shadow-[var(--iptv-primary)]/20 transition-all hover:scale-105"
+                    className="h-14 px-8 bg-[var(--frame-primary)] hover:bg-[var(--frame-primary)]/90 text-white rounded-xl gap-3 text-lg font-semibold shadow-lg shadow-[var(--frame-primary)]/20 transition-all hover:scale-105"
                   >
                     <Play className="w-6 h-6 fill-current" />
                     {playbackError ? 'TEKRAR DENE' : 'HEMEN İZLE'}
@@ -369,7 +369,7 @@ function CopyLinkButton({ url }: { url: string }) {
             
             <Button 
               onClick={handleClose}
-              className="w-full bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white"
+              className="w-full bg-[var(--frame-primary)] hover:bg-[var(--frame-primary-dark)] text-white"
             >
               Tamam
             </Button>

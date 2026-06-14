@@ -11,12 +11,12 @@ export function Footer() {
   const language = usePlayerStore((s) => s.language);
 
   return (
-    <footer className="py-12 bg-[var(--iptv-background)] border-t border-white/10">
+    <footer className="py-12 bg-[var(--frame-background)] border-t border-white/10">
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[var(--iptv-primary)] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-[var(--frame-primary)] flex items-center justify-center">
               <Tv className="w-5 h-5 text-white" />
             </div>
             <span className="text-white font-bold tracking-[0.2em]">FRAME</span>
@@ -30,10 +30,6 @@ export function Footer() {
             <span className="text-white/20">·</span>
             <Link href="/legal/privacy" className="hover:text-white transition-colors">
               {language === 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy'}
-            </Link>
-            <span className="text-white/20">·</span>
-            <Link href="/legal/faq" className="hover:text-white transition-colors">
-              {language === 'tr' ? 'Sıkça Sorulan Sorular' : 'FAQ'}
             </Link>
           </div>
 

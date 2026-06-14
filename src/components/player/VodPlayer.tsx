@@ -6,7 +6,7 @@ import Hls from 'hls.js';
 import { X, AlertTriangle, EyeOff } from 'lucide-react';
 import { usePlayerStore } from '@/store/usePlayerStore';
 
-const MKV_WARNING_KEY = 'iptv_mkv_warning_dismissed';
+const MKV_WARNING_KEY = 'frame_mkv_warning_dismissed';
 
 interface VodPlayerProps {
   src: string;
@@ -104,7 +104,7 @@ export function VodPlayer({ src, poster, title }: VodPlayerProps) {
       airplay: true,
       theme: '#E50914',
       moreVideoAttr: {
-        // crossOrigin removed: IPTV servers don't return CORS headers,
+        // crossOrigin removed: Yayın servers don't return CORS headers,
         // and Electron has webSecurity:false so it's not needed
       },
       settings: [],

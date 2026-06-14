@@ -22,7 +22,7 @@ export function MobileHeader({ sidebarContent }: MobileHeaderProps) {
   return (
     <>
       {/* Mobile Header Bar - Only visible on mobile */}
-      <header className="md:hidden sticky top-0 z-50 safe-area-top bg-[var(--iptv-surface-dark)] border-b border-white/5">
+      <header className="md:hidden sticky top-0 z-50 safe-area-top bg-[var(--frame-surface-dark)] border-b border-white/5">
         <div className="flex items-center justify-between h-14 px-4">
           {/* Left: Hamburger Menu */}
           <Button
@@ -36,7 +36,7 @@ export function MobileHeader({ sidebarContent }: MobileHeaderProps) {
 
           {/* Center: Logo */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-[var(--iptv-primary)] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-[var(--frame-primary)] flex items-center justify-center">
               <Tv className="w-4 h-4 text-white" />
             </div>
             <span className="text-white font-bold tracking-[0.2em] text-lg">FRAME</span>
@@ -49,7 +49,7 @@ export function MobileHeader({ sidebarContent }: MobileHeaderProps) {
 
       {/* Mobile Sidebar Drawer */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-72 p-0 bg-[var(--iptv-surface-dark)] border-[var(--iptv-border)]">
+        <SheetContent side="left" className="w-72 p-0 bg-[var(--frame-surface-dark)] border-[var(--frame-border)]">
           <SheetHeader className="sr-only">
             <SheetTitle>Navigation Menu</SheetTitle>
           </SheetHeader>

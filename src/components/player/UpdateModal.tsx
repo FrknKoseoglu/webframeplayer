@@ -88,7 +88,7 @@ export function UpdateModal({ isOpen, onClose, currentVersion, latestVersion }: 
           </Button>
           <Button
             onClick={handleDownload}
-            className="bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white gap-2"
+            className="bg-[var(--frame-primary)] hover:bg-[var(--frame-primary-dark)] text-white gap-2"
           >
             <Download className="w-4 h-4" />
             {language === 'tr' ? 'Hemen İndir' : 'Download Now'}

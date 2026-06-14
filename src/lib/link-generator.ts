@@ -1,5 +1,5 @@
 /**
- * Magic Link Generator — Serverless, client-side only
+ * Magic Code Generator — Serverless, client-side only
  * 
  * Compresses link data using lz-string for short URLs.
  * All data lives in the URL hash, no database needed.
@@ -120,7 +120,7 @@ function expandKeys(mini: Record<string, string | number>): MagicLinkData {
 }
 
 /**
- * Map legacy Base64-encoded keys (from old /m/ magic links) to new format.
+ * Map legacy Base64-encoded keys (from old /m/ magic codes) to new format.
  * Supports both old plain URL param names and new minified keys.
  */
 function mapLegacyKeys(obj: Record<string, string>): MagicLinkData {
@@ -151,7 +151,7 @@ function mapLegacyKeys(obj: Record<string, string>): MagicLinkData {
 // ─── URL Builder ────────────────────────────────────────────────
 
 /**
- * Build a full magic link URL from data.
+ * Build a full magic code URL from data.
  * Uses window.location.origin as the base URL.
  */
 export function buildMagicUrl(data: MagicLinkData): string {

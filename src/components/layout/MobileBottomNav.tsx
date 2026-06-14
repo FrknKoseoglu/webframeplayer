@@ -24,7 +24,7 @@ export function MobileBottomNav({ activeNav, onNavClick }: MobileBottomNavProps)
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <div className="md:hidden sticky top-0 z-30 bg-[var(--iptv-surface-dark)] border-b border-white/10">
+    <div className="md:hidden sticky top-0 z-30 bg-[var(--frame-surface-dark)] border-b border-white/10">
       <div className="flex items-center justify-around py-2 px-2">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
@@ -36,7 +36,7 @@ export function MobileBottomNav({ activeNav, onNavClick }: MobileBottomNavProps)
               onClick={() => onNavClick(item.id, item.contentType)}
               className={`flex items-center justify-center w-14 h-14 rounded-xl transition-all ${
                 isActive
-                  ? 'bg-[var(--iptv-primary)] text-white'
+                  ? 'bg-[var(--frame-primary)] text-white'
                   : 'text-white/50 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -50,7 +50,7 @@ export function MobileBottomNav({ activeNav, onNavClick }: MobileBottomNavProps)
           onClick={() => setSearchOpen(!searchOpen)}
           className={`flex items-center justify-center w-14 h-14 rounded-xl transition-all ${
             searchOpen
-              ? 'bg-[var(--iptv-primary)] text-white'
+              ? 'bg-[var(--frame-primary)] text-white'
               : 'text-white/50 hover:text-white hover:bg-white/5'
           }`}
         >

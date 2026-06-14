@@ -121,9 +121,9 @@ export function ProfileLoaderScreen({ profileName, bootStep, completedSteps }: {
   completedSteps: string[];
 }) {
   return (
-    <div className="min-h-screen bg-[var(--iptv-background)] flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--frame-background)] flex flex-col items-center justify-center p-4">
       <div className="flex flex-col items-center gap-6 animate-fade-in-up w-full max-w-sm">
-        <div className="w-20 h-20 bg-[var(--iptv-primary)] rounded-3xl flex items-center justify-center shadow-glow mb-2">
+        <div className="w-20 h-20 bg-[var(--frame-primary)] rounded-3xl flex items-center justify-center shadow-glow mb-2">
           <Tv className="w-10 h-10 text-white" />
         </div>
 
@@ -149,7 +149,7 @@ export function ProfileLoaderScreen({ profileName, bootStep, completedSteps }: {
                 {isCompleted ? (
                   <CheckCircle className="w-4 h-4 text-green-400 shrink-0" />
                 ) : isCurrent ? (
-                  <Loader2 className="w-4 h-4 text-[var(--iptv-primary)] animate-spin shrink-0" />
+                  <Loader2 className="w-4 h-4 text-[var(--frame-primary)] animate-spin shrink-0" />
                 ) : (
                   <div className="w-4 h-4 rounded-full border border-white/20 shrink-0" />
                 )}

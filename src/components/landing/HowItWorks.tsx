@@ -29,7 +29,7 @@ export function HowItWorks() {
   ];
 
   return (
-    <section className="py-20 md:py-32 bg-[var(--iptv-background)]">
+    <section className="py-20 md:py-32 bg-[var(--frame-background)]">
       <div className="max-w-5xl mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -48,11 +48,11 @@ export function HowItWorks() {
               <div key={index} className="relative text-center">
                 {/* Connector Line (hidden on mobile) */}
                 {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-8 left-[60%] w-full h-0.5 bg-gradient-to-r from-[var(--iptv-primary)]/50 to-transparent" />
+                  <div className="hidden md:block absolute top-8 left-[60%] w-full h-0.5 bg-gradient-to-r from-[var(--frame-primary)]/50 to-transparent" />
                 )}
 
                 {/* Step Number */}
-                <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--iptv-primary)] to-red-700 mb-6">
+                <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--frame-primary)] to-red-700 mb-6">
                   <span className="text-2xl font-bold text-white">{step.number}</span>
                 </div>
 

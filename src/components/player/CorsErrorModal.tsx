@@ -111,7 +111,7 @@ export function CorsErrorModal({ isOpen, onClose, domainName, magicLink }: CorsE
               className="border-purple-500/20 text-purple-400 hover:bg-purple-500/10"
             >
               {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
-              {copied ? 'Kopyalandı!' : 'Sihirli Bağlantı Kopyala'}
+              {copied ? 'Kopyalandı!' : 'Sihirli Kod Kopyala'}
             </Button>
           )}
           <Button

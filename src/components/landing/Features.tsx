@@ -47,7 +47,7 @@ export function Features() {
   ];
 
   return (
-    <section id="features" className="py-20 md:py-32 bg-[var(--iptv-surface-dark)]">
+    <section id="features" className="py-20 md:py-32 bg-[var(--frame-surface-dark)]">
       <div className="max-w-6xl mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-16">

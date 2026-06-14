@@ -60,22 +60,35 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
     if (!magicUrl) return;
 
     try {
-      let dParam: string | null = null;
-      try {
-        const url = new URL(magicUrl);
-        dParam = url.searchParams.get('d');
-      } catch {
-        setError('Geçersiz bir URL girdiniz.');
+      const codeString = magicUrl.trim();
+      let decoded: any = null;
+
+      if (codeString.startsWith('frame-')) {
+        const base64Part = codeString.substring(6);
+        decoded = JSON.parse(atob(base64Part));
+      } else {
+        // Fallback: URL check
+        try {
+          const url = new URL(codeString);
+          const dParam = url.searchParams.get('d');
+          if (dParam) {
+            decoded = JSON.parse(atob(dParam));
+          }
+        } catch {
+          // Fallback: direct base64 check
+          try {
+            decoded = JSON.parse(atob(codeString));
+          } catch {
+            // Not base64
+          }
+        }
+      }
+
+      if (!decoded) {
+        setError('Geçersiz Magic Code.');
         return;
       }
 
-      if (!dParam) {
-        setError('Bu URL sihirli bir bağlantı (' + magicUrl + ') değil.');
-        return;
-      }
-
-      const decoded = JSON.parse(atob(dParam));
-      
       if (decoded.importUrl) {
          setM3uUrl(decoded.importUrl);
          setM3uName(decodeURIComponent(decoded.serviceName || ''));
@@ -97,10 +110,10 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
            handleXtreamLogin(fakeEvent);
          }, 0);
       } else {
-         setError('Sihirli bağlantı bilgileri okunamadı.');
+         setError('Magic Code bilgileri okunamadı.');
       }
     } catch (err) {
-      setError('Bağlantı ayrıştırılamadı. Geçerli bir Sihirli Bağlantı (Magic Link) olduğundan emin olun.');
+      setError('Magic Code ayrıştırılamadı. Geçerli bir Magic Code girdiğinizden emin olun.');
     }
   };
 
@@ -280,11 +293,11 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--iptv-background)] text-white flex flex-col overflow-hidden relative selection:bg-[var(--iptv-primary)] selection:text-white">
+    <div className="min-h-screen bg-[var(--frame-background)] text-white flex flex-col overflow-hidden relative selection:bg-[var(--frame-primary)] selection:text-white">
       {/* Ambient Background Effect */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[var(--iptv-primary)]/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-[var(--iptv-primary)]/5 blur-[100px] rounded-full" />
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[var(--frame-primary)]/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-[var(--frame-primary)]/5 blur-[100px] rounded-full" />
       </div>
 
       {/* Main Content */}
@@ -292,14 +305,14 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
         <div className="w-full max-w-[880px] flex flex-col gap-8 animate-fade-in-up">
           {/* Logo / Header */}
           <div className="flex flex-col items-center justify-center text-center space-y-4">
-            <div className="w-16 h-16 bg-[var(--iptv-primary)] rounded-2xl flex items-center justify-center shadow-glow mb-2">
+            <div className="w-16 h-16 bg-[var(--frame-primary)] rounded-2xl flex items-center justify-center shadow-glow mb-2">
               <Tv className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-white">
               {isEditMode ? 'Hizmeti Düzenle' : onBack ? 'Yeni Hizmet Ekle' : 'Frame Player'}
             </h1>
             <p className="text-gray-400 text-sm font-medium">
-              {isEditMode ? 'Hizmet bilgilerini güncelleyin' : onBack ? 'Yeni bir IPTV hizmeti ekleyin' : 'Hesabınıza giriş yaparak yayınların keyfini çıkarın'}
+              {isEditMode ? 'Hizmet bilgilerini güncelleyin' : onBack ? 'Yeni bir Yayın hizmeti ekleyin' : 'Hesabınıza giriş yaparak yayınların keyfini çıkarın'}
             </p>
             {onBack && (
               <Button
@@ -313,14 +326,14 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
           </div>
 
           {/* Login Card */}
-          <div className="bg-[var(--iptv-surface)]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 sm:p-8 shadow-2xl flex flex-col gap-6">
+          <div className="bg-[var(--frame-surface)]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 sm:p-8 shadow-2xl flex flex-col gap-6">
             {/* Tabs */}
-            <div className="flex gap-2 bg-[var(--iptv-input-bg)] p-1 rounded-xl">
+            <div className="flex gap-2 bg-[var(--frame-input-bg)] p-1 rounded-xl">
               <button
                 onClick={() => setActiveTab('xtream')}
                 className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
                   activeTab === 'xtream'
-                    ? 'bg-[var(--iptv-primary)] text-white shadow-lg'
+                    ? 'bg-[var(--frame-primary)] text-white shadow-lg'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -330,7 +343,7 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
                 onClick={() => setActiveTab('m3u')}
                 className={`flex-1 py-2.5 px-2 sm:px-4 rounded-lg text-sm font-semibold transition-all ${
                   activeTab === 'm3u'
-                    ? 'bg-[var(--iptv-primary)] text-white shadow-lg'
+                    ? 'bg-[var(--frame-primary)] text-white shadow-lg'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -344,7 +357,7 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                Magic Link
+                Magic Code
               </button>
             </div>
 
@@ -359,12 +372,12 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
             {isLoading && (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-3 text-sm text-gray-300">
-                  <Loader2 className="w-4 h-4 animate-spin text-[var(--iptv-primary)]" />
+                  <Loader2 className="w-4 h-4 animate-spin text-[var(--frame-primary)]" />
                   <span>{LOADING_MESSAGES[loadingStep]}</span>
                 </div>
-                <div className="h-1 bg-[var(--iptv-input-bg)] rounded-full overflow-hidden">
+                <div className="h-1 bg-[var(--frame-input-bg)] rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-[var(--iptv-primary)] transition-all duration-300"
+                    className="h-full bg-[var(--frame-primary)] transition-all duration-300"
                     style={{ 
                       width: loadingStep === 'authenticating' ? '15%' 
                            : loadingStep === 'fetching_categories' ? '30%'
@@ -389,11 +402,11 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
                   </label>
                   <Input
                     type="text"
-                    placeholder="Evdeki IPTV, Ofis TV..."
+                    placeholder="Evdeki Yayın, Ofis TV..."
                     value={serviceName}
                     onChange={(e) => setServiceName(e.target.value)}
                     disabled={isLoading}
-                    className="bg-[var(--iptv-input-bg)] border-[var(--iptv-border)] text-white placeholder:text-gray-600 focus:border-[var(--iptv-primary)] focus-visible:ring-[var(--iptv-primary)]"
+                    className="bg-[var(--frame-input-bg)] border-[var(--frame-border)] text-white placeholder:text-gray-600 focus:border-[var(--frame-primary)] focus-visible:ring-[var(--frame-primary)]"
                   />
                 </div>
 
@@ -408,7 +421,7 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
                     onChange={(e) => setXtreamUrl(e.target.value)}
                     required
                     disabled={isLoading}
-                    className="bg-[var(--iptv-input-bg)] border-[var(--iptv-border)] text-white placeholder:text-gray-600 focus:border-[var(--iptv-primary)] focus-visible:ring-[var(--iptv-primary)]"
+                    className="bg-[var(--frame-input-bg)] border-[var(--frame-border)] text-white placeholder:text-gray-600 focus:border-[var(--frame-primary)] focus-visible:ring-[var(--frame-primary)]"
                   />
                 </div>
 
@@ -423,7 +436,7 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
                     onChange={(e) => setXtreamUsername(e.target.value)}
                     required
                     disabled={isLoading}
-                    className="bg-[var(--iptv-input-bg)] border-[var(--iptv-border)] text-white placeholder:text-gray-600 focus:border-[var(--iptv-primary)] focus-visible:ring-[var(--iptv-primary)]"
+                    className="bg-[var(--frame-input-bg)] border-[var(--frame-border)] text-white placeholder:text-gray-600 focus:border-[var(--frame-primary)] focus-visible:ring-[var(--frame-primary)]"
                   />
                 </div>
 
@@ -439,7 +452,7 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
                       onChange={(e) => setXtreamPassword(e.target.value)}
                       required
                       disabled={isLoading}
-                      className="bg-[var(--iptv-input-bg)] border-[var(--iptv-border)] text-white placeholder:text-gray-600 focus:border-[var(--iptv-primary)] focus-visible:ring-[var(--iptv-primary)] pr-12"
+                      className="bg-[var(--frame-input-bg)] border-[var(--frame-border)] text-white placeholder:text-gray-600 focus:border-[var(--frame-primary)] focus-visible:ring-[var(--frame-primary)] pr-12"
                     />
                     <button
                       type="button"
@@ -454,7 +467,7 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white font-bold text-lg py-6 rounded-xl shadow-lg shadow-[var(--iptv-primary)]/20 mt-2"
+                  className="w-full bg-[var(--frame-primary)] hover:bg-[var(--frame-primary-dark)] text-white font-bold text-lg py-6 rounded-xl shadow-lg shadow-[var(--frame-primary)]/20 mt-2"
                 >
                   {isLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -481,7 +494,7 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
                     value={m3uName}
                     onChange={(e) => setM3uName(e.target.value)}
                     disabled={isLoading}
-                    className="bg-[var(--iptv-input-bg)] border-[var(--iptv-border)] text-white placeholder:text-gray-600 focus:border-[var(--iptv-primary)] focus-visible:ring-[var(--iptv-primary)]"
+                    className="bg-[var(--frame-input-bg)] border-[var(--frame-border)] text-white placeholder:text-gray-600 focus:border-[var(--frame-primary)] focus-visible:ring-[var(--frame-primary)]"
                   />
                 </div>
 
@@ -496,14 +509,14 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
                     onChange={(e) => setM3uUrl(e.target.value)}
                     required
                     disabled={isLoading}
-                    className="bg-[var(--iptv-input-bg)] border-[var(--iptv-border)] text-white placeholder:text-gray-600 focus:border-[var(--iptv-primary)] focus-visible:ring-[var(--iptv-primary)]"
+                    className="bg-[var(--frame-input-bg)] border-[var(--frame-border)] text-white placeholder:text-gray-600 focus:border-[var(--frame-primary)] focus-visible:ring-[var(--frame-primary)]"
                   />
                 </div>
 
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-[var(--iptv-primary)] hover:bg-[var(--iptv-primary-dark)] text-white font-bold text-lg py-6 rounded-xl shadow-lg shadow-[var(--iptv-primary)]/20 mt-2"
+                  className="w-full bg-[var(--frame-primary)] hover:bg-[var(--frame-primary-dark)] text-white font-bold text-lg py-6 rounded-xl shadow-lg shadow-[var(--frame-primary)]/20 mt-2"
                 >
                   {isLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -517,24 +530,24 @@ export function LoginScreen({ onBack, editProfile }: LoginScreenProps) {
               </form>
             )}
 
-            {/* Magic Link Form */}
+            {/* Magic Code Form */}
             {activeTab === 'magic' && (
               <form onSubmit={handleMagicLogin} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium text-gray-300 ml-1">
-                    Sihirli Bağlantı (Magic Link)
+                    Magic Code
                   </label>
                   <Input
-                    type="url"
-                    placeholder="https://.../?d=..."
+                    type="text"
+                    placeholder="frame-..."
                     value={magicUrl}
                     onChange={(e) => setMagicUrl(e.target.value)}
                     required
                     disabled={isLoading}
-                    className="bg-[var(--iptv-input-bg)] border-[var(--iptv-border)] text-white placeholder:text-gray-600 focus:border-[var(--iptv-primary)] focus-visible:ring-[var(--iptv-primary)]"
+                    className="bg-[var(--frame-input-bg)] border-[var(--frame-border)] text-white placeholder:text-gray-600 focus:border-[var(--frame-primary)] focus-visible:ring-[var(--frame-primary)]"
                   />
                   <p className="text-xs text-gray-400 ml-1">
-                    Kopyaladığınız sihirli bağlantıyı buraya yapıştırıp bilgileri otomatik doldurabilirsiniz.
+                    Oluşturduğunuz Magic Code'u buraya yapıştırıp bilgileri otomatik doldurabilirsiniz.
                   </p>
                 </div>
 

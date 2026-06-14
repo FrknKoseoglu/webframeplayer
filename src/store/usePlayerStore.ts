@@ -489,7 +489,7 @@ export const usePlayerStore = create<PlayerStore>()(
       reset: () => set(initialState),
     }),
     {
-      name: 'iptv-player-storage',
+      name: 'frame-player-storage',
       storage: createJSONStorage(() => storage),
       partialize: (state) => ({
         profiles: state.profiles,
