@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { usePlayerStore, useHistory } from '@/store/usePlayerStore';
-import type { ContentItem } from '@/types/iptv';
+import type { ContentItem } from '@/types/player';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

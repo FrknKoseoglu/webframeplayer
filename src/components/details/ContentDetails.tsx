@@ -10,7 +10,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { useState } from 'react';
-import type { ContentItem } from '@/types/iptv';
+import type { ContentItem } from '@/types/player';
 
 interface ContentDetailsProps {
   content: ContentItem;

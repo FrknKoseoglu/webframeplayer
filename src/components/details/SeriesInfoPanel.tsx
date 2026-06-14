@@ -5,7 +5,7 @@ import { Star, Play, ChevronRight, Loader2, Clock, CheckCircle, Download, Copy, 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { getSeriesInfo } from '@/lib/xtream-adapter';
-import type { ContentItem, Season, Episode } from '@/types/iptv';
+import type { ContentItem, Season, Episode } from '@/types/player';
 
 interface SeriesInfoPanelProps {
   content: ContentItem;

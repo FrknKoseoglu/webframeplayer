@@ -5,7 +5,7 @@ import { Tv, Film, Video, Heart, Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { cn } from '@/lib/utils';
-import type { ContentType } from '@/types/iptv';
+import type { ContentType } from '@/types/player';
 
 interface MobileBottomNavProps {
   activeNav: string;

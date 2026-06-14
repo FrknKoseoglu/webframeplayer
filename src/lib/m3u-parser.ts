@@ -1,5 +1,5 @@
 import parser from 'iptv-playlist-parser';
-import type { ContentItem, Category } from '@/types/iptv';
+import type { ContentItem, Category } from '@/types/player';
 
 interface M3UPlaylistItem {
   name: string;

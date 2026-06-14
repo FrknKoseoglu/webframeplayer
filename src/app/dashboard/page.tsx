@@ -28,7 +28,7 @@ import { HistoryView } from '@/components/history/HistoryView';
 import { getShortEPG, convertEpgListings } from '@/lib/xtream-adapter';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MarqueeText } from '@/components/ui/MarqueeText';
-import type { ContentType, ContentItem, Category, EpgProgram, Season } from '@/types/iptv';
+import type { ContentType, ContentItem, Category, EpgProgram, Season } from '@/types/player';
 
 type NavItem = {
   id: string;

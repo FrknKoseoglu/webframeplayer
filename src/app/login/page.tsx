@@ -7,7 +7,7 @@ import { usePlayerStore } from '@/store/usePlayerStore';
 import { LoginScreen } from '@/components/auth/LoginScreen';
 import { ServiceSelector } from '@/components/auth/ServiceSelector';
 import { useProfileLoader, ProfileLoaderScreen } from '@/components/auth/ProfileLoader';
-import type { Profile } from '@/types/iptv';
+import type { Profile } from '@/types/player';
 
 function LoginPageContent() {
   const router = useRouter();

@@ -13,7 +13,7 @@ import type {
   XtreamSeriesInfo,
   Season,
   Episode,
-} from '@/types/iptv';
+} from '@/types/player';
 
 // Helper to safely decode Base64 strings (utf-8 support)
 function decodeBase64(str: string): string {

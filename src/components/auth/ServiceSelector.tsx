@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { usePlayerStore } from '@/store/usePlayerStore';
-import type { Profile } from '@/types/iptv';
+import type { Profile } from '@/types/player';
 
 interface ServiceSelectorProps {
   onAddNew: () => void;

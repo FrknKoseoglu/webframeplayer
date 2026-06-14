@@ -9,7 +9,7 @@ import {
   convertCategories, convertLiveStreams, convertVodStreams, convertSeries,
 } from '@/lib/xtream-adapter';
 import { processM3UPlaylist } from '@/lib/m3u-parser';
-import type { Profile } from '@/types/iptv';
+import type { Profile } from '@/types/player';
 
 const BOOT_MESSAGES: Record<string, string> = {
   idle: '',

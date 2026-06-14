@@ -1,7 +1,7 @@
 'use client';
 
 import { usePlayerStore, useHistory } from '@/store/usePlayerStore';
-import type { ContentItem } from '@/types/iptv';
+import type { ContentItem } from '@/types/player';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { History, Play, Trash2, Clock, Tv, Film, Video } from 'lucide-react';

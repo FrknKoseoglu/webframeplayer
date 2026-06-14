@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { getSeriesInfo } from '@/lib/xtream-adapter';
 import { ContentDetailsDialog } from '@/components/details/ContentDetailsDialog';
-import type { ContentItem, Season, Episode } from '@/types/iptv';
+import type { ContentItem, Season, Episode } from '@/types/player';
 
 interface PlayerPreviewProps {
   content: ContentItem;

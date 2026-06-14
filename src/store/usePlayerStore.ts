@@ -3,7 +3,7 @@ import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { get, set, del } from 'idb-keyval';
 import { useMemo } from 'react';
 import { fetchFullEpg } from '@/lib/xtream-adapter';
-import type { Profile, ContentItem, Category, ContentType, LoadingStep, EpgProgram, SearchIndexItem, Episode } from '@/types/iptv';
+import type { Profile, ContentItem, Category, ContentType, LoadingStep, EpgProgram, SearchIndexItem, Episode } from '@/types/player';
 import type { Language } from '@/lib/i18n';
 
 // IndexedDB Storage Adapter

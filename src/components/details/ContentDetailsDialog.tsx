@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { X, Star, Calendar, Clock, Info } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import type { ContentItem } from '@/types/iptv';
+import type { ContentItem } from '@/types/player';
 
 interface ContentDetailsDialogProps {
   content: ContentItem | null;

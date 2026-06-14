@@ -20,8 +20,8 @@ import {
   convertSeries,
 } from '@/lib/xtream-adapter';
 import { processM3UPlaylist } from '@/lib/m3u-parser';
-import type { Profile, LoadingStep } from '@/types/iptv';
-import { LOADING_MESSAGES } from '@/types/iptv';
+import type { Profile, LoadingStep } from '@/types/player';
+import { LOADING_MESSAGES } from '@/types/player';
 
 type LoginTab = 'xtream' | 'm3u' | 'magic';
 
