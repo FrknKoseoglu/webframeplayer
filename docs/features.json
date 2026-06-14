@@ -1,0 +1,13 @@
+{
+  "currentWIP": null,
+  "features": [
+    {
+      "id": "TASK-001",
+      "title": "Harness Engineering Altyapısının Kurulması",
+      "status": "completed",
+      "assignedTo": "AI Agent",
+      "updatedAt": "2026-06-14T14:27:00+03:00"
+    }
+  ],
+  "backlog": []
+}

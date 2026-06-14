@@ -1,0 +1,27 @@
+# Project Directory Map
+
+- `/` (Root Directory)
+  - `package.json`, `next.config.ts`, `tsconfig.json`, vb. yapılandırma dosyaları.
+  - `main.js`, `preload.js`: Electron ana süreç ve önyükleme (IPC) betikleri.
+  - `electron-builder-hooks.js`: Electron derleme / paketleme kancaları.
+  - `binding.gyp`: Native C++ eklentisi (MPV renderer) için derleme yapılandırması.
+  - `/bin`, `/deps`, `/build`: Native bağımlılıklar ve derleme çıktı dizinleri.
+  - `/public`: Statik varlıklar ve uygulama ikonları.
+  - `/prisma`:
+    - `schema.prisma`: Veritabanı şeması ve modeller.
+    - `seed.ts`: Veritabanı başlangıç/tohumlama verileri.
+  - `/resources`: Harici binary kaynaklar (ffmpeg vb.).
+  - `/scripts`: Özelleştirilmiş süreç script'leri.
+  - `/src`: Ana uygulama kaynak kod dizini.
+    - `/app`: Next.js App Router yapısı (Sayfalar ve API'ler).
+      - `/admin`, `/dashboard`, `/login`, `/settings`, `/setup`, vb.: Ana uygulama rotaları.
+      - `/api`: Backend REST / Next.js uç noktaları.
+    - `/components`: Özelleştirilmiş ve yeniden kullanılabilir React bileşenleri.
+      - `/ui`: Radix temelli temel kullanıcı arayüzü bileşenleri.
+      - `/player`, `/epg`, `/auth`, `/settings`, vb.: Özellik tabanlı (feature-based) modüler bileşenler.
+    - `/store`: Zustand state yönetim modülleri (örn. `usePlayerStore.ts`).
+    - `/lib`: Ortak fonksiyonlar, adaptörler ve yardımcı kütüphaneler (`auth.ts`, `db.ts`, `xtream-adapter.ts`, `m3u-parser.ts` vb.).
+    - `/main`: Electron'un ana süreciyle veya native tarafla ilgili ek TS/JS dosyaları.
+      - `/native`: C++ eklentileri veya OS tabanlı modül entegrasyonları.
+    - `/hooks`: Özel React Hook'ları.
+    - `/types`: Proje geneli TypeScript arayüz ve tip tanımlamaları.
