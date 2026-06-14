@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     const upstreamResponse = await fetch(url, {
       headers: {
-        'User-Agent': 'Yayın-Player/1.0',
+        'User-Agent': 'Yayin-Player/1.0',
         ...Object.fromEntries(headers.entries()),
       },
       // Important: Disable caching for streams to avoid memory issues

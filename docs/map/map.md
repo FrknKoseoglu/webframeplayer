@@ -12,6 +12,7 @@
     - `seed.ts`: Veritabanı başlangıç/tohumlama verileri.
   - `/resources`: Harici binary kaynaklar (ffmpeg vb.).
   - `/scripts`: Özelleştirilmiş süreç script'leri.
+  - `/__tests__`: Birim (unit) ve entegrasyon test dosyaları.
   - `/src`: Ana uygulama kaynak kod dizini.
     - `/app`: Next.js App Router yapısı (Sayfalar ve API'ler).
       - `/admin`, `/dashboard`, `/login`, `/settings`, `/setup`, vb.: Ana uygulama rotaları.

@@ -1,0 +1,3 @@
+- [x] Fix Xtream API User-Agent header character encoding error
+- [x] Fix Stream API User-Agent header character encoding error
+- [x] Verify fix by running test suite
