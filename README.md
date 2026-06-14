@@ -1,6 +1,6 @@
 # FRAME Web Player
 
-FRAME is an open-source, BYOC (Bring Your Own Content) media player built with Next.js and Electron. It allows users to play their own network media links (such as M3U/M3U8 playlists) through a modern web and desktop interface.
+FRAME is an open-source, BYOC (Bring Your Own Content) media player built with Next.js and Electron. It allows users to play their own network media links (such as M3U/M3U8 playlists) through a modern web and desktop interface. 
 
 > **Disclaimer:** FRAME is purely a client-side media player, similar to VLC Media Player or MPC-HC. It does **not** provide, host, or distribute any media content, channels, or subscriptions. Users are solely responsible for the content they choose to play using this software. The project is strictly for personal and educational use.
 
@@ -23,36 +23,30 @@ FRAME is an open-source, BYOC (Bring Your Own Content) media player built with N
 ### Installation
 
 1. Clone the repository:
-
 ```bash
-git clone https://github.com/FrknKoseoglu/webframeplayer.git
-cd webframeplayer
+git clone https://github.com/your-username/frame-web-player.git
+cd frame-web-player
 ```
 
-1. Install dependencies (this will also compile the native addon if on Windows):
-
+2. Install dependencies (this will also compile the native addon if on Windows):
 ```bash
 npm install
 ```
 
-1. Run the Next.js development server:
-
+3. Run the Next.js development server:
 ```bash
 npm run dev
 ```
-
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the web interface.
 
 ### Running as Desktop App (Electron)
 
 To run the application as a standalone desktop player with MPV support:
-
 ```bash
 npm run electron-dev
 ```
 
 To build and package the application for distribution:
-
 ```bash
 npm run electron-build
 ```

@@ -11,7 +11,11 @@
     "postinstall": "prisma generate",
     "install": "node -e \"if(process.platform === 'win32') require('child_process').execSync('node-gyp rebuild', {stdio: 'inherit'})\"",
     "electron-dev": "concurrently -k \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron-build": "npx -y cross-env ELECTRON_BUILD=true npm run build && electron-builder",
+    "electron-build": "npx -y cross-env ELECTRON_BUILD=true npm run build && electron-builder --win",
+    "electron-build-win": "npx -y cross-env ELECTRON_BUILD=true npm run build && electron-builder --win",
+    "electron-build-linux": "npx -y cross-env ELECTRON_BUILD=true npm run build && electron-builder --linux",
+    "electron-build-mac": "npx -y cross-env ELECTRON_BUILD=true npm run build && electron-builder --mac",
+    "electron-build-all": "npx -y cross-env ELECTRON_BUILD=true npm run build && electron-builder --win --mac --linux",
     "electron-pack": "electron-builder",
     "rebuild": "electron-rebuild -f"
   },
@@ -51,6 +55,23 @@
         "portable"
       ],
       "icon": "public/web-app-manifest-512x512.png"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "public/web-app-manifest-512x512.png",
+      "category": "public.app-category.video"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "tar.gz"
+      ],
+      "icon": "public/web-app-manifest-512x512.png",
+      "category": "Video"
     }
   },
   "dependencies": {
