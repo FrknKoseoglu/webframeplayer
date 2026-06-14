@@ -70,4 +70,4 @@ By using this software, you agree to the Terms of Service outlined in the applic
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the CC BY-NC 4.0 License - see the LICENSE file for details.
