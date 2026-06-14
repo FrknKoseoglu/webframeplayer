@@ -36,7 +36,7 @@ export function Footer() {
           {/* Social */}
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com"
+              href="https://github.com/FrknKoseoglu/webframeplayer"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"

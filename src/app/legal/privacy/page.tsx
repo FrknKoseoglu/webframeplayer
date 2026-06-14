@@ -29,7 +29,7 @@ export default function PrivacyPage() {
         },
         {
           title: '5. Yasal Haklarınız (KVKK & GDPR)',
-          content: 'Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Genel Veri Koruma Yönetmeliği (GDPR) kapsamında; sistemlerimizde (eğer var ise) tutulan verilerinize erişme, bu verilerin kullanım amacını öğrenme, anonimleştirilmesini veya tamamen silinmesini (Unutulma Hakkı) talep etme hakkına sahipsiniz.\n\nTalepleriniz için iletişim: oew585p6r@mozmail.com'
+          content: 'Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Genel Veri Koruma Yönetmeliği (GDPR) kapsamında; sistemlerimizde (eğer var ise) tutulan verilerinize erişme, bu verilerin kullanım amacını öğrenme, anonimleştirilmesini veya tamamen silinmesini (Unutulma Hakkı) talep etme hakkına sahipsiniz.\n\nTalepleriniz için iletişim: webframeplayer@gmail.com'
         }
       ]
     },
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
         },
         {
           title: '5. Your Legal Rights (KVKK & GDPR)',
-          content: 'Within the scope of the Personal Data Protection Law (KVKK) and the European General Data Protection Regulation (GDPR); you have the right to access your data held in our systems (if any), learn the purpose of use of this data, request its anonymization or complete deletion (Right to be Forgotten).\n\nFor your requests contact: oew585p6r@mozmail.com'
+          content: 'Within the scope of the Personal Data Protection Law (KVKK) and the European General Data Protection Regulation (GDPR); you have the right to access your data held in our systems (if any), learn the purpose of use of this data, request its anonymization or complete deletion (Right to be Forgotten).\n\nFor your requests contact: webframeplayer@gmail.com'
         }
       ]
     }
