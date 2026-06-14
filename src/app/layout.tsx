@@ -1,0 +1,124 @@
+import type { Metadata } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
+import { Toaster } from 'sonner';
+import { Suspense } from 'react';
+import { ConfirmProvider } from '@/components/ui/confirm-dialog';
+import { UpdateChecker } from '@/components/player/UpdateChecker';
+import { FontSizeSync } from '@/components/ui/FontSizeSync';
+import "./globals.css";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+export const metadata: Metadata = {
+  title: "Frame | The Ultimate Web Media Player",
+  description: "Experience your content in its purest form. Frame is a high-performance, cloud-synced web player for your m3u playlists and Xtream Codes. No clutter, just focus.",
+  keywords: "frame player, web frame, minimalist Frame Player, cloud media player, web media player, online tv player, m3u player, xtream codes login, hls player",
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
+  openGraph: {
+    title: "Frame | The Ultimate Web Media Player",
+    description: "Experience your content in its purest form. A high-performance, cloud-synced web player for your media.",
+    type: "website",
+    siteName: "Frame Player",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Frame | The Ultimate Web Media Player",
+    description: "Experience your content in its purest form. No clutter, just focus.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="tr" className="dark">
+      <head>
+        {/* Google Tag Manager */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5KWH3FZ4');`,
+          }}
+        />
+        {/* End Google Tag Manager */}
+        {/* Google Analytics */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-0G4ZT7FEY4"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+
+              // Detect if running inside Electron
+              var isElectron = typeof window !== 'undefined' && window.navigator && window.navigator.userAgent.toLowerCase().indexOf(' electron/') > -1;
+              var platform = isElectron ? 'electron' : 'web';
+              
+              // App version (set at build time or generic if unavailable)
+              var appVersion = process.env.NEXT_PUBLIC_APP_VERSION || '0.4.0';
+
+              gtag('config', 'G-0G4ZT7FEY4', {
+                'app_platform': platform,
+                'app_version': appVersion
+              });
+            `,
+          }}
+        />
+      </head>
+      <body className={`${plusJakartaSans.variable} font-sans antialiased`}>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe 
+            src="https://www.googletagmanager.com/ns.html?id=GTM-5KWH3FZ4"
+            height="0" 
+            width="0" 
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
+        {/* End Google Tag Manager (noscript) */}
+        
+        <Toaster 
+          position="top-center"
+          richColors
+          closeButton
+          theme="dark"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: 'rgba(30, 30, 40, 0.95)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+            },
+          }}
+        />
+        <ConfirmProvider>
+          <Suspense fallback={null}>
+            <UpdateChecker />
+            <FontSizeSync />
+          </Suspense>
+          {children}
+        </ConfirmProvider>
+      </body>
+    </html>
+  );
+}

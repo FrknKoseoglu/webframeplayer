@@ -1,0 +1,76 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+#AI
+.agents/skills/*
+!.agents/skills/jira-pm/
+.kilo/
+.worktree/
+.config/
+.pi/
+.claude/
+.continue/
+.cursor/
+.aider/
+
+# Reports
+verification_report.md
+
+# Test
+.playwright/
+artifacts/
+
+# IDE
+.vscode/
+
+# electron-builder
+/dist
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+/src/generated/prisma
+
+# native libraries exceeding 100mb
+deps/mpv/lib/libmpv-2.dll
+libmpv-2.dll
+*.dll
+
+# Logs
+.logs
